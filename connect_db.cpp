@@ -27,7 +27,6 @@ QSqlQuery Connect_db::runQuery(QString str){
     retval = query.exec(str);
     if (query.isActive() == false)
     {
-
        qDebug() << query.lastError().databaseText();
     }
 }

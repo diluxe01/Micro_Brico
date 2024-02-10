@@ -11,8 +11,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     this->ui->getUsers->setEnabled(true);
-    //Test the connection between signals and slots
-    //mgmt = Management::Management();
 }
 
 MainWindow::~MainWindow()
@@ -78,7 +76,12 @@ void MainWindow::on_popupLogin_destroyed()
 void MainWindow::on_popupLogin_ok()
 {
     qDebug() << "OK popup! ;)";
-    g_connect_db.is_user_identified(&this->login_user);
+    if (g_connect_db.is_user_identified(&this->login_user))
+    {
+        this->ui->tabWidget->setEnabled(true);
+        this->ui->TAB_ges_user->setEnabled(true);
+        this->ui->TAB_ges_resa->setEnabled(true);
+    }
     delete (this->p_loginConnect);
 }
 

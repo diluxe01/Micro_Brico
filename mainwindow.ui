@@ -35,14 +35,17 @@
       </property>
       <widget class="QWidget" name="TAB_ges_user">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <attribute name="title">
         <string>Gestion Utilisateurs</string>
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QFrame" name="frame">
+         <widget class="QFrame" name="framedisplayUtilisateur">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
           </property>
@@ -85,7 +88,10 @@
          </widget>
         </item>
         <item>
-         <widget class="QFrame" name="frame_2">
+         <widget class="QFrame" name="framegestionUtilisateur">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
           </property>
@@ -123,6 +129,9 @@
        </layout>
       </widget>
       <widget class="QWidget" name="TAB_ges_resa">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <attribute name="title">
         <string>Tab 2</string>
        </attribute>
