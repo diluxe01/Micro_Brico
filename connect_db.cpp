@@ -26,31 +26,49 @@ QSqlQuery Connect_db::runQuery(QString str){
 
 
 void Connect_db::add_user (Utilisateur *user)  {
-    QSqlQuery query =  Connect_db::runQuery("insert into utilisateur (nom, mdp) values('"+user->getName()+"','"+user->getMdp()+"')");
+    QSqlQuery query =  Connect_db::runQuery("insert into utilisateur "
+                                           "( nom, mdp, prenom, email, token, utinfo)"
+                                           " values('"+user->getNom()+"','"+user->getMdp()+"',"+user->getPrenom()+"',"+user->getEmail()+"',"+user->getToken()+"',"+user->getUtinfo()+"', )");
     while (query.next())
     {
         qDebug() << query.value(0).toString();
     }
 }
 
+bool Connect_db::is_user_identified(Utilisateur *login_user)
+{
+    QSqlQuery query("SELECT mdp from utilisateur where email ="+login_user->getEmail(), this->db);
+    QString mdp_db = "";
+    while (query.next())
+    {
+        mdp_db = query.value("mdp").toString();
+    }
+    if (mdp_db == login_user->getMdp())
+    {
+
+        qDebug() << "User is identified";
+    }
+    else
+    {
+        qDebug() << "Utilisateur non identifié. Mauvais mdp ou email.";
+    }
+}
+
 void  Connect_db::select_all_users (std::list<Utilisateur*> *list)  {
 
     QSqlDatabase dbtest = QSqlDatabase::database();
-
-    QSqlQuery query1("SELECT database()", this->db);
-    while (query1.next())
-    {
-        qDebug() << query1.value(0).toString();
-    }
-    QSqlQuery query2("SELECT id, nom, mdp from utilisateur", this->db);
-
+    QSqlQuery query2("SELECT id, nom, mdp, prenom, email, utinfo from utilisateur", this->db);
     while (query2.next())
     {
         QString nom = query2.value("nom").toString();
         QString mdp = query2.value("mdp").toString();
+        QString prenom = query2.value("prenom").toString();
+        QString email = query2.value("email").toString();
+        QString utinfo = query2.value("utinfo").toString();
         int id = query2.value("id").toInt();
 
-        Utilisateur * u = new Utilisateur(nom, id, mdp);
+        Utilisateur * u = new Utilisateur(nom, mdp,prenom, email, utinfo );
+        u->setId(id);
         list->push_back(u);
     }
 

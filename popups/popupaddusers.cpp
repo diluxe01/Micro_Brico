@@ -39,15 +39,12 @@ void popupAddUsers::deleteInstance(void)
 
 void popupAddUsers::on_buttonBox_clicked(QAbstractButton *button)
 {
-    QString nom = ui->lineEdit_Nom->text();
-    QString prenom = ui->lineEdit_Prenom->text();
-    QString mdp = ui->lineEdit_mdp->text();
-    QString confirm_mdp = ui->lineEdit_confirme_mdp->text();
-    QString utinfo = ui->lineEditUserName->text();
-    QString mail = ui->lineEditMail->text();
-
-
-    this->user->setUserData(ui->lineEditUserName->text(),0, ui->lineEdit_mdp->text() );
+    this->user->setUserData(ui->lineEdit_Nom->text(),
+                            ui->lineEdit_mdp->text(),
+                            ui->lineEdit_Prenom->text(),
+                            ui->lineEditMail->text(),
+                            ui->lineEdit_utinfo->text()
+                            );
 }
 
 void popupAddUsers::setUser(Utilisateur * p_user)

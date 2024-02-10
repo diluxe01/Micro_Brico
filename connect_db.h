@@ -17,6 +17,7 @@ public:
     Connect_db();
     void select_all_users(std::list<Utilisateur*> *list);
     void add_user (Utilisateur *user);
+    bool is_user_identified(Utilisateur *login_user);
 };
 
 #endif // CONNECT_DB_H

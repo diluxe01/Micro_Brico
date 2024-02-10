@@ -22,8 +22,6 @@ set(PROJECT_SOURCES
         datamodel.h
         utilisateur.cpp
         utilisateur.h
-        management.cpp
-        management.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -35,10 +33,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         connect_db.h connect_db.cpp
         datamodel.cpp
         utilisateur.h utilisateur.cpp
-        management.h management.cpp
+
 
         popups/popupaddusers.h popups/popupaddusers.cpp popups/popupaddusers.ui
-        management.h management.cpp
         popups/login_connect.h popups/login_connect.cpp popups/login_connect.ui
 
 

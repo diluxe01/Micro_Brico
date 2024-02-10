@@ -1,4 +1,3 @@
-#include "management.h"
 #include "qdebug.h"
 
 Management::Management(QObject *parent)

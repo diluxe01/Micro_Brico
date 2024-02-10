@@ -1,27 +1,36 @@
 #include "utilisateur.h"
 #include <qstring.h>
 
-Utilisateur::Utilisateur(QString name, int id, QString mdp ) {
-    this->name = name;
-    this->mdp = mdp;
-    this->id = id;
-}
 
 Utilisateur::Utilisateur(void ) {
-    this->name = "foo";
+    this->nom = "nom";
     this->mdp = "mdp";
-    this->id = 0;
+    this->prenom = "prenom";
+    this->email = "email";
+    this->token = "token";
+    this->utinfo = "utinfo";
 }
-void Utilisateur::setUserData(QString name,int id,QString mdp)
+Utilisateur::Utilisateur( QString nom, QString mdp, QString prenom, QString email, QString utinfo)
 {
-    this->name = name;
-    this->id = id;
+    this->nom = nom;
     this->mdp = mdp;
+    this->prenom = prenom;
+    this->email = email;
+    this->utinfo = utinfo;
 }
 
-QString Utilisateur::getName(void)
+void Utilisateur::setUserData( QString nom, QString mdp, QString prenom, QString email, QString utinfo)
 {
-    return this->name;
+    this->nom = nom;
+    this->mdp = mdp;
+    this->prenom = prenom;
+    this->email = email;
+    this->utinfo = utinfo;
+}
+
+QString Utilisateur::getNom(void)
+{
+    return this->nom;
 }
 
 QString Utilisateur::getMdp(void)
@@ -29,8 +38,49 @@ QString Utilisateur::getMdp(void)
     return this->mdp;
 }
 
+QString Utilisateur::getPrenom() const
+{
+    return prenom;
+}
+
+QString Utilisateur::getEmail() const
+{
+    return email;
+}
+
+QString Utilisateur::getToken() const
+{
+    return token;
+}
+
+QString Utilisateur::getUtinfo() const
+{
+    return utinfo;
+}
+
+void Utilisateur::setId(int newId)
+{
+    id = newId;
+}
+
+void Utilisateur::setMdp(const QString &newMdp)
+{
+    mdp = newMdp;
+}
+
+void Utilisateur::setEmail(const QString &newEmail)
+{
+    email = newEmail;
+}
+
 QString Utilisateur::ToString() {
 
-    QString ret = "name: " + this->name + " mdp:  " + this->mdp + " id: " + QString::number(this->id);
+    QString ret = " nom: " + this->nom +
+                  " mdp: " + this->mdp +
+                  " id: " + QString::number(this->id) +
+                  " prenom: " + this->prenom +
+                  " email: " + this->email +
+                  " utinfo: " + this->utinfo
+                    ;
     return ret;
 }

@@ -31,6 +31,16 @@ void MainWindow::test_slot_called()
     qDebug() << "Hey there! ;)";
 }
 
+void MainWindow::add_user_to_DB(void)
+{
+    g_connect_db.add_user(&this->new_user);
+
+    qDebug() << "MGMT: AddUser to DB;)";
+}
+
+//---------------------------------------------------------
+// vvvvvv POPUP ADD USER SECTION vvvvvv
+
 void MainWindow::on_popupaddUser_destroyed()
 {
     qDebug() << "destroyed popup! ;)";
@@ -40,20 +50,50 @@ void MainWindow::on_popupaddUser_destroyed()
 void MainWindow::on_popupaddUser_ok()
 {
     qDebug() << "OK popup! ;)";
-    this->mgmt.addUserToDB();
+    this->add_user_to_DB();
     this->p_popupAddUser->deleteInstance();
 }
 
-void MainWindow::on_addUser_clicked()
+
+void MainWindow::on_actionNouvel_Utilisateur_triggered()
 {
     this->p_popupAddUser = popupAddUsers::GetInstance();
-    this->p_popupAddUser->setUser(this->mgmt.getNewUserRef());
+    this->p_popupAddUser->setUser(&(this->new_user));
     this->p_popupAddUser->show();
     QObject::connect(this->p_popupAddUser->getOkButton(), &QDialogButtonBox::accepted, this, &MainWindow::on_popupaddUser_ok);
     QObject::connect(this->p_popupAddUser->getOkButton(), &QDialogButtonBox::rejected, this, &MainWindow::on_popupaddUser_destroyed);
-
 }
 
+// ^^^^^^ POPUP ADD USER SECTION ^^^^^^
+//---------------------------------------------------------
+// vvvvvv POPUP LOGIN SECTION vvvvvv
+
+
+void MainWindow::on_popupLogin_destroyed()
+{
+    qDebug() << "destroyed popup! ;)";
+    delete (this->p_loginConnect);
+}
+
+void MainWindow::on_popupLogin_ok()
+{
+    qDebug() << "OK popup! ;)";
+    g_connect_db.is_user_identified(&this->login_user);
+    delete (this->p_loginConnect);
+}
+
+void MainWindow::on_actionSe_connecter_triggered()
+{
+    this->p_loginConnect = new (Login_connect);
+    this->p_loginConnect->setUser(&this->login_user);
+    this->p_loginConnect->show();
+    QObject::connect(this->p_loginConnect->getOkButton(), &QDialogButtonBox::accepted, this, &MainWindow::on_popupLogin_ok);
+    QObject::connect(this->p_loginConnect->getOkButton(), &QDialogButtonBox::rejected, this, &MainWindow::on_popupLogin_destroyed);
+}
+
+// ^^^^^^ POPUP LOGIN SECTION ^^^^^^
+//---------------------------------------------------------
+// vvvvvv MAIN WINDOW "Gestion Utilisateur" SECTION vvvvvv
 void MainWindow::clearUserList(void)
 {
     for(const auto& elem : this->userList)
@@ -80,6 +120,18 @@ void MainWindow::on_getUsers_clicked()
     MainWindow::refreshScrollArea();
 }
 
+void MainWindow::on_addUser_clicked()
+{
+    this->p_popupAddUser = popupAddUsers::GetInstance();
+    this->p_popupAddUser->setUser(&(this->new_user));
+    this->p_popupAddUser->show();
+    QObject::connect(this->p_popupAddUser->getOkButton(), &QDialogButtonBox::accepted, this, &MainWindow::on_popupaddUser_ok);
+    QObject::connect(this->p_popupAddUser->getOkButton(), &QDialogButtonBox::rejected, this, &MainWindow::on_popupaddUser_destroyed);
+
+}
+// ^^^^^^ MAIN WINDOW "Gestion Utilisateur" ^^^^^^
+//---------------------------------------------------------
+
 void MainWindow::refreshScrollArea(void)
 {
     this->ui->listWidget->clear();
@@ -87,21 +139,5 @@ void MainWindow::refreshScrollArea(void)
     {
         new QListWidgetItem(toto->ToString(), this->ui->listWidget);
     }
-}
-
-void MainWindow::on_actionNouvel_Utilisateur_triggered()
-{
-    this->p_popupAddUser = popupAddUsers::GetInstance();
-    this->p_popupAddUser->setUser(this->mgmt.getNewUserRef());
-    this->p_popupAddUser->show();
-    QObject::connect(this->p_popupAddUser->getOkButton(), &QDialogButtonBox::accepted, this, &MainWindow::on_popupaddUser_ok);
-    QObject::connect(this->p_popupAddUser->getOkButton(), &QDialogButtonBox::rejected, this, &MainWindow::on_popupaddUser_destroyed);
-}
-
-
-void MainWindow::on_actionSe_connecter_triggered()
-{
-    this->p_loginConnect = new (Login_connect);
-    this->p_loginConnect->show();
 }
 
