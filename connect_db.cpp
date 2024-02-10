@@ -3,6 +3,8 @@
 #include <qstring.h>
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QCryptographicHash>
+#include <QSqlError>
 
 
 Connect_db::Connect_db() {
@@ -19,38 +21,64 @@ Connect_db::Connect_db() {
     }
 
 QSqlQuery Connect_db::runQuery(QString str){
+    bool retval= false;
     qDebug() << str;
-    QSqlQuery query(str, this->db);
-    return query;
+    QSqlQuery query(this->db);
+    retval = query.exec(str);
+    if (query.isActive() == false)
+    {
+
+       qDebug() << query.lastError().databaseText();
+    }
 }
 
 
 void Connect_db::add_user (Utilisateur *user)  {
     QSqlQuery query =  Connect_db::runQuery("insert into utilisateur "
                                            "( nom, mdp, prenom, email, token, utinfo)"
-                                           " values('"+user->getNom()+"','"+user->getMdp()+"',"+user->getPrenom()+"',"+user->getEmail()+"',"+user->getToken()+"',"+user->getUtinfo()+"', )");
+                                           " values('"+user->getNom()+"','"+user->getMdp()+"','"+user->getPrenom()+"','"+user->getEmail()+"','"+user->getToken()+"','"+user->getUtinfo()+"')");
     while (query.next())
     {
         qDebug() << query.value(0).toString();
     }
 }
 
+QString Connect_db::get_sha1_from_Qstring(QString mdp)
+{
+    QString mdp_sha1 = "";
+    QCryptographicHash * hash = new QCryptographicHash(QCryptographicHash::Sha1);
+    hash->addData(mdp.toStdString());
+    QByteArray hashTs = hash->result().toHex();
+    mdp_sha1 = QString(hashTs);
+    return mdp_sha1;
+}
+
 bool Connect_db::is_user_identified(Utilisateur *login_user)
 {
-    QSqlQuery query("SELECT mdp from utilisateur where email ="+login_user->getEmail(), this->db);
+    QString query_string =  "SELECT mdp from utilisateur where email ='"+login_user->getEmail()+"'";
+    QSqlQuery query(query_string, this->db);
     QString mdp_db = "";
-    while (query.next())
-    {
-        mdp_db = query.value("mdp").toString();
-    }
-    if (mdp_db == login_user->getMdp())
-    {
+    QString mdp_user_sha1 = "";
 
+    query.next();
+    mdp_db = query.value("mdp").toString();
+    qDebug() <<  query_string;
+    qDebug() <<  "MDP from DB is: "<<mdp_db;
+
+    //Convert user mdp to sha1
+    mdp_user_sha1 = get_sha1_from_Qstring(login_user->getMdp());
+
+    qDebug() <<  "MDP from USER is: "<<mdp_user_sha1;
+
+    if (mdp_db == mdp_user_sha1)
+    {
         qDebug() << "User is identified";
+        return true;
     }
     else
     {
         qDebug() << "Utilisateur non identifié. Mauvais mdp ou email.";
+        return false;
     }
 }
 

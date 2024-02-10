@@ -1,5 +1,7 @@
 #include "popupaddusers.h"
 #include "ui_popupaddusers.h"
+#include "../connect_db.h"
+#include "../datamodel.h"
 
 popupAddUsers::popupAddUsers(QWidget *parent)
     : QDialog(parent)
@@ -45,6 +47,8 @@ void popupAddUsers::on_buttonBox_clicked(QAbstractButton *button)
                             ui->lineEditMail->text(),
                             ui->lineEdit_utinfo->text()
                             );
+    //Convert mdp to sha1
+    this->user->setMdp(g_connect_db.get_sha1_from_Qstring(ui->lineEdit_mdp->text()));
 }
 
 void popupAddUsers::setUser(Utilisateur * p_user)

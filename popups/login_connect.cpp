@@ -31,3 +31,9 @@ void Login_connect::on_buttonBox_clicked(QAbstractButton *button)
 
 }
 
+
+void Login_connect::on_buttonBox_accepted()
+{
+
+}
+
