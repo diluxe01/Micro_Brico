@@ -144,3 +144,32 @@ void MainWindow::refreshScrollArea(void)
     }
 }
 
+//---------------------------------------------------------
+// vvvvvv POPUP DELETE_USER SECTION vvvvvv
+
+void MainWindow::on_deleteUser_clicked()
+{
+    this->p_popupDeleteUser = new (Delete_user);
+    this->p_popupDeleteUser->show();
+    QObject::connect(this->p_popupDeleteUser->getOkButton(), &QDialogButtonBox::accepted, this, &MainWindow::on_popupDelete_ok);
+    QObject::connect(this->p_popupDeleteUser->getOkButton(), &QDialogButtonBox::rejected, this, &MainWindow::on_popupDelete_destroyed);
+}
+
+
+void MainWindow::on_popupDelete_destroyed()
+{
+    delete (this->p_popupDeleteUser);
+}
+
+void MainWindow::on_popupDelete_ok()
+{
+    Utilisateur tmp_user;
+    tmp_user.setEmail(this->p_popupDeleteUser->getMail());
+    tmp_user.setUtinfo(this->p_popupDeleteUser->getUtinfo());
+    g_connect_db.delete_user(&tmp_user);
+
+    delete (this->p_popupDeleteUser);
+}
+// ^^^^^^ POPUP DELETE_USER SECTION ^^^^^^
+//---------------------------------------------------------
+

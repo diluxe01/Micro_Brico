@@ -10,13 +10,14 @@
 class Connect_db
 {
 private:
-    QSqlQuery runQuery(QString);
+    bool runQuery(QString);
 public:
 
     QSqlDatabase db;
     Connect_db();
     void select_all_users(std::list<Utilisateur*> *list);
-    void add_user (Utilisateur *user);
+    bool add_user (Utilisateur *user);
+    bool delete_user(Utilisateur *user_to_delete);
     bool is_user_identified(Utilisateur *login_user);
     QString get_sha1_from_Qstring(QString mdp);
 };

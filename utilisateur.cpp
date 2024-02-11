@@ -73,6 +73,11 @@ void Utilisateur::setEmail(const QString &newEmail)
     email = newEmail;
 }
 
+void Utilisateur::setUtinfo(const QString &newUtinfo)
+{
+    utinfo = newUtinfo;
+}
+
 QString Utilisateur::ToString() {
 
     QString ret = " nom: " + this->nom +

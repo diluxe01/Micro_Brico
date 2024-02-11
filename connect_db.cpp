@@ -20,25 +20,35 @@ Connect_db::Connect_db() {
 
     }
 
-QSqlQuery Connect_db::runQuery(QString str){
-    bool retval= false;
+bool Connect_db::runQuery(QString str){
+    bool retval= true;
     qDebug() << str;
     QSqlQuery query(this->db);
     retval = query.exec(str);
     if (query.isActive() == false)
     {
        qDebug() << query.lastError().databaseText();
+        retval = false;
     }
+    return retval;
 }
 
 
-void Connect_db::add_user (Utilisateur *user)  {
-    QSqlQuery query =  Connect_db::runQuery("insert into utilisateur "
+bool Connect_db::add_user (Utilisateur *user)  {
+    return Connect_db::runQuery("insert into utilisateur "
                                            "( nom, mdp, prenom, email, token, utinfo)"
                                            " values('"+user->getNom()+"','"+user->getMdp()+"','"+user->getPrenom()+"','"+user->getEmail()+"','"+user->getToken()+"','"+user->getUtinfo()+"')");
-    while (query.next())
+}
+
+bool Connect_db::delete_user(Utilisateur *user_to_delete)
+{
+    if (user_to_delete->getEmail()!= "")
     {
-        qDebug() << query.value(0).toString();
+        return Connect_db::runQuery("delete from Utilisateur where email = '"+user_to_delete->getEmail()+"'");
+    }
+    else if (user_to_delete->getUtinfo()!= "")
+    {
+        return Connect_db::runQuery("delete from Utilisateur where utinfo = '"+user_to_delete->getUtinfo()+"'");
     }
 }
 

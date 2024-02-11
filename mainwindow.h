@@ -5,6 +5,7 @@
 
 #include "./popups/popupaddusers.h"
 #include "./popups/login_connect.h"
+#include "./popups/delete_user.h"
 #include <list>
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -33,6 +34,8 @@ private slots:
 
     void on_actionSe_connecter_triggered();
 
+    void on_deleteUser_clicked();
+
 private:
     Ui::MainWindow *ui;
     std::list<Utilisateur*> userList;
@@ -40,11 +43,15 @@ private:
     Utilisateur login_user;
     popupAddUsers *p_popupAddUser;
     Login_connect *p_loginConnect;
+    Delete_user *p_popupDeleteUser;
     void add_user_to_DB(void);
     void clearUserList(void);
     void refreshScrollArea(void);
 
     void on_popupLogin_destroyed();
     void on_popupLogin_ok();
+    void on_popupDelete_ok();
+    void on_popupDelete_destroyed();
+
 };
 #endif // MAINWINDOW_H

@@ -22,6 +22,8 @@ public:
     void setMdp(const QString &newMdp);
     void setEmail(const QString &newEmail);
 
+    void setUtinfo(const QString &newUtinfo);
+
 private:
     int id;
     QString nom;
