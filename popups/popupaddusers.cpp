@@ -51,6 +51,24 @@ void popupAddUsers::on_buttonBox_clicked(QAbstractButton *button)
     this->user->setMdp(g_connect_db.get_sha1_from_Qstring(ui->lineEdit_mdp->text()));
 }
 
+void popupAddUsers::setCaller_privilege(T_user_privilege newCaller_privilege)
+{
+    caller_privilege = newCaller_privilege;
+}
+
+void popupAddUsers::show_wrapper()
+{
+    if (this->caller_privilege == E_admin)
+    {
+        this->ui->comboBox_privilege->setEnabled(true);
+    }
+    else
+    {
+        this->ui->comboBox_privilege->setEnabled(false);
+    }
+    this->show();
+}
+
 void popupAddUsers::setUser(Utilisateur * p_user)
 {
     this->user = p_user;

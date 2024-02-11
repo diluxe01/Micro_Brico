@@ -27,7 +27,8 @@ public:
 
     void setUser(Utilisateur * p_user);
     QDialogButtonBox* getOkButton(void);
-
+    void setCaller_privilege(T_user_privilege newCaller_privilege);
+    void show_wrapper(void);
 
 private slots:
     void on_buttonBox_clicked(QAbstractButton *button);
@@ -35,6 +36,8 @@ private slots:
 private:
     Ui::popupAddUsers *ui;
     Utilisateur *user;
+    T_user_privilege caller_privilege;
+
 
 };
 

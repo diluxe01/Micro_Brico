@@ -57,7 +57,21 @@ void MainWindow::on_actionNouvel_Utilisateur_triggered()
 {
     this->p_popupAddUser = popupAddUsers::GetInstance();
     this->p_popupAddUser->setUser(&(this->new_user));
-    this->p_popupAddUser->show();
+    // check if a user is connected when creating a new account, and if so, get its privilege
+    if (this->login_user.getIs_logged_on())
+    {
+        this->p_popupAddUser->setCaller_privilege(this->login_user.getPrivilege());
+
+        if (this->login_user.getPrivilege() == E_admin){
+            qDebug() << "ADMIN";
+        }
+        else
+        {
+            qDebug() << "BASIC";
+        }
+
+    }
+    this->p_popupAddUser->show_wrapper();
     QObject::connect(this->p_popupAddUser->getOkButton(), &QDialogButtonBox::accepted, this, &MainWindow::on_popupaddUser_ok);
     QObject::connect(this->p_popupAddUser->getOkButton(), &QDialogButtonBox::rejected, this, &MainWindow::on_popupaddUser_destroyed);
 }
@@ -81,6 +95,11 @@ void MainWindow::on_popupLogin_ok()
         this->ui->tabWidget->setEnabled(true);
         this->ui->TAB_ges_user->setEnabled(true);
         this->ui->TAB_ges_resa->setEnabled(true);
+        this->login_user.setIs_logged_on(true);
+    }
+    else
+    {
+        this->login_user.setIs_logged_on(false);
     }
     delete (this->p_loginConnect);
 }
@@ -123,15 +142,11 @@ void MainWindow::on_getUsers_clicked()
     MainWindow::refreshScrollArea();
 }
 
-void MainWindow::on_addUser_clicked()
+void MainWindow::activateWidgets(bool)
 {
-    this->p_popupAddUser = popupAddUsers::GetInstance();
-    this->p_popupAddUser->setUser(&(this->new_user));
-    this->p_popupAddUser->show();
-    QObject::connect(this->p_popupAddUser->getOkButton(), &QDialogButtonBox::accepted, this, &MainWindow::on_popupaddUser_ok);
-    QObject::connect(this->p_popupAddUser->getOkButton(), &QDialogButtonBox::rejected, this, &MainWindow::on_popupaddUser_destroyed);
 
 }
+
 // ^^^^^^ MAIN WINDOW "Gestion Utilisateur" ^^^^^^
 //---------------------------------------------------------
 
@@ -143,6 +158,7 @@ void MainWindow::refreshScrollArea(void)
         new QListWidgetItem(toto->ToString(), this->ui->listWidget);
     }
 }
+
 
 //---------------------------------------------------------
 // vvvvvv POPUP DELETE_USER SECTION vvvvvv

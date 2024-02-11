@@ -3,6 +3,12 @@
 #include <qstring.h>
 using namespace std;
 
+enum T_user_privilege
+{
+    E_admin,
+    E_basic
+};
+
 class Utilisateur
 {
 public:
@@ -24,6 +30,17 @@ public:
 
     void setUtinfo(const QString &newUtinfo);
 
+    T_user_privilege getPrivilege() const;
+
+    void setPrivilege(const T_user_privilege &newPrivilege);
+
+    bool getIs_logged_on() const;
+    void setIs_logged_on(bool newIs_logged_on);
+
+    void setPrenom(const QString &newPrenom);
+
+    void setNom(const QString &newNom);
+
 private:
     int id;
     QString nom;
@@ -32,6 +49,8 @@ private:
     QString email;
     QString token;
     QString utinfo;
+    T_user_privilege privilege;
+    bool is_logged_on;
 };
 
 #endif // UTILISATEUR_H

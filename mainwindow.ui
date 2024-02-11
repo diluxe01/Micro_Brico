@@ -100,13 +100,6 @@
                </property>
               </widget>
              </item>
-             <item>
-              <widget class="QPushButton" name="addUser">
-               <property name="text">
-                <string>Ajouter Nouvel utilisateur</string>
-               </property>
-              </widget>
-             </item>
             </layout>
            </item>
            <item>
@@ -178,11 +171,6 @@
      <height>22</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuGestion_Utilisateurs">
-    <property name="title">
-     <string>Gestion Utilisateurs</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuLogin">
     <property name="title">
      <string>Login</string>
@@ -192,7 +180,6 @@
     <addaction name="actionSe_connecter"/>
    </widget>
    <addaction name="menuLogin"/>
-   <addaction name="menuGestion_Utilisateurs"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionNouvel_Utilisateur">

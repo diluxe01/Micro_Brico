@@ -9,6 +9,7 @@ Utilisateur::Utilisateur(void ) {
     this->email = "email";
     this->token = "token";
     this->utinfo = "utinfo";
+    this->is_logged_on = false;
 }
 Utilisateur::Utilisateur( QString nom, QString mdp, QString prenom, QString email, QString utinfo)
 {
@@ -17,6 +18,7 @@ Utilisateur::Utilisateur( QString nom, QString mdp, QString prenom, QString emai
     this->prenom = prenom;
     this->email = email;
     this->utinfo = utinfo;
+    this->is_logged_on = false;
 }
 
 void Utilisateur::setUserData( QString nom, QString mdp, QString prenom, QString email, QString utinfo)
@@ -76,6 +78,36 @@ void Utilisateur::setEmail(const QString &newEmail)
 void Utilisateur::setUtinfo(const QString &newUtinfo)
 {
     utinfo = newUtinfo;
+}
+
+T_user_privilege Utilisateur::getPrivilege() const
+{
+    return privilege;
+}
+
+void Utilisateur::setPrivilege(const T_user_privilege &newPrivilege)
+{
+    privilege = newPrivilege;
+}
+
+bool Utilisateur::getIs_logged_on() const
+{
+    return is_logged_on;
+}
+
+void Utilisateur::setIs_logged_on(bool newIs_logged_on)
+{
+    is_logged_on = newIs_logged_on;
+}
+
+void Utilisateur::setPrenom(const QString &newPrenom)
+{
+    prenom = newPrenom;
+}
+
+void Utilisateur::setNom(const QString &newNom)
+{
+    nom = newNom;
 }
 
 QString Utilisateur::ToString() {

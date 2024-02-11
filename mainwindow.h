@@ -25,7 +25,6 @@ private slots:
     void test_slot_called();
 
     /*Add user popup slots */
-    void on_addUser_clicked();
     void on_popupaddUser_destroyed();
     void on_popupaddUser_ok();
     void on_getUsers_clicked();
@@ -47,6 +46,8 @@ private:
     void add_user_to_DB(void);
     void clearUserList(void);
     void refreshScrollArea(void);
+
+    void activateWidgets(bool);
 
     void on_popupLogin_destroyed();
     void on_popupLogin_ok();

@@ -10,7 +10,7 @@
 class Connect_db
 {
 private:
-    bool runQuery(QString);
+    void update_user_infos_from_db(Utilisateur *login_user);
 public:
 
     QSqlDatabase db;
