@@ -4,6 +4,7 @@
 #include "datamodel.h"
 #include <QDialogButtonBox>
 #include <QListWidgetItem>
+#include <QTimer>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -11,6 +12,9 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     this->ui->getUsers->setEnabled(true);
+    update_connection_status(false);
+
+    connect(&g_connect_db, &Connect_db::log_value_changed, this, &MainWindow::update_connection_status);
 }
 
 MainWindow::~MainWindow()
@@ -18,16 +22,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-/*
-void MainWindow::activate_privilege()
-{
-
-}
-*/
-void MainWindow::test_slot_called()
-{
-    qDebug() << "Hey there! ;)";
-}
 
 void MainWindow::add_user_to_DB(void)
 {
@@ -90,20 +84,13 @@ void MainWindow::on_popupLogin_destroyed()
 void MainWindow::on_popupLogin_ok()
 {
     qDebug() << "OK popup! ;)";
-    if (g_connect_db.is_user_identified(&this->login_user))
+    if (g_connect_db.connect_user(&this->login_user))
     {
-        this->ui->tabWidget->setEnabled(true);
-        this->ui->TAB_ges_user->setEnabled(true);
-        this->ui->TAB_ges_resa->setEnabled(true);
-        this->login_user.setIs_logged_on(true);
         this->login_user.setToken(g_connect_db.get_unique_token());
-
-        qDebug() << "token: " << this->login_user.getToken();
         g_connect_db.update_user_token_on_db(&this->login_user);
     }
     else
     {
-        this->login_user.setIs_logged_on(false);
     }
     delete (this->p_loginConnect);
 }
@@ -134,7 +121,7 @@ void MainWindow::on_getUsers_clicked()
     /* refresh the user list by cleaning and loading it again */
     this->clearUserList();
 
-    g_connect_db.select_all_users(&this->userList);
+    g_connect_db.select_all_users(&this->login_user, &this->userList);
 
     qDebug() << "Iterate: ";
 
@@ -188,3 +175,18 @@ void MainWindow::on_popupDelete_ok()
 // ^^^^^^ POPUP DELETE_USER SECTION ^^^^^^
 //---------------------------------------------------------
 
+
+//---------------------------------------------------------
+// vvvvvv SLOTS SECTION vvvvvv
+void MainWindow::update_connection_status(bool new_log_status)
+{
+    qDebug() << "update_connection_status: ";
+    this->login_user.setIs_logged_on(new_log_status);
+    qDebug() << "new_log_status "<< new_log_status;
+    this->ui->tabWidget->setEnabled(new_log_status);
+    this->ui->TAB_ges_user->setEnabled(new_log_status);
+    this->ui->TAB_ges_resa->setEnabled(new_log_status);
+    this->login_user.setIs_logged_on(new_log_status);
+}
+// ^^^^^^ SLOTS SECTION ^^^^^^
+//---------------------------------------------------------

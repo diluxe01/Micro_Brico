@@ -21,9 +21,10 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-private slots:
-    void test_slot_called();
+public slots:
+    void update_connection_status(bool new_log_status);
 
+private slots:
     /*Add user popup slots */
     void on_popupaddUser_destroyed();
     void on_popupaddUser_ok();
@@ -34,6 +35,7 @@ private slots:
     void on_actionSe_connecter_triggered();
 
     void on_deleteUser_clicked();
+
 
 private:
     Ui::MainWindow *ui;

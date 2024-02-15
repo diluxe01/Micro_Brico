@@ -64,11 +64,32 @@ QString Connect_db::get_unique_token(void)
 void Connect_db::update_user_token_on_db(Utilisateur *login_user)
 {
     QString query_string =  "update utilisateur set token ='"+login_user->getToken()+"'where email ='"+login_user->getEmail()+"'";
-    QSqlQuery query(query_string, this->db);
+    QSqlQuery query(this->db);
     query.exec(query_string);
 }
 
-bool Connect_db::is_user_identified(Utilisateur *login_user)
+bool Connect_db::is_user_connected(Utilisateur *login_user)
+{
+    // This function checks if the user given as a parameter is still connected, by comparing its token with the token on the server
+    // If not, this functions sets the parameter is_logged_on to False
+    QString token_db;
+    QString query_string =  "SELECT token from utilisateur where email ='"+login_user->getEmail()+"'";
+    QSqlQuery query(this->db);
+    query.exec(query_string);
+    query.first();
+    token_db = query.value("token").toString();
+
+    if (token_db != login_user->getToken())
+    {
+        qDebug() <<  "token_db: "<<token_db;
+        qDebug() <<  "login_user->getToken(): "<<login_user->getToken();
+        emit log_value_changed(false);
+        return false;
+    }
+    return true;
+}
+
+bool Connect_db::connect_user(Utilisateur *login_user)
 {
     QString query_string =  "SELECT mdp from utilisateur where email ='"+login_user->getEmail()+"'";
     QSqlQuery query(query_string, this->db);
@@ -90,14 +111,16 @@ bool Connect_db::is_user_identified(Utilisateur *login_user)
     {
         qDebug() << "User is identified";
         returnVal = true;
+        emit log_value_changed(true);
     }
     else
     {
         qDebug() << "Utilisateur non identifié. Mauvais mdp ou email.";
         returnVal = false;
+        emit log_value_changed(false);
     }
 
-    Connect_db::update_user_infos_from_db(login_user);
+    update_user_infos_from_db(login_user);
     return returnVal;
 }
 
@@ -120,24 +143,27 @@ void Connect_db::update_user_infos_from_db(Utilisateur *login_user)
     }
 }
 
-void  Connect_db::select_all_users (std::list<Utilisateur*> *list)  {
-
-    QSqlDatabase dbtest = QSqlDatabase::database();
-    QSqlQuery query2("SELECT id, nom, mdp, prenom, email, utinfo, token from utilisateur", this->db);
-    while (query2.next())
+void  Connect_db::select_all_users (Utilisateur *login_user, std::list<Utilisateur*> *list)
+{
+    if (is_user_connected(login_user))
     {
-        QString nom = query2.value("nom").toString();
-        QString mdp = query2.value("mdp").toString();
-        QString prenom = query2.value("prenom").toString();
-        QString email = query2.value("email").toString();
-        QString utinfo = query2.value("utinfo").toString();
-        QString token = query2.value("token").toString();
-        int id = query2.value("id").toInt();
+        QSqlDatabase dbtest = QSqlDatabase::database();
+        QSqlQuery query2("SELECT id, nom, mdp, prenom, email, utinfo, token from utilisateur", this->db);
+        while (query2.next())
+        {
+            QString nom = query2.value("nom").toString();
+            QString mdp = query2.value("mdp").toString();
+            QString prenom = query2.value("prenom").toString();
+            QString email = query2.value("email").toString();
+            QString utinfo = query2.value("utinfo").toString();
+            QString token = query2.value("token").toString();
+            int id = query2.value("id").toInt();
 
-        Utilisateur * u = new Utilisateur(nom, mdp,prenom, email, utinfo );
-        u->setId(id);
-        u->setToken(token);
-        list->push_back(u);
+            Utilisateur * u = new Utilisateur(nom, mdp,prenom, email, utinfo );
+            u->setId(id);
+            u->setToken(token);
+            list->push_back(u);
+        }
     }
 
 }
