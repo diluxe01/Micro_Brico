@@ -96,6 +96,10 @@ void MainWindow::on_popupLogin_ok()
         this->ui->TAB_ges_user->setEnabled(true);
         this->ui->TAB_ges_resa->setEnabled(true);
         this->login_user.setIs_logged_on(true);
+        this->login_user.setToken(g_connect_db.get_unique_token());
+
+        qDebug() << "token: " << this->login_user.getToken();
+        g_connect_db.update_user_token_on_db(&this->login_user);
     }
     else
     {
@@ -133,11 +137,6 @@ void MainWindow::on_getUsers_clicked()
     g_connect_db.select_all_users(&this->userList);
 
     qDebug() << "Iterate: ";
-
-    for(const auto& toto : this->userList)
-    {
-        qDebug()  << toto->ToString() ;
-    }
 
     MainWindow::refreshScrollArea();
 }

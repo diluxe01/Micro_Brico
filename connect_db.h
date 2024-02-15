@@ -20,6 +20,8 @@ public:
     bool delete_user(Utilisateur *user_to_delete);
     bool is_user_identified(Utilisateur *login_user);
     QString get_sha1_from_Qstring(QString mdp);
+    QString get_unique_token(void);
+    void update_user_token_on_db(Utilisateur *login_user);
 };
 
 #endif // CONNECT_DB_H

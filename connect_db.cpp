@@ -5,7 +5,7 @@
 #include <QSqlQuery>
 #include <QCryptographicHash>
 #include <QSqlError>
-
+#include <QDateTime>
 
 Connect_db::Connect_db() {
 
@@ -50,6 +50,22 @@ QString Connect_db::get_sha1_from_Qstring(QString mdp)
     QByteArray hashTs = hash->result().toHex();
     mdp_sha1 = QString(hashTs);
     return mdp_sha1;
+}
+
+QString Connect_db::get_unique_token(void)
+{
+    QString token;
+    QDateTime datetime;
+    QString date = datetime.currentDateTime().toString();
+    token = Connect_db::get_sha1_from_Qstring(date);
+    return token;
+}
+
+void Connect_db::update_user_token_on_db(Utilisateur *login_user)
+{
+    QString query_string =  "update utilisateur set token ='"+login_user->getToken()+"'where email ='"+login_user->getEmail()+"'";
+    QSqlQuery query(query_string, this->db);
+    query.exec(query_string);
 }
 
 bool Connect_db::is_user_identified(Utilisateur *login_user)
@@ -107,7 +123,7 @@ void Connect_db::update_user_infos_from_db(Utilisateur *login_user)
 void  Connect_db::select_all_users (std::list<Utilisateur*> *list)  {
 
     QSqlDatabase dbtest = QSqlDatabase::database();
-    QSqlQuery query2("SELECT id, nom, mdp, prenom, email, utinfo from utilisateur", this->db);
+    QSqlQuery query2("SELECT id, nom, mdp, prenom, email, utinfo, token from utilisateur", this->db);
     while (query2.next())
     {
         QString nom = query2.value("nom").toString();
@@ -115,10 +131,12 @@ void  Connect_db::select_all_users (std::list<Utilisateur*> *list)  {
         QString prenom = query2.value("prenom").toString();
         QString email = query2.value("email").toString();
         QString utinfo = query2.value("utinfo").toString();
+        QString token = query2.value("token").toString();
         int id = query2.value("id").toInt();
 
         Utilisateur * u = new Utilisateur(nom, mdp,prenom, email, utinfo );
         u->setId(id);
+        u->setToken(token);
         list->push_back(u);
     }
 

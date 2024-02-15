@@ -41,6 +41,8 @@ public:
 
     void setNom(const QString &newNom);
 
+    void setToken(const QString &newToken);
+
 private:
     int id;
     QString nom;

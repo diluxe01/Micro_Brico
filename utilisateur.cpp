@@ -110,6 +110,11 @@ void Utilisateur::setNom(const QString &newNom)
     nom = newNom;
 }
 
+void Utilisateur::setToken(const QString &newToken)
+{
+    token = newToken;
+}
+
 QString Utilisateur::ToString() {
 
     QString ret = " nom: " + this->nom +
@@ -117,7 +122,8 @@ QString Utilisateur::ToString() {
                   " id: " + QString::number(this->id) +
                   " prenom: " + this->prenom +
                   " email: " + this->email +
-                  " utinfo: " + this->utinfo
+                  " utinfo: " + this->utinfo +
+                  " token: " + this->token
                     ;
     return ret;
 }
