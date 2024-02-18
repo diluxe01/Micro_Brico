@@ -22,20 +22,18 @@ public:
     ~MainWindow();
 
 public slots:
-    void update_connection_status(bool new_log_status);
+    void update_connection_status(bool is_user_logged);
+    void log_stuffs(QtMsgType type, const QString &msg);
 
 private slots:
     /*Add user popup slots */
     void on_popupaddUser_destroyed();
     void on_popupaddUser_ok();
     void on_getUsers_clicked();
-
     void on_actionNouvel_Utilisateur_triggered();
-
     void on_actionSe_connecter_triggered();
-
     void on_deleteUser_clicked();
-
+    void on_actionSe_d_connecter_triggered();
 
 private:
     Ui::MainWindow *ui;

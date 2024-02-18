@@ -89,6 +89,7 @@ bool Connect_db::is_user_connected(Utilisateur *login_user)
     return true;
 }
 
+// Return true if connection succedded
 bool Connect_db::connect_user(Utilisateur *login_user)
 {
     QString query_string =  "SELECT mdp from utilisateur where email ='"+login_user->getEmail()+"'";
@@ -111,6 +112,7 @@ bool Connect_db::connect_user(Utilisateur *login_user)
     {
         qDebug() << "User is identified";
         returnVal = true;
+        update_user_infos_from_db(login_user);
         emit log_value_changed(true);
     }
     else
@@ -119,8 +121,6 @@ bool Connect_db::connect_user(Utilisateur *login_user)
         returnVal = false;
         emit log_value_changed(false);
     }
-
-    update_user_infos_from_db(login_user);
     return returnVal;
 }
 

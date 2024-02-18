@@ -38,6 +38,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         popups/popupaddusers.h popups/popupaddusers.cpp popups/popupaddusers.ui
         popups/login_connect.h popups/login_connect.cpp popups/login_connect.ui
         popups/delete_user.h popups/delete_user.cpp popups/delete_user.ui
+        logger/logbrowser.h logger/logbrowser.cpp
+        logger/logbrowserdialog.h logger/logbrowserdialog.cpp
+
 
 
     )

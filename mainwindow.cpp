@@ -5,6 +5,19 @@
 #include <QDialogButtonBox>
 #include <QListWidgetItem>
 #include <QTimer>
+#include "logger/logbrowser.h"
+#include <QPointer>
+#include <QDebug>
+#include <QString>
+#include <QDateTime>
+
+QPointer<LogBrowser> logBrowser;
+
+void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+    if(logBrowser)
+        logBrowser->outputMessage( type,msg );
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -13,8 +26,13 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     this->ui->getUsers->setEnabled(true);
     update_connection_status(false);
-
     connect(&g_connect_db, &Connect_db::log_value_changed, this, &MainWindow::update_connection_status);
+
+    // Init of the logger and connection to the application slots
+    logBrowser = new LogBrowser;
+    qInstallMessageHandler(myMessageOutput);
+    connect(logBrowser, &LogBrowser::sendMessage, this, &MainWindow::log_stuffs, Qt::QueuedConnection);
+
 }
 
 MainWindow::~MainWindow()
@@ -104,6 +122,11 @@ void MainWindow::on_actionSe_connecter_triggered()
     QObject::connect(this->p_loginConnect->getOkButton(), &QDialogButtonBox::rejected, this, &MainWindow::on_popupLogin_destroyed);
 }
 
+void MainWindow::on_actionSe_d_connecter_triggered()
+{
+    update_connection_status(false);
+}
+
 // ^^^^^^ POPUP LOGIN SECTION ^^^^^^
 //---------------------------------------------------------
 // vvvvvv MAIN WINDOW "Gestion Utilisateur" SECTION vvvvvv
@@ -178,15 +201,49 @@ void MainWindow::on_popupDelete_ok()
 
 //---------------------------------------------------------
 // vvvvvv SLOTS SECTION vvvvvv
-void MainWindow::update_connection_status(bool new_log_status)
+void MainWindow::update_connection_status(bool is_user_logged)
 {
-    qDebug() << "update_connection_status: ";
-    this->login_user.setIs_logged_on(new_log_status);
-    qDebug() << "new_log_status "<< new_log_status;
-    this->ui->tabWidget->setEnabled(new_log_status);
-    this->ui->TAB_ges_user->setEnabled(new_log_status);
-    this->ui->TAB_ges_resa->setEnabled(new_log_status);
-    this->login_user.setIs_logged_on(new_log_status);
+    if (is_user_logged)
+    {
+        qInfo() << "Vous êtes maintenant connecté.";
+    }
+    else
+    {
+        qInfo() << "Vous êtes maintenant déconnecté.";
+    }
+    this->login_user.setIs_logged_on(is_user_logged);
+    this->ui->tabWidget->setEnabled(is_user_logged);
+    this->ui->TAB_ges_user->setEnabled(is_user_logged);
+    this->ui->TAB_ges_resa->setEnabled(is_user_logged);
+    this->ui->actionSe_connecter->setEnabled(!is_user_logged);
+    this->ui->actionSe_d_connecter->setEnabled(is_user_logged);
+    this->ui->listWidget->clear();
 }
+
+
+void MainWindow::log_stuffs(QtMsgType type, const QString &msg)
+{
+    QDateTime date ;
+    QString date_str = date.currentDateTime().toString();
+    switch (type) {
+    case QtInfoMsg:
+        this->ui->textEditLogs->append(date_str +" : "+ msg);
+        break;
+
+    case QtWarningMsg:
+        this->ui->textEditLogs->append(date_str +tr(" : — WARNING: %1").arg(msg));
+        break;
+
+    case QtCriticalMsg:
+        this->ui->textEditLogs->append(date_str +tr(" : — CRITICAL: %1").arg(msg));
+        break;
+
+    case QtFatalMsg:
+        this->ui->textEditLogs->append(date_str +tr(" : — FATAL: %1").arg(msg));
+        break;
+    }
+}
+
 // ^^^^^^ SLOTS SECTION ^^^^^^
 //---------------------------------------------------------
+

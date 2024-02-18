@@ -175,9 +175,10 @@
     <property name="title">
      <string>Login</string>
     </property>
-    <addaction name="actionNouvel_Utilisateur"/>
-    <addaction name="separator"/>
     <addaction name="actionSe_connecter"/>
+    <addaction name="actionSe_d_connecter"/>
+    <addaction name="separator"/>
+    <addaction name="actionNouvel_Utilisateur"/>
    </widget>
    <addaction name="menuLogin"/>
   </widget>
@@ -190,6 +191,11 @@
   <action name="actionSe_connecter">
    <property name="text">
     <string>Se connecter</string>
+   </property>
+  </action>
+  <action name="actionSe_d_connecter">
+   <property name="text">
+    <string>Se déconnecter</string>
    </property>
   </action>
  </widget>
