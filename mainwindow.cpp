@@ -10,6 +10,8 @@
 #include <QDebug>
 #include <QString>
 #include <QDateTime>
+#include <QCloseEvent>
+#include <QMessageBox>
 
 QPointer<LogBrowser> logBrowser;
 
@@ -24,28 +26,48 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->ui->getUsers->setEnabled(true);
+
+    // Init of the connection status slot
+    this->login_user.setIs_logged_on(true);
     update_connection_status(false);
     connect(&g_connect_db, &Connect_db::log_value_changed, this, &MainWindow::update_connection_status);
 
-    // Init of the logger and connection to the application slots
+    // Init of the logger connected to the application slot
     logBrowser = new LogBrowser;
     qInstallMessageHandler(myMessageOutput);
     connect(logBrowser, &LogBrowser::sendMessage, this, &MainWindow::log_stuffs, Qt::QueuedConnection);
-
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    logBrowser->close();
+    delete logBrowser;
 }
 
+void MainWindow::closeEvent (QCloseEvent *event)
+{
+    // QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Gestion Reservations microBrico",
+    //                                                            tr("Are you sure?\n"),
+    //                                                            QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
+    //                                                            QMessageBox::Yes);
+    // if (resBtn != QMessageBox::Yes) {
+    //     event->ignore();
+    // } else {
+    //     event->accept();
+        delete this;
+    // }
+}
 
 void MainWindow::add_user_to_DB(void)
 {
     g_connect_db.add_user(&this->new_user);
 
     qDebug() << "MGMT: AddUser to DB;)";
+}
+void MainWindow::on_actionAfficher_les_logs_triggered()
+{
+    logBrowser->show();
 }
 
 //---------------------------------------------------------
@@ -203,21 +225,24 @@ void MainWindow::on_popupDelete_ok()
 // vvvvvv SLOTS SECTION vvvvvv
 void MainWindow::update_connection_status(bool is_user_logged)
 {
-    if (is_user_logged)
+    if (is_user_logged != this->login_user.getIs_logged_on())
     {
-        qInfo() << "Vous êtes maintenant connecté.";
+        if (is_user_logged)
+        {
+            qInfo() << "Vous êtes maintenant connecté.";
+        }
+        else
+        {
+            qInfo() << "Vous êtes maintenant déconnecté.";
+        }
+        this->login_user.setIs_logged_on(is_user_logged);
+        this->ui->tabWidget->setEnabled(is_user_logged);
+        this->ui->TAB_ges_user->setEnabled(is_user_logged);
+        this->ui->TAB_ges_kits->setEnabled(is_user_logged);
+        this->ui->actionSe_connecter->setEnabled(!is_user_logged);
+        this->ui->actionSe_d_connecter->setEnabled(is_user_logged);
+        this->ui->listWidget->clear();
     }
-    else
-    {
-        qInfo() << "Vous êtes maintenant déconnecté.";
-    }
-    this->login_user.setIs_logged_on(is_user_logged);
-    this->ui->tabWidget->setEnabled(is_user_logged);
-    this->ui->TAB_ges_user->setEnabled(is_user_logged);
-    this->ui->TAB_ges_resa->setEnabled(is_user_logged);
-    this->ui->actionSe_connecter->setEnabled(!is_user_logged);
-    this->ui->actionSe_d_connecter->setEnabled(is_user_logged);
-    this->ui->listWidget->clear();
 }
 
 
@@ -246,4 +271,32 @@ void MainWindow::log_stuffs(QtMsgType type, const QString &msg)
 
 // ^^^^^^ SLOTS SECTION ^^^^^^
 //---------------------------------------------------------
+
+//---------------------------------------------------------
+// vvvvvv POPUP DELETE_USER SECTION vvvvvv
+
+
+void MainWindow::on_pushButton_addkit_clicked()
+{
+    this->p_popupAddKit = new (PoppupAddKit);
+    this->p_popupAddKit->show();
+    QObject::connect(this->p_popupAddKit->getOkButton(), &QDialogButtonBox::accepted, this, &MainWindow::on_popupAddKit_ok);
+    QObject::connect(this->p_popupAddKit->getOkButton(), &QDialogButtonBox::rejected, this, &MainWindow::on_popupAddKit_destroyed);
+}
+
+
+void MainWindow::on_popupAddKit_destroyed()
+{
+    delete (this->p_popupAddKit);
+}
+
+void MainWindow::on_popupAddKit_ok()
+{
+    Utilisateur tmp_user;
+
+    delete (this->p_popupAddKit);
+}
+// ^^^^^^ POPUP DELETE_USER SECTION ^^^^^^
+//---------------------------------------------------------
+
 

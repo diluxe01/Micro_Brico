@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1018</width>
-    <height>770</height>
+    <width>1029</width>
+    <height>760</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,7 +27,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="TAB_ges_user">
        <property name="enabled">
@@ -121,25 +121,77 @@
           </layout>
          </widget>
         </item>
-        <item>
-         <widget class="QFrame" name="frame">
-          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Raised</enum>
-          </property>
-         </widget>
-        </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="TAB_ges_resa">
+      <widget class="QWidget" name="TAB_ges_kits">
        <property name="enabled">
         <bool>true</bool>
        </property>
        <attribute name="title">
-        <string>Tab 2</string>
+        <string>Gestion Kits</string>
        </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QGroupBox" name="groupBox_2">
+          <property name="title">
+           <string>GroupBox</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <widget class="QTableWidget" name="tableWidget"/>
+           </item>
+           <item>
+            <widget class="QFrame" name="frame_3">
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <item>
+               <widget class="QPushButton" name="pushButton_getkit">
+                <property name="text">
+                 <string>Rechercher Kit</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEdit_findkit"/>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_3">
+          <property name="title">
+           <string>GroupBox</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <item>
+            <widget class="QPushButton" name="pushButton_addkit">
+             <property name="text">
+              <string>Ajouter un Kit</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QFrame" name="frame">
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -167,7 +219,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1018</width>
+     <width>1029</width>
      <height>22</height>
     </rect>
    </property>
@@ -180,7 +232,14 @@
     <addaction name="separator"/>
     <addaction name="actionNouvel_Utilisateur"/>
    </widget>
+   <widget class="QMenu" name="menuOutils">
+    <property name="title">
+     <string>Outils</string>
+    </property>
+    <addaction name="actionAfficher_les_logs"/>
+   </widget>
    <addaction name="menuLogin"/>
+   <addaction name="menuOutils"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionNouvel_Utilisateur">
@@ -196,6 +255,11 @@
   <action name="actionSe_d_connecter">
    <property name="text">
     <string>Se déconnecter</string>
+   </property>
+  </action>
+  <action name="actionAfficher_les_logs">
+   <property name="text">
+    <string>Afficher les logs</string>
    </property>
   </action>
  </widget>

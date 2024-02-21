@@ -5,6 +5,4 @@
 
 extern  Connect_db g_connect_db;
 
-extern Utilisateur g_user;
-
 #endif // DATAMODEL_H

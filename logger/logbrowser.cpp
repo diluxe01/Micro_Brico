@@ -17,7 +17,15 @@ LogBrowser::~LogBrowser()
 {
     delete browserDialog;
 }
+LogBrowser::show()
+{
+    browserDialog->show();
+}
 
+LogBrowser::close()
+{
+    browserDialog->close();
+}
 void LogBrowser::outputMessage(QtMsgType type, const QString &msg)
 {
     emit sendMessage( type, msg );

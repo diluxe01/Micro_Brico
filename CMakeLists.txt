@@ -40,6 +40,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         popups/delete_user.h popups/delete_user.cpp popups/delete_user.ui
         logger/logbrowser.h logger/logbrowser.cpp
         logger/logbrowserdialog.h logger/logbrowserdialog.cpp
+        popups/poppupaddkit.h popups/poppupaddkit.cpp popups/poppupaddkit.ui
+        kit.h kit.cpp
+        item.h item.cpp
+        money.h money.cpp
 
 
 

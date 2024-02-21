@@ -11,7 +11,8 @@ class LogBrowser : public QObject
 public:
     explicit LogBrowser(QObject *parent = 0);
     ~LogBrowser();
-
+    show();
+    close();
 public slots:
     void outputMessage( QtMsgType type, const QString &msg );
 

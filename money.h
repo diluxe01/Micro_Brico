@@ -1,0 +1,22 @@
+#ifndef MONEY_H
+#define MONEY_H
+
+# include <QString>
+
+class Money
+{
+private:
+    uint32_t u32_value;
+    QString str_value;
+
+public:
+    Money();
+    Money(QString init_value);
+
+    QString getStringValue(void);
+
+
+    void setValue(QString new_value);
+};
+
+#endif // MONEY_H
