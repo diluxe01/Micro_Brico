@@ -21,6 +21,7 @@ private:
     Money caution;
 public:
     explicit Kit(QObject *parent = nullptr);
+    Kit(uint idkit, const QString &nom, const QString &description, const QDateTime &date_achat, const Money &prix_achat, const QString &texte_libre, bool en_panne, const QString &code, const Money &caution);
 
 signals:
 };

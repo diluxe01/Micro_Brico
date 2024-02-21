@@ -225,6 +225,7 @@ void MainWindow::on_popupDelete_ok()
 // vvvvvv SLOTS SECTION vvvvvv
 void MainWindow::update_connection_status(bool is_user_logged)
 {
+    is_user_logged = 1;
     if (is_user_logged != this->login_user.getIs_logged_on())
     {
         if (is_user_logged)
@@ -280,21 +281,31 @@ void MainWindow::on_pushButton_addkit_clicked()
 {
     this->p_popupAddKit = new (PoppupAddKit);
     this->p_popupAddKit->show();
-    QObject::connect(this->p_popupAddKit->getOkButton(), &QDialogButtonBox::accepted, this, &MainWindow::on_popupAddKit_ok);
-    QObject::connect(this->p_popupAddKit->getOkButton(), &QDialogButtonBox::rejected, this, &MainWindow::on_popupAddKit_destroyed);
+    QObject::connect(this->p_popupAddKit->getOkButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_ok);
+    QObject::connect(this->p_popupAddKit->getCancelButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_destroyed);
 }
 
 
 void MainWindow::on_popupAddKit_destroyed()
 {
+    this->p_popupAddKit->close();
     delete (this->p_popupAddKit);
 }
 
 void MainWindow::on_popupAddKit_ok()
 {
     Utilisateur tmp_user;
+    Kit * p_kit;
+    p_kit = this->p_popupAddKit->get_kit_from_form();
+    if (p_kit == NULL)
+    {
 
-    delete (this->p_popupAddKit);
+    }
+    else
+    {
+        this->p_popupAddKit->close();
+        delete (this->p_popupAddKit);
+    }
 }
 // ^^^^^^ POPUP DELETE_USER SECTION ^^^^^^
 //---------------------------------------------------------

@@ -9,6 +9,7 @@ private:
     uint32_t u32_value;
     QString str_value;
 
+    bool cleanInput(QString new_value, QString separator);
 public:
     Money();
     Money(QString init_value);
@@ -16,7 +17,7 @@ public:
     QString getStringValue(void);
 
 
-    void setValue(QString new_value);
+    bool setValue(QString new_value);
 };
 
 #endif // MONEY_H

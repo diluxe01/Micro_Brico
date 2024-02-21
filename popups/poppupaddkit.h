@@ -2,7 +2,10 @@
 #define POPPUPADDKIT_H
 
 #include <QDialog>
-#include <QDialogButtonBox>
+#include <QPushButton>
+#include "../item.h"
+#include "../kit.h"
+#include<list>
 
 namespace Ui {
 class PoppupAddKit;
@@ -14,14 +17,22 @@ class PoppupAddKit : public QDialog
 
 public:
     explicit PoppupAddKit(QWidget *parent = nullptr);
-    QDialogButtonBox* getOkButton(void);
+    QPushButton* getOkButton(void);
+    QPushButton *getCancelButton();
     ~PoppupAddKit();
 
+    Kit *get_kit_from_form();
 private slots:
     void on_pushButton_addobject_clicked();
 
+    void on_pushButton_deleteitemfromlist_clicked();
+
+
 private:
     Ui::PoppupAddKit *ui;
+
+    std::list<Item*> item_list;
+    void push_back_new_item_on_tabWidget(Item *item);
 };
 
 #endif // POPPUPADDKIT_H
