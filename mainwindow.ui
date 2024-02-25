@@ -138,7 +138,11 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_5">
            <item>
-            <widget class="QTableWidget" name="tableWidget_kit"/>
+            <widget class="QTableWidget" name="tableWidget_kit">
+             <property name="editTriggers">
+              <set>QAbstractItemView::NoEditTriggers</set>
+             </property>
+            </widget>
            </item>
            <item>
             <widget class="QFrame" name="frame_3">

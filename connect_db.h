@@ -20,6 +20,7 @@ private:
     bool is_user_connected(Utilisateur *login_user);
 
     bool get_querry_errors(QSqlQuery &query);
+    void populate_kit_list_from_query(std::list<Kit *> *kits, QSqlQuery query);
 public:
 
     QSqlDatabase db;
@@ -34,6 +35,7 @@ public:
     QString get_unique_token(void);
     void update_user_token_on_db(Utilisateur *login_user);
 
+    void select_kits_by_code(std::list<Kit *> *kits, QString code);
 signals:
     void log_value_changed(bool is_user_logged);
 };

@@ -216,7 +216,15 @@ void MainWindow::on_pushButton_getkit_clicked()
 {
     /* refresh the user list by cleaning and loading it again */
     this->clearKitList();
-    g_connect_db.select_all_kits(&this->kitList);
+
+    if (ui->lineEdit_findkitbycode->text()!="")
+    {
+        g_connect_db.select_kits_by_code(&this->kitList,ui->lineEdit_findkitbycode->text() );
+    }
+    else
+    {
+        g_connect_db.select_all_kits(&this->kitList);
+    }
 
     qDebug() << "Iterate: ";
 
@@ -258,8 +266,8 @@ void MainWindow::push_back_new_kit_on_table(Kit* kit, int row)
     ui->tableWidget_kit->setItem(row-1, 2, p_widget_item_caution);
 
     // Set second item of last row (date)
-    QString toto = kit->getDate_achat().toString("dd.MM.yyyy");
-    p_widget_item_date= new QTableWidgetItem(toto);
+    QString date = kit->getDate_achat().toString("dd.MM.yyyy");
+    p_widget_item_date= new QTableWidgetItem(date);
     ui->tableWidget_kit->setItem(row-1, 3, p_widget_item_date);
 
     // Set second item of last row (prix)

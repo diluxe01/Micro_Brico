@@ -219,18 +219,31 @@ void  Connect_db::select_all_kits (std::list<Kit*> *kits)
 {
     QSqlQuery query2("SELECT idkit, nom, description, date_achat, prix_achat, texte_libre, en_panne, code_kit, caution from kit", this->db);
     get_querry_errors(query2);
-    while (query2.next())
+
+    populate_kit_list_from_query(kits, query2);
+}
+
+void  Connect_db::select_kits_by_code (std::list<Kit*> *kits, QString code)
+{
+    QSqlQuery query2("SELECT idkit, nom, description, date_achat, prix_achat, texte_libre, en_panne, code_kit, caution from kit where code_kit='"+code+"'", this->db);
+    get_querry_errors(query2);
+    populate_kit_list_from_query(kits, query2);
+}
+
+void Connect_db::populate_kit_list_from_query(std::list<Kit*> *kits, QSqlQuery query)
+{
+    while (query.next())
     {
-        get_querry_errors(query2);
-        int id = query2.value("idkit").toInt();
-        QString nom = query2.value("nom").toString();
-        QString description = query2.value("description").toString();
-        QString date_achat = query2.value("date_achat").toString();
-        QString prix_achat = query2.value("prix_achat").toString();
-        QString texte_libre = query2.value("texte_libre").toString();
-        int en_pane = query2.value("en_panne").toInt();
-        QString code_kit = query2.value("code_kit").toString();
-        QString caution = query2.value("caution").toString();
+        get_querry_errors(query);
+        int id = query.value("idkit").toInt();
+        QString nom = query.value("nom").toString();
+        QString description = query.value("description").toString();
+        QString date_achat = query.value("date_achat").toString();
+        QString prix_achat = query.value("prix_achat").toString();
+        QString texte_libre = query.value("texte_libre").toString();
+        int en_pane = query.value("en_panne").toInt();
+        QString code_kit = query.value("code_kit").toString();
+        QString caution = query.value("caution").toString();
 
         bool bool_panne;
         if (en_pane == 1)
