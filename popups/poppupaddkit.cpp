@@ -2,6 +2,9 @@
 #include "ui_poppupaddkit.h"
 #include <QStringList>
 #include <QTableWidgetItem>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
+
 #include "../money.h"
 
 PoppupAddKit::PoppupAddKit(QWidget *parent)
@@ -15,6 +18,7 @@ PoppupAddKit::PoppupAddKit(QWidget *parent)
     header_list.append("Nom");
     header_list.append("Etat");
     ui->tableWidget_itemBasket->setHorizontalHeaderLabels(header_list);
+    this->kit = new Kit();
 }
 
 PoppupAddKit::~PoppupAddKit()
@@ -62,7 +66,7 @@ void PoppupAddKit::on_pushButton_addobject_clicked()
         }
         //Push_back new item into private item list
         Item* item = new Item(0, item_text, 0, item_etat);
-        this->item_list.push_back(item);
+        this->kit->item_list.push_back(item);
 
         //Push_back new item into display tab
         push_back_new_item_on_tabWidget(item);
@@ -73,7 +77,7 @@ void PoppupAddKit::on_pushButton_addobject_clicked()
 
 void PoppupAddKit::push_back_new_item_on_tabWidget(Item* item)
 {
-    int nb_row = this->item_list.size();
+    int nb_row = this->kit->item_list.size();
     ui->tableWidget_itemBasket->setRowCount(nb_row);
     QTableWidgetItem* p_widget_item_name;
     QTableWidgetItem* p_widget_item_state;
@@ -89,7 +93,7 @@ void PoppupAddKit::push_back_new_item_on_tabWidget(Item* item)
 void PoppupAddKit::on_pushButton_deleteitemfromlist_clicked()
 {
     std::list<Item*>::iterator it;
-    if (this->item_list.empty() == false)
+    if (this->kit->item_list.empty() == false)
     {
         //Get current row
         int currentRow = ui->tableWidget_itemBasket->currentRow();
@@ -98,9 +102,9 @@ void PoppupAddKit::on_pushButton_deleteitemfromlist_clicked()
         ui->tableWidget_itemBasket->removeRow(currentRow);
 
         //Delete element on the list at given index
-        it = this->item_list.begin();
+        it = this->kit->item_list.begin();
         advance(it, currentRow);
-        this->item_list.erase(it);
+        this->kit->item_list.erase(it);
     }
 
 }
@@ -115,42 +119,68 @@ Kit * PoppupAddKit::get_kit_from_form()
     QString nom = ui->lineEdit_kit_name->text();
     QString description = ui->textEdit_kit_description->toPlainText();
     QString texte_libre = ui->textEdit_kit_texte_libre->toPlainText();
-   //uint idkit, const QString &nom, const QString &description, const QDateTime &date_achat, const Money &prix_achat, const QString &texte_libre, bool en_panne, const QString &code, const Money &caution
 
     Money prix_formatted;
+    Money caution_formatted;
+    QDate date_formatted;
 
-    //Verify the date
-    if ( (dateAchat != "") || (dateAchat.contains("/") == false) )
+    QRegularExpression re("^(\\d\\d)/(\\d\\d)/(\\d\\d\\d\\d)$");
+    QRegularExpressionMatch match = re.match(dateAchat);
+
+
+    //-----------Verifie le nom------------
+    if (nom =="")
     {
-        QStringList date_split = dateAchat.split("/");
-        if (date_split.size() == 3)
-        {
-            QDate date_formatted(date_split[2].toInt(), date_split[1].toInt(), date_split[0].toInt());
-        }
-        else
-        {
-            qWarning() << "Erreur dans le format de la date: Doit avoir la forme: JJ/MM/AAAA";
-            ok_to_make_a_kit = false;
-        }
-    }
-    else{
-        qWarning() << "Erreur dans le format de la date: Doit avoir la forme: JJ/MM/AAAA";
+        qInfo() << "Erreur dans le format du nom: Veuillez nommer le kit";
         ok_to_make_a_kit = false;
     }
+    //-----------Verifie le code------------
+    if (code =="")
+    {
+        qInfo() << "Erreur dans le format du code: Veuillez donner un code";
+        ok_to_make_a_kit = false;
+    }
+    //-----------Verifie la date------------
+    if (match.hasMatch()) {
+        QString day = match.captured(1); // day == "08"
+        QString month = match.captured(2); // month == "12"
+        QString year = match.captured(3); // year == "1985"
+        if (date_formatted.setDate(year.toInt(),month.toInt(),day.toInt()) == false)
+        {
+            ok_to_make_a_kit = false;
+            qInfo() << "Erreur dans le format de la date: Doit avoir le format: JJ/MM/AAAA";
+        }
+    }
+    else
+    {
+        ok_to_make_a_kit = false;
+        qInfo() << "Erreur dans le format de la date: Doit avoir le format: JJ/MM/AAAA";
+    }
 
-    //Verify the price
+    //-----------Verifie le prix-----------
     if (prix_formatted.setValue(prix) == false)
     {
-        qWarning() << "Erreur dans le format du prix: Doit avoir la forme: 125,50";
+        qInfo() << "Erreur dans le format du prix: Doit avoir le format: xxxx,yy";
         ok_to_make_a_kit = false;
     }
-
+    //-----------Verifie la caution -----------
+    if (caution_formatted.setValue(caution) == false)
+    {
+        qInfo() << "Erreur dans le format de la caution: Doit avoir le format: xxxx,yy";
+        ok_to_make_a_kit = false;
+    }
 
     if (ok_to_make_a_kit)
     {
-        // Kit kit = new Kit(0, nom, description,/* date */ 0,  );
-        Kit* p_kit = new Kit();
-        return p_kit;
+        this->kit->setNom( nom);
+        this->kit->setDescription(description);
+        this->kit->setDate_achat(date_formatted);
+        this->kit->setPrix_achat(prix_formatted);
+        this->kit->setTexte_libre(texte_libre);
+        this->kit->setEn_panne(false);
+        this->kit->setCode(code);
+        this->kit->setCaution( caution_formatted);
+        return this->kit;
     }
     else
     {
@@ -159,8 +189,4 @@ Kit * PoppupAddKit::get_kit_from_form()
     }
 }
 
-// Kit PoppupAddKit::get_items_from_form()
-// {
-
-// }
 

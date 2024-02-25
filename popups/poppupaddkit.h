@@ -5,7 +5,7 @@
 #include <QPushButton>
 #include "../item.h"
 #include "../kit.h"
-#include<list>
+#include <list>
 
 namespace Ui {
 class PoppupAddKit;
@@ -22,6 +22,7 @@ public:
     ~PoppupAddKit();
 
     Kit *get_kit_from_form();
+
 private slots:
     void on_pushButton_addobject_clicked();
 
@@ -30,8 +31,7 @@ private slots:
 
 private:
     Ui::PoppupAddKit *ui;
-
-    std::list<Item*> item_list;
+    Kit * kit;
     void push_back_new_item_on_tabWidget(Item *item);
 };
 

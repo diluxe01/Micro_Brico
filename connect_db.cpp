@@ -20,11 +20,32 @@ Connect_db::Connect_db() {
 
     }
 
+void Connect_db::get_querry_errors(QSqlQuery &query)
+{
+    if (query.lastError().isValid())
+        {
+            // qDebug() << query.lastError();
+            qInfo() << query.lastError();
+        }
+}
 bool Connect_db::add_user (Utilisateur *user)  {
     QSqlQuery query  = QSqlQuery(this->db);
     query.exec("insert into utilisateur "
                "( nom, mdp, prenom, email, token, utinfo)"
                " values('"+user->getNom()+"','"+user->getMdp()+"','"+user->getPrenom()+"','"+user->getEmail()+"','"+user->getToken()+"','"+user->getUtinfo()+"')");
+    get_querry_errors(query);
+    return true;
+}
+
+bool Connect_db::add_kit (Kit *kit)  {
+    QSqlQuery query  = QSqlQuery(this->db);
+    QString exec_string = "insert into kit "
+                          "( nom, description, date_achat, prix_achat, texte_libre, en_panne, code, caution) "
+                          "values('"+kit->getNom()+"','"+kit->getDescription()+"','"+kit->getDate_achat().toString(Qt::ISODateWithMs)+"','"+kit->getPrix_achat().getStringValue()+"','"+kit->getTexte_libre()+"','0','"+kit->getCode()+"','"+kit->getCaution().getStringValue()+"')";
+
+    qDebug() << exec_string;
+    query.exec(exec_string);
+    get_querry_errors(query);
     return true;
 }
 
@@ -71,7 +92,7 @@ void Connect_db::update_user_token_on_db(Utilisateur *login_user)
 bool Connect_db::is_user_connected(Utilisateur *login_user)
 {
     // This function checks if the user given as a parameter is still connected, by comparing its token with the token on the server
-    // If not, this functions sets the parameter is_logged_on to False
+    // If not, this functions emits a signal to the appli, to inform that user is disconnected
     QString token_db;
     QString query_string =  "SELECT token from utilisateur where email ='"+login_user->getEmail()+"'";
     QSqlQuery query(this->db);

@@ -20,7 +20,7 @@ popupAddUsers::~popupAddUsers()
  * Static methods should be defined outside the class.
  */
 
-popupAddUsers* popupAddUsers::popuAddUser_= nullptr;;
+popupAddUsers* popupAddUsers::popuAddUser_= nullptr;
 
 popupAddUsers *popupAddUsers::GetInstance()
 {

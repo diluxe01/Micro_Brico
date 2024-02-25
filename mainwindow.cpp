@@ -296,13 +296,16 @@ void MainWindow::on_popupAddKit_ok()
 {
     Utilisateur tmp_user;
     Kit * p_kit;
+    std::list<Item*> p_list_item;
     p_kit = this->p_popupAddKit->get_kit_from_form();
+    // p_list_item = this->p_popupAddKit->get_items_from_form();
     if (p_kit == NULL)
     {
 
     }
     else
     {
+        g_connect_db.add_kit(p_kit);
         this->p_popupAddKit->close();
         delete (this->p_popupAddKit);
     }

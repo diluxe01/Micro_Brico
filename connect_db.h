@@ -5,6 +5,8 @@
 #include <QSqlDatabase>
 #include <QObject>
 #include "utilisateur.h"
+#include "kit.h"
+#include "item.h"
 
 #include <list>
 
@@ -15,12 +17,15 @@ class Connect_db : public QObject
 private:
     void update_user_infos_from_db(Utilisateur *login_user);
     bool is_user_connected(Utilisateur *login_user);
+
+    void get_querry_errors(QSqlQuery &query);
 public:
 
     QSqlDatabase db;
     Connect_db();
     void select_all_users(Utilisateur *login_user, std::list<Utilisateur*> *list);
     bool add_user (Utilisateur *user);
+    bool add_kit (Kit *kit);
     bool delete_user(Utilisateur *user_to_delete);
     bool connect_user(Utilisateur *login_user);
     QString get_sha1_from_Qstring(QString mdp);

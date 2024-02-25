@@ -8,8 +8,9 @@ class Money
 private:
     uint32_t u32_value;
     QString str_value;
+    QString partie_entiere;
+    QString partie_decimale;
 
-    bool cleanInput(QString new_value, QString separator);
 public:
     Money();
     Money(QString init_value);
