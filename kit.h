@@ -25,6 +25,7 @@ private:
 public:
     explicit Kit(QObject *parent = nullptr);
     Kit(uint idkit, const QString &nom, const QString &description, const QDate &date_achat, const Money &prix_achat, const QString &texte_libre, bool en_panne, const QString &code, const Money &caution);
+    Kit(uint idkit, const QString &nom, const QString &description, const QString &date_achat, const QString &prix_achat, const QString &texte_libre, const bool en_panne, const QString &code, const QString &caution);
 
     std::list<Item*> item_list;
 
@@ -50,6 +51,10 @@ public:
 
     void setCode(const QString &newCode);
 
+    void setDate_achat(const QString &newDate_achat);
+    void setPrix_achat(const QString &newPrix_achat);
+    void setCaution(const QString &newCaution);
+    QString getEn_panne_str() const;
 signals:
 };
 

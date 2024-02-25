@@ -162,11 +162,23 @@ Kit * PoppupAddKit::get_kit_from_form()
     {
         qInfo() << "Erreur dans le format du prix: Doit avoir le format: xxxx,yy";
         ok_to_make_a_kit = false;
+    }else if (prix_formatted.getPartie_entiere().toInt()>9999999)
+    {
+        qInfo() << "Erreur dans le format du prix: Le prix dépasse la limite autorisée.";
+        ok_to_make_a_kit = false;
+
     }
     //-----------Verifie la caution -----------
     if (caution_formatted.setValue(caution) == false)
     {
         qInfo() << "Erreur dans le format de la caution: Doit avoir le format: xxxx,yy";
+        ok_to_make_a_kit = false;
+    }
+
+    //-----------Verifie qu'il y a au moins un item -----------
+    if (this->kit->item_list.empty())
+    {
+        qInfo() << "Erreur. Vous devez ajouter au moins un sous-objet.";
         ok_to_make_a_kit = false;
     }
 

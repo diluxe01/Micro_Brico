@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>819</width>
-    <height>570</height>
+    <width>816</width>
+    <height>637</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,7 +25,7 @@
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>6000</height>
+       <height>700</height>
       </size>
      </property>
      <property name="title">
@@ -43,7 +43,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Nom du kit:</string>
+           <string>Nom du kit:*</string>
           </property>
          </widget>
         </item>
@@ -63,7 +63,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Code:</string>
+           <string>Code:* (il doit être unique)</string>
           </property>
          </widget>
         </item>
@@ -88,7 +88,14 @@
          </widget>
         </item>
         <item>
-         <widget class="QTextEdit" name="textEdit_kit_description"/>
+         <widget class="QTextEdit" name="textEdit_kit_description">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>100</height>
+           </size>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -103,7 +110,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Date Achat:</string>
+           <string>Date Achat:*</string>
           </property>
          </widget>
         </item>
@@ -127,7 +134,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Prix Achat (euros):</string>
+           <string>Prix Achat (euros):*</string>
           </property>
          </widget>
         </item>
@@ -156,7 +163,20 @@
          </widget>
         </item>
         <item>
-         <widget class="QTextEdit" name="textEdit_kit_texte_libre"/>
+         <widget class="QTextEdit" name="textEdit_kit_texte_libre">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>100</height>
+           </size>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -171,7 +191,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Montant Caution (euros):</string>
+           <string>Montant Caution (euros):*</string>
           </property>
          </widget>
         </item>
@@ -198,13 +218,20 @@
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>300</height>
+       <height>400</height>
       </size>
      </property>
      <property name="title">
-      <string>Objets du kit</string>
+      <string>Objets du kit*</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Note: Ajoutez au moins un objet dans le kit.</string>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QFrame" name="frame_display_item">
         <property name="frameShape">
@@ -215,7 +242,14 @@
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="QTableWidget" name="tableWidget_itemBasket"/>
+          <widget class="QTableWidget" name="tableWidget_itemBasket">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>100</height>
+            </size>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_deleteitemfromlist">
@@ -255,7 +289,7 @@
             </size>
            </property>
            <property name="currentText">
-            <string>Comme neuf</string>
+            <string/>
            </property>
            <property name="placeholderText">
             <string>Etat</string>

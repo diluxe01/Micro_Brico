@@ -20,13 +20,15 @@ Connect_db::Connect_db() {
 
     }
 
-void Connect_db::get_querry_errors(QSqlQuery &query)
+bool Connect_db::get_querry_errors(QSqlQuery &query)
 {
     if (query.lastError().isValid())
         {
             // qDebug() << query.lastError();
             qInfo() << query.lastError();
+            return true;
         }
+    return false;
 }
 bool Connect_db::add_user (Utilisateur *user)  {
     QSqlQuery query  = QSqlQuery(this->db);
@@ -38,15 +40,43 @@ bool Connect_db::add_user (Utilisateur *user)  {
 }
 
 bool Connect_db::add_kit (Kit *kit)  {
+    list<Item*>::iterator it;
+    bool returnValue = false;
+    QString idkit;
     QSqlQuery query  = QSqlQuery(this->db);
+    //add a kit in DB
     QString exec_string = "insert into kit "
-                          "( nom, description, date_achat, prix_achat, texte_libre, en_panne, code, caution) "
+                          "( nom, description, date_achat, prix_achat, texte_libre, en_panne, code_kit, caution) "
                           "values('"+kit->getNom()+"','"+kit->getDescription()+"','"+kit->getDate_achat().toString(Qt::ISODateWithMs)+"','"+kit->getPrix_achat().getStringValue()+"','"+kit->getTexte_libre()+"','0','"+kit->getCode()+"','"+kit->getCaution().getStringValue()+"')";
 
     qDebug() << exec_string;
     query.exec(exec_string);
-    get_querry_errors(query);
-    return true;
+
+    //Add associated items to DB if no errors
+    if (!get_querry_errors(query))
+    {
+        exec_string = "select idkit from kit where code_kit='"+kit->getCode()+"'";
+        query.exec(exec_string);
+        if (!get_querry_errors(query))
+        {
+            query.first();
+            idkit = query.value("idkit").toString();
+            for (it = kit->item_list.begin(); it != kit->item_list.end(); it++)
+            {
+
+                exec_string = "insert into item (name,forkey, etat) values('"+(*it)->getName()+"', '"+idkit+"', '"+(*it)->getEtatStr()+"')";
+                query.exec(exec_string);
+                if (!get_querry_errors(query))
+                {
+                    returnValue = true;
+                }
+            }
+        }
+
+
+    }
+
+    return returnValue;
 }
 
 bool Connect_db::delete_user(Utilisateur *user_to_delete)
@@ -164,27 +194,51 @@ void Connect_db::update_user_infos_from_db(Utilisateur *login_user)
     }
 }
 
-void  Connect_db::select_all_users (Utilisateur *login_user, std::list<Utilisateur*> *list)
+void  Connect_db::select_all_users (std::list<Utilisateur*> *list)
 {
-    if (is_user_connected(login_user))
+    QSqlQuery query2("SELECT id, nom, mdp, prenom, email, utinfo, token from utilisateur", this->db);
+    get_querry_errors(query2);
+    while (query2.next())
     {
-        QSqlDatabase dbtest = QSqlDatabase::database();
-        QSqlQuery query2("SELECT id, nom, mdp, prenom, email, utinfo, token from utilisateur", this->db);
-        while (query2.next())
-        {
-            QString nom = query2.value("nom").toString();
-            QString mdp = query2.value("mdp").toString();
-            QString prenom = query2.value("prenom").toString();
-            QString email = query2.value("email").toString();
-            QString utinfo = query2.value("utinfo").toString();
-            QString token = query2.value("token").toString();
-            int id = query2.value("id").toInt();
+        QString nom = query2.value("nom").toString();
+        QString mdp = query2.value("mdp").toString();
+        QString prenom = query2.value("prenom").toString();
+        QString email = query2.value("email").toString();
+        QString utinfo = query2.value("utinfo").toString();
+        QString token = query2.value("token").toString();
+        int id = query2.value("id").toInt();
 
-            Utilisateur * u = new Utilisateur(nom, mdp,prenom, email, utinfo );
-            u->setId(id);
-            u->setToken(token);
-            list->push_back(u);
-        }
+        Utilisateur * u = new Utilisateur(nom, mdp,prenom, email, utinfo );
+        u->setId(id);
+        u->setToken(token);
+        list->push_back(u);
     }
+}
 
+void  Connect_db::select_all_kits (std::list<Kit*> *kits)
+{
+    QSqlQuery query2("SELECT idkit, nom, description, date_achat, prix_achat, texte_libre, en_panne, code_kit, caution from kit", this->db);
+    get_querry_errors(query2);
+    while (query2.next())
+    {
+        get_querry_errors(query2);
+        int id = query2.value("idkit").toInt();
+        QString nom = query2.value("nom").toString();
+        QString description = query2.value("description").toString();
+        QString date_achat = query2.value("date_achat").toString();
+        QString prix_achat = query2.value("prix_achat").toString();
+        QString texte_libre = query2.value("texte_libre").toString();
+        int en_pane = query2.value("en_panne").toInt();
+        QString code_kit = query2.value("code_kit").toString();
+        QString caution = query2.value("caution").toString();
+
+        bool bool_panne;
+        if (en_pane == 1)
+            bool_panne = true;
+        else
+            bool_panne = false;
+        Kit * k = new Kit(id,nom, description,date_achat,prix_achat,texte_libre, bool_panne,code_kit, caution);
+
+        kits->push_back(k);
+    }
 }

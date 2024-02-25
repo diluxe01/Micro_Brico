@@ -12,6 +12,16 @@ Money::Money(QString init_value)
     setValue(init_value);
 }
 
+uint32_t Money::getU32_value() const
+{
+    return u32_value;
+}
+
+QString Money::getPartie_entiere() const
+{
+    return partie_entiere;
+}
+
 QString Money::getStringValue()
 {
     return this->str_value;

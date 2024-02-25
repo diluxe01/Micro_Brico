@@ -36,6 +36,18 @@ MainWindow::MainWindow(QWidget *parent)
     logBrowser = new LogBrowser;
     qInstallMessageHandler(myMessageOutput);
     connect(logBrowser, &LogBrowser::sendMessage, this, &MainWindow::log_stuffs, Qt::QueuedConnection);
+
+    // init of Kit display table
+    QStringList header_list;
+    ui->tableWidget_kit->setRowCount(0);
+    ui->tableWidget_kit->setColumnCount(6);
+    header_list.append("Nom");
+    header_list.append("Code");
+    header_list.append("Caution");
+    header_list.append("Date achat");
+    header_list.append("Prix d'achat");
+    header_list.append("En Panne?");
+    ui->tableWidget_kit->setHorizontalHeaderLabels(header_list);
 }
 
 MainWindow::~MainWindow()
@@ -166,11 +178,11 @@ void MainWindow::on_getUsers_clicked()
     /* refresh the user list by cleaning and loading it again */
     this->clearUserList();
 
-    g_connect_db.select_all_users(&this->login_user, &this->userList);
+    g_connect_db.select_all_users(&this->userList);
 
     qDebug() << "Iterate: ";
 
-    MainWindow::refreshScrollArea();
+    MainWindow::refresh_user_list_table();
 }
 
 void MainWindow::activateWidgets(bool)
@@ -178,10 +190,7 @@ void MainWindow::activateWidgets(bool)
 
 }
 
-// ^^^^^^ MAIN WINDOW "Gestion Utilisateur" ^^^^^^
-//---------------------------------------------------------
-
-void MainWindow::refreshScrollArea(void)
+void MainWindow::refresh_user_list_table(void)
 {
     this->ui->listWidget->clear();
     for(const auto& toto : this->userList)
@@ -189,6 +198,82 @@ void MainWindow::refreshScrollArea(void)
         new QListWidgetItem(toto->ToString(), this->ui->listWidget);
     }
 }
+// ^^^^^^ MAIN WINDOW "Gestion Utilisateur" ^^^^^^
+//---------------------------------------------------------
+
+//---------------------------------------------------------
+// vvvvvv MAIN WINDOW "Gestion Kits" SECTION vvvvvv
+void MainWindow::clearKitList(void)
+{
+    for(const auto& elem : this->kitList)
+    {
+        delete (elem);
+    }
+    this->kitList.clear();
+}
+
+void MainWindow::on_pushButton_getkit_clicked()
+{
+    /* refresh the user list by cleaning and loading it again */
+    this->clearKitList();
+    g_connect_db.select_all_kits(&this->kitList);
+
+    qDebug() << "Iterate: ";
+
+    MainWindow::refresh_kit_list_table();
+}
+
+void MainWindow::refresh_kit_list_table(void)
+{
+    list<Kit*>::iterator it;
+    int row = 0;
+    this->ui->tableWidget_kit->clearContents();
+    for (it = kitList.begin(); it != kitList.end(); it++)
+    {
+        row++;
+        push_back_new_kit_on_table((*it), row);
+    }
+}
+
+void MainWindow::push_back_new_kit_on_table(Kit* kit, int row)
+{
+    ui->tableWidget_kit->setRowCount(row);
+    QTableWidgetItem* p_widget_item_nom;
+    QTableWidgetItem* p_widget_item_code;
+    QTableWidgetItem* p_widget_item_caution;
+    QTableWidgetItem* p_widget_item_date;
+    QTableWidgetItem* p_widget_item_prix;
+    QTableWidgetItem* p_widget_item_etat;
+
+    // Set first item of last row (name)
+    p_widget_item_nom= new QTableWidgetItem(kit->getNom());
+    ui->tableWidget_kit->setItem(row-1, 0, p_widget_item_nom);
+
+    // Set second item of last row (code)
+    p_widget_item_code= new QTableWidgetItem(kit->getCode());
+    ui->tableWidget_kit->setItem(row-1, 1, p_widget_item_code);
+
+    // Set second item of last row (caution)
+    p_widget_item_caution= new QTableWidgetItem(kit->getCaution().getStringValue());
+    ui->tableWidget_kit->setItem(row-1, 2, p_widget_item_caution);
+
+    // Set second item of last row (date)
+    QString toto = kit->getDate_achat().toString("dd.MM.yyyy");
+    p_widget_item_date= new QTableWidgetItem(toto);
+    ui->tableWidget_kit->setItem(row-1, 3, p_widget_item_date);
+
+    // Set second item of last row (prix)
+    p_widget_item_prix= new QTableWidgetItem(kit->getPrix_achat().getStringValue());
+    ui->tableWidget_kit->setItem(row-1, 4, p_widget_item_prix);
+
+    // Set second item of last row (etat)
+    p_widget_item_etat= new QTableWidgetItem(kit->getEn_panne_str());
+    ui->tableWidget_kit->setItem(row-1, 5, p_widget_item_etat);
+}
+
+// ^^^^^^ MAIN WINDOW "Gestion Kits" ^^^^^^
+//---------------------------------------------------------
+
 
 
 //---------------------------------------------------------

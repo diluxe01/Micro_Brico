@@ -42,9 +42,12 @@ private slots:
     void on_popupAddKit_destroyed();
     void on_popupAddKit_ok();
 
+    void on_pushButton_getkit_clicked();
+
 private:
     Ui::MainWindow *ui;
     std::list<Utilisateur*> userList;
+    std::list<Kit*> kitList;
     Utilisateur new_user;
     Utilisateur login_user;
     popupAddUsers *p_popupAddUser;
@@ -54,7 +57,7 @@ private:
     void closeEvent (QCloseEvent *event);
     void add_user_to_DB(void);
     void clearUserList(void);
-    void refreshScrollArea(void);
+    void refresh_user_list_table(void);
 
     void activateWidgets(bool);
 
@@ -63,5 +66,8 @@ private:
     void on_popupDelete_ok();
     void on_popupDelete_destroyed();
 
+    void push_back_new_kit_on_table(Kit *kit, int row);
+    void refresh_kit_list_table();
+    void clearKitList();
 };
 #endif // MAINWINDOW_H

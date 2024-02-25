@@ -9,6 +9,7 @@
 #include "item.h"
 
 #include <list>
+#include <iterator>
 
 class Connect_db : public QObject
 {
@@ -18,12 +19,13 @@ private:
     void update_user_infos_from_db(Utilisateur *login_user);
     bool is_user_connected(Utilisateur *login_user);
 
-    void get_querry_errors(QSqlQuery &query);
+    bool get_querry_errors(QSqlQuery &query);
 public:
 
     QSqlDatabase db;
     Connect_db();
-    void select_all_users(Utilisateur *login_user, std::list<Utilisateur*> *list);
+    void select_all_users(std::list<Utilisateur*> *list);
+    void select_all_kits(std::list<Kit*> *kits);
     bool add_user (Utilisateur *user);
     bool add_kit (Kit *kit);
     bool delete_user(Utilisateur *user_to_delete);

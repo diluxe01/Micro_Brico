@@ -19,6 +19,8 @@ public:
 
 
     bool setValue(QString new_value);
+    uint32_t getU32_value() const;
+    QString getPartie_entiere() const;
 };
 
 #endif // MONEY_H
