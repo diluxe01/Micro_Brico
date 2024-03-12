@@ -34,6 +34,7 @@ public:
     void setForkey(uint newForkey);
 
     QString getEtatStr() const;
+    void setEtatStr(QString etat_str);
 signals:
 };
 

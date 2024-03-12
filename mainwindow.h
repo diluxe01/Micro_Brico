@@ -44,10 +44,12 @@ private slots:
 
     void on_pushButton_getkit_clicked();
 
+    void on_tableWidget_kit_cellClicked(int row, int column);
+
 private:
     Ui::MainWindow *ui;
     std::list<Utilisateur*> userList;
-    std::list<Kit*> kitList;
+    std::vector<Kit*> kitList;
     Utilisateur new_user;
     Utilisateur login_user;
     popupAddUsers *p_popupAddUser;
@@ -66,8 +68,12 @@ private:
     void on_popupDelete_ok();
     void on_popupDelete_destroyed();
 
-    void push_back_new_kit_on_table(Kit *kit, int row);
     void refresh_kit_list_table();
+    void push_back_new_kit_on_table(Kit *kit, int row);
     void clearKitList();
+
+    void refresh_item_list_table(Kit *kit);
+    void push_back_new_item_on_table(Item *item, int row);
+    void clearItemList(Kit *k);
 };
 #endif // MAINWINDOW_H

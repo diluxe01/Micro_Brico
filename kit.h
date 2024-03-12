@@ -27,7 +27,7 @@ public:
     Kit(uint idkit, const QString &nom, const QString &description, const QDate &date_achat, const Money &prix_achat, const QString &texte_libre, bool en_panne, const QString &code, const Money &caution);
     Kit(uint idkit, const QString &nom, const QString &description, const QString &date_achat, const QString &prix_achat, const QString &texte_libre, const bool en_panne, const QString &code, const QString &caution);
 
-    std::list<Item*> item_list;
+    std::vector<Item*> item_list;
 
     QString getNom() const;
     QString getDescription() const;
@@ -37,6 +37,7 @@ public:
     bool getEn_panne() const;
     QString getCode() const;
     Money getCaution() const;
+    uint getIdKit() const;
 
     void setIdkit(uint newIdkit);
     void setNom(const QString &newNom);

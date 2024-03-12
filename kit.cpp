@@ -51,6 +51,11 @@ Money Kit::getCaution() const
     return caution;
 }
 
+uint Kit::getIdKit() const
+{
+    return idkit;
+}
+
 void Kit::setIdkit(uint newIdkit)
 {
     idkit = newIdkit;

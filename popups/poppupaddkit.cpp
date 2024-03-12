@@ -92,7 +92,6 @@ void PoppupAddKit::push_back_new_item_on_tabWidget(Item* item)
 
 void PoppupAddKit::on_pushButton_deleteitemfromlist_clicked()
 {
-    std::list<Item*>::iterator it;
     if (this->kit->item_list.empty() == false)
     {
         //Get current row
@@ -102,9 +101,7 @@ void PoppupAddKit::on_pushButton_deleteitemfromlist_clicked()
         ui->tableWidget_itemBasket->removeRow(currentRow);
 
         //Delete element on the list at given index
-        it = this->kit->item_list.begin();
-        advance(it, currentRow);
-        this->kit->item_list.erase(it);
+        this->kit->item_list.erase(this->kit->item_list.begin()+currentRow);
     }
 
 }

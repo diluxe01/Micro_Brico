@@ -27,6 +27,9 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    // Set active user in g_db_connect
+    g_connect_db.setActiveUser(&(this->login_user));
+
     // Init of the connection status slot
     this->login_user.setIs_logged_on(true);
     update_connection_status(false);
@@ -48,6 +51,16 @@ MainWindow::MainWindow(QWidget *parent)
     header_list.append("Prix d'achat");
     header_list.append("En Panne?");
     ui->tableWidget_kit->setHorizontalHeaderLabels(header_list);
+
+
+    // init of items display table
+    header_list.clear();
+    ui->tableWidget_item->setRowCount(0);
+    ui->tableWidget_item->setColumnCount(2);
+    header_list.append("Nom");
+    header_list.append("Etat");
+    ui->tableWidget_item->setHorizontalHeaderLabels(header_list);
+
 }
 
 MainWindow::~MainWindow()
@@ -136,7 +149,7 @@ void MainWindow::on_popupLogin_destroyed()
 void MainWindow::on_popupLogin_ok()
 {
     qDebug() << "OK popup! ;)";
-    if (g_connect_db.connect_user(&this->login_user))
+    if (g_connect_db.connect_user())
     {
         this->login_user.setToken(g_connect_db.get_unique_token());
         g_connect_db.update_user_token_on_db(&this->login_user);
@@ -217,6 +230,7 @@ void MainWindow::on_pushButton_getkit_clicked()
     /* refresh the user list by cleaning and loading it again */
     this->clearKitList();
 
+    /* if user enterd a code, then search for Kits with this code */
     if (ui->lineEdit_findkitbycode->text()!="")
     {
         g_connect_db.select_kits_by_code(&this->kitList,ui->lineEdit_findkitbycode->text() );
@@ -233,7 +247,7 @@ void MainWindow::on_pushButton_getkit_clicked()
 
 void MainWindow::refresh_kit_list_table(void)
 {
-    list<Kit*>::iterator it;
+    vector<Kit*>::iterator it;
     int row = 0;
     this->ui->tableWidget_kit->clearContents();
     for (it = kitList.begin(); it != kitList.end(); it++)
@@ -261,22 +275,75 @@ void MainWindow::push_back_new_kit_on_table(Kit* kit, int row)
     p_widget_item_code= new QTableWidgetItem(kit->getCode());
     ui->tableWidget_kit->setItem(row-1, 1, p_widget_item_code);
 
-    // Set second item of last row (caution)
+    // Set third item of last row (caution)
     p_widget_item_caution= new QTableWidgetItem(kit->getCaution().getStringValue());
     ui->tableWidget_kit->setItem(row-1, 2, p_widget_item_caution);
 
-    // Set second item of last row (date)
+    // Set fourth item of last row (date)
     QString date = kit->getDate_achat().toString("dd.MM.yyyy");
     p_widget_item_date= new QTableWidgetItem(date);
     ui->tableWidget_kit->setItem(row-1, 3, p_widget_item_date);
 
-    // Set second item of last row (prix)
+    // Set fifth item of last row (prix)
     p_widget_item_prix= new QTableWidgetItem(kit->getPrix_achat().getStringValue());
     ui->tableWidget_kit->setItem(row-1, 4, p_widget_item_prix);
 
-    // Set second item of last row (etat)
+    // Set sixth item of last row (etat)
     p_widget_item_etat= new QTableWidgetItem(kit->getEn_panne_str());
     ui->tableWidget_kit->setItem(row-1, 5, p_widget_item_etat);
+}
+
+void MainWindow::clearItemList(Kit* k)
+{
+    for(const auto& elem : k->item_list)
+    {
+        delete (elem);
+    }
+    k->item_list.clear();
+}
+
+
+void MainWindow::on_tableWidget_kit_cellClicked(int row, int column)
+{
+
+    Kit* k = this->kitList[row];
+    if (k->item_list.empty())
+    {
+        clearItemList(k);
+        g_connect_db.select_items_by_kit(k);
+    }
+    refresh_item_list_table(k);
+
+}
+
+/*
+This Function updates the item table with every items
+associated with the currently selected kit
+*/
+void MainWindow::refresh_item_list_table(Kit* kit)
+{
+    vector<Item*>::iterator it;
+    int row = 0;
+    this->ui->tableWidget_item->clearContents();
+    for (it = kit->item_list.begin(); it != kit->item_list.end(); it++)
+    {
+        row++;
+        push_back_new_item_on_table((*it), row);
+    }
+}
+
+void MainWindow::push_back_new_item_on_table(Item* item, int row)
+{
+    ui->tableWidget_item->setRowCount(row);
+    QTableWidgetItem* p_widget_item_name;
+    QTableWidgetItem* p_widget_item_etat;
+    // Set first item of last row (name)
+    p_widget_item_name= new QTableWidgetItem(item->getName());
+    ui->tableWidget_item->setItem(row-1, 0, p_widget_item_name);
+
+    // Set second item of last row (etat)
+    p_widget_item_etat= new QTableWidgetItem(item->getEtatStr());
+    ui->tableWidget_item->setItem(row-1, 1, p_widget_item_etat);
 }
 
 // ^^^^^^ MAIN WINDOW "Gestion Kits" ^^^^^^
@@ -367,7 +434,7 @@ void MainWindow::log_stuffs(QtMsgType type, const QString &msg)
 //---------------------------------------------------------
 
 //---------------------------------------------------------
-// vvvvvv POPUP DELETE_USER SECTION vvvvvv
+// vvvvvv POPUP Add_kit SECTION vvvvvv
 
 
 void MainWindow::on_pushButton_addkit_clicked()
@@ -403,7 +470,7 @@ void MainWindow::on_popupAddKit_ok()
         delete (this->p_popupAddKit);
     }
 }
-// ^^^^^^ POPUP DELETE_USER SECTION ^^^^^^
+// ^^^^^^ POPUP Add_kit SECTION ^^^^^^
 //---------------------------------------------------------
 
 

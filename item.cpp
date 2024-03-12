@@ -37,7 +37,7 @@ T_etat_item Item::getEtat() const
 QString Item::getEtatStr() const
 {
     QString etat_str;
-    switch(etat)
+    switch(this->etat)
     {
     case E_NEW:
         etat_str = "NEUF";
@@ -56,6 +56,30 @@ QString Item::getEtatStr() const
         break;
     }
     return etat_str;
+}
+
+void Item::setEtatStr(QString etat_str)
+{
+    if (etat_str == "NEUF")
+    {
+        this->etat = E_NEW;
+    }
+    else if (etat_str == "USE")
+    {
+        this->etat = E_WORN;
+    }
+    else if (etat_str == "CASSE")
+    {
+        this->etat = E_BROKEN;
+    }
+    else if (etat_str == "PERDU")
+    {
+        this->etat = E_LOST;
+    }
+    else
+    {
+        this->etat = E_NEW;
+    }
 }
 
 Item::Item(uint id, const QString &name, uint forkey, T_etat_item etat) : id(std::move(id)),
