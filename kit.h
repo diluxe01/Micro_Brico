@@ -6,7 +6,7 @@
 #include <QDate>
 #include "money.h"
 #include "item.h"
-#include <list>
+#include <vector>
 class Kit : public QObject
 {
     Q_OBJECT
@@ -45,17 +45,15 @@ public:
     void setDate_achat(const QDate &newDate_achat);
     void setPrix_achat(const Money &newPrix_achat);
     void setTexte_libre(const QString &newTexte_libre);
-
     void setCaution(const Money &newCaution);
-
     void setEn_panne(bool newEn_panne);
-
     void setCode(const QString &newCode);
-
     void setDate_achat(const QString &newDate_achat);
     void setPrix_achat(const QString &newPrix_achat);
     void setCaution(const QString &newCaution);
     QString getEn_panne_str() const;
+    ~Kit();
+    QString toString();
 signals:
 };
 

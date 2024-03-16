@@ -30,6 +30,12 @@ MainWindow::MainWindow(QWidget *parent)
     // Set active user in g_db_connect
     g_connect_db.setActiveUser(&(this->login_user));
 
+    // Init date Edit in resa tab to current date
+    QDate maxDate;
+    maxDate.setDate(9999,12,30);
+    ui->dateEdit_deb_resa->setDate(QDate::currentDate());
+    ui->dateEdit_deb_resa->setDateRange(QDate::currentDate(), maxDate);
+
     // Init of the connection status slot
     this->login_user.setIs_logged_on(true);
     update_connection_status(false);
@@ -40,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent)
     qInstallMessageHandler(myMessageOutput);
     connect(logBrowser, &LogBrowser::sendMessage, this, &MainWindow::log_stuffs, Qt::QueuedConnection);
 
-    // init of Kit display table
+    // Init of Kit display table
     QStringList header_list;
     ui->tableWidget_kit->setRowCount(0);
     ui->tableWidget_kit->setColumnCount(6);
@@ -53,7 +59,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tableWidget_kit->setHorizontalHeaderLabels(header_list);
 
 
-    // init of items display table
+    // Init of items display table
     header_list.clear();
     ui->tableWidget_item->setRowCount(0);
     ui->tableWidget_item->setColumnCount(2);
@@ -95,6 +101,14 @@ void MainWindow::on_actionAfficher_les_logs_triggered()
     logBrowser->show();
 }
 
+void MainWindow::clearKitList(std::vector<Kit*> *i_kitlist)
+{
+    for(const auto& elem : *i_kitlist)
+    {
+        delete (elem);
+    }
+    i_kitlist->clear();
+}
 //---------------------------------------------------------
 // vvvvvv POPUP ADD USER SECTION vvvvvv
 
@@ -192,9 +206,6 @@ void MainWindow::on_getUsers_clicked()
     this->clearUserList();
 
     g_connect_db.select_all_users(&this->userList);
-
-    qDebug() << "Iterate: ";
-
     MainWindow::refresh_user_list_table();
 }
 
@@ -216,31 +227,27 @@ void MainWindow::refresh_user_list_table(void)
 
 //---------------------------------------------------------
 // vvvvvv MAIN WINDOW "Gestion Kits" SECTION vvvvvv
-void MainWindow::clearKitList(void)
-{
-    for(const auto& elem : this->kitList)
-    {
-        delete (elem);
-    }
-    this->kitList.clear();
-}
 
 void MainWindow::on_pushButton_getkit_clicked()
 {
     /* refresh the user list by cleaning and loading it again */
-    this->clearKitList();
+    this->clearKitList(&this->kitList);
 
     /* if user enterd a code, then search for Kits with this code */
     if (ui->lineEdit_findkitbycode->text()!="")
     {
         g_connect_db.select_kits_by_code(&this->kitList,ui->lineEdit_findkitbycode->text() );
     }
+    /* if user enterd a text, then search for Kits with this code */
+    else if (ui->lineEdit_findkitbyname->text()!="")
+    {
+        g_connect_db.select_kits_by_name(&this->kitList,ui->lineEdit_findkitbyname->text() );
+    }
     else
     {
         g_connect_db.select_all_kits(&this->kitList);
     }
 
-    qDebug() << "Iterate: ";
 
     MainWindow::refresh_kit_list_table();
 }
@@ -303,6 +310,8 @@ void MainWindow::clearItemList(Kit* k)
 }
 
 
+
+
 void MainWindow::on_tableWidget_kit_cellClicked(int row, int column)
 {
 
@@ -313,9 +322,14 @@ void MainWindow::on_tableWidget_kit_cellClicked(int row, int column)
         g_connect_db.select_items_by_kit(k);
     }
     refresh_item_list_table(k);
-
+    GESKIT_refresh_descritption(k);
 }
 
+void MainWindow::GESKIT_refresh_descritption(Kit* kit)
+{
+    this->ui->textEdit_detailsKit->setText(kit->getTexte_libre());
+    this->ui->textEdit_descritpionKit->setText(kit->getDescription());
+}
 /*
 This Function updates the item table with every items
 associated with the currently selected kit
@@ -472,5 +486,66 @@ void MainWindow::on_popupAddKit_ok()
 }
 // ^^^^^^ POPUP Add_kit SECTION ^^^^^^
 //---------------------------------------------------------
+
+
+//---------------------------------------------------------
+// vvvvvv MAIN WINDOW "Gestion Reservation" vvvvvv
+
+void MainWindow::on_dateEdit_deb_resa_userDateChanged(const QDate &date)
+{
+    if(date.dayOfWeek() == 5) // if friday
+    {
+
+        ui->pushButton_reserver->setEnabled(true);
+    }
+    else
+    {
+        qInfo()<< "Date de début: Vous devez choisir un vendredi!";
+        ui->pushButton_reserver->setEnabled(false);
+    }
+}
+
+
+
+void MainWindow::on_pushButton_getkit_resa_clicked()
+{
+    /* refresh the user list by cleaning and loading it again */
+    this->clearKitList(&this->kitListResa);
+
+    /* if user enterd a code, then search for Kits with this code */
+    if (ui->lineEdit_findkitbycode_resa->text()!="")
+    {
+        g_connect_db.select_kits_by_code(&this->kitListResa,ui->lineEdit_findkitbycode_resa->text() );
+    }
+    /* if user enterd a text, then search for Kits with this code */
+    else if (ui->lineEdit_findkitbyname_resa->text()!="")
+    {
+        g_connect_db.select_kits_by_name(&this->kitListResa,ui->lineEdit_findkitbyname_resa->text() );
+    }
+    else
+    {
+        g_connect_db.select_all_kits(&this->kitListResa);
+    }
+
+    qDebug() << "Iterate: ";
+
+    MainWindow::RESA_refresh_kit_list_table();
+}
+
+void MainWindow::RESA_refresh_kit_list_table(void)
+{
+    vector<Kit*>::iterator it;
+    int row = 0;
+    this->ui->listWidget_resa->clear();
+    for(const auto& kit_elem : this->kitListResa)
+    {
+        new QListWidgetItem(kit_elem->toString(), this->ui->listWidget_resa);
+    }
+}
+
+
+// ^^^^^^ MAIN WINDOW "Gestion Reservation" ^^^^^^
+//---------------------------------------------------------
+
 
 

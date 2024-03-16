@@ -205,7 +205,7 @@ void Connect_db::update_user_infos_from_db(Utilisateur *login_user)
     }
 }
 
-void  Connect_db::select_all_users (std::list<Utilisateur*> *list)
+void  Connect_db::select_all_users (std::vector<Utilisateur*> *list)
 {
     QSqlQuery query2 = QSqlQuery(this->db);
     runQuery(query2, "SELECT id, nom, mdp, prenom, email, utinfo, token from utilisateur");
@@ -262,7 +262,14 @@ void  Connect_db::select_all_kits (std::vector<Kit *> *kits)
 void  Connect_db::select_kits_by_code (std::vector<Kit*> *kits, QString code)
 {
     QSqlQuery query(this->db);
-    runQuery(query, "SELECT idkit, nom, description, date_achat, prix_achat, texte_libre, en_panne, code_kit, caution from kit where code_kit='"+code+"'");
+    runQuery(query, "SELECT idkit, nom, description, date_achat, prix_achat, texte_libre, en_panne, code_kit, caution from kit where code_kit REGEXP '"+code+"'");
+    populate_kit_list_from_query(kits, query);
+}
+
+void  Connect_db::select_kits_by_name (std::vector<Kit*> *kits, QString code)
+{
+    QSqlQuery query(this->db);
+    runQuery(query, "SELECT idkit, nom, description, date_achat, prix_achat, texte_libre, en_panne, code_kit, caution from kit where nom REGEXP '"+code+"'");
     populate_kit_list_from_query(kits, query);
 }
 

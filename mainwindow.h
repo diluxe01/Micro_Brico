@@ -46,10 +46,17 @@ private slots:
 
     void on_tableWidget_kit_cellClicked(int row, int column);
 
+
+
+    void on_dateEdit_deb_resa_userDateChanged(const QDate &date);
+
+    void on_pushButton_getkit_resa_clicked();
+
 private:
     Ui::MainWindow *ui;
-    std::list<Utilisateur*> userList;
-    std::vector<Kit*> kitList;
+    std::vector<Utilisateur*> userList;
+    std::vector<Kit*> kitList; //List of kits only for "Gestion Kits" tab
+    std::vector<Kit*> kitListResa; //List of kits only for "Gestion Kits Resa" tab
     Utilisateur new_user;
     Utilisateur login_user;
     popupAddUsers *p_popupAddUser;
@@ -70,10 +77,12 @@ private:
 
     void refresh_kit_list_table();
     void push_back_new_kit_on_table(Kit *kit, int row);
-    void clearKitList();
+    void clearKitList(std::vector<Kit*> *);
 
     void refresh_item_list_table(Kit *kit);
     void push_back_new_item_on_table(Item *item, int row);
     void clearItemList(Kit *k);
+    void RESA_refresh_kit_list_table();
+    void GESKIT_refresh_descritption(Kit *kit);
 };
 #endif // MAINWINDOW_H

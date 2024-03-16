@@ -28,7 +28,7 @@ public:
 
     QSqlDatabase db;
     Connect_db();
-    void select_all_users(std::list<Utilisateur*> *list);
+    void select_all_users(std::vector<Utilisateur*> *list);
     void select_all_kits(std::vector<Kit*> *kits);
     bool add_user (Utilisateur *user);
     bool add_kit (Kit *kit);
@@ -38,6 +38,7 @@ public:
     QString get_unique_token(void);
     void update_user_token_on_db(Utilisateur *login_user);
     void select_kits_by_code(std::vector<Kit *> *kits, QString code);
+    void select_kits_by_name(std::vector<Kit *> *kits, QString code);
     void setActiveUser(Utilisateur * p_user);
     void select_items_by_kit (Kit * kit);
     void populate_item_list_from_query(Kit * kit, QSqlQuery query);

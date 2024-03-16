@@ -112,11 +112,22 @@ void Kit::setEn_panne(bool newEn_panne)
     en_panne = newEn_panne;
 }
 
-
-
 void Kit::setCode(const QString &newCode)
 {
     code = newCode;
+}
+
+QString Kit::toString()
+{
+    return this->nom + " (" + this->code + ")";
+}
+
+Kit::~Kit()
+{
+    for(const auto& elem : this->item_list)
+    {
+        delete (elem);
+    }
 }
 
 Kit::Kit(QObject *parent)
