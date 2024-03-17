@@ -12,6 +12,7 @@
 #include <QDateTime>
 #include <QCloseEvent>
 #include <QMessageBox>
+#include <QRegularExpression>
 
 QPointer<LogBrowser> logBrowser;
 
@@ -90,7 +91,7 @@ void MainWindow::closeEvent (QCloseEvent *event)
     // }
 }
 
-void MainWindow::add_user_to_DB(void)
+void MainWindow::GESUSER_add_user_to_DB(void)
 {
     g_connect_db.add_user(&this->new_user);
 
@@ -101,14 +102,8 @@ void MainWindow::on_actionAfficher_les_logs_triggered()
     logBrowser->show();
 }
 
-void MainWindow::clearKitList(std::vector<Kit*> *i_kitlist)
-{
-    for(const auto& elem : *i_kitlist)
-    {
-        delete (elem);
-    }
-    i_kitlist->clear();
-}
+
+
 //---------------------------------------------------------
 // vvvvvv POPUP ADD USER SECTION vvvvvv
 
@@ -121,7 +116,7 @@ void MainWindow::on_popupaddUser_destroyed()
 void MainWindow::on_popupaddUser_ok()
 {
     qDebug() << "OK popup! ;)";
-    this->add_user_to_DB();
+    this->GESUSER_add_user_to_DB();
     this->p_popupAddUser->deleteInstance();
 }
 
@@ -191,22 +186,14 @@ void MainWindow::on_actionSe_d_connecter_triggered()
 // ^^^^^^ POPUP LOGIN SECTION ^^^^^^
 //---------------------------------------------------------
 // vvvvvv MAIN WINDOW "Gestion Utilisateur" SECTION vvvvvv
-void MainWindow::clearUserList(void)
-{
-    for(const auto& elem : this->userList)
-    {
-        delete (elem);
-    }
-    this->userList.clear();
-}
 
 void MainWindow::on_getUsers_clicked()
 {
     /* refresh the user list by cleaning and loading it again */
-    this->clearUserList();
+    g_utils.clearList(&this->userList);
 
     g_connect_db.select_all_users(&this->userList);
-    MainWindow::refresh_user_list_table();
+    MainWindow::GESUSER_refresh_user_list_table();
 }
 
 void MainWindow::activateWidgets(bool)
@@ -214,7 +201,7 @@ void MainWindow::activateWidgets(bool)
 
 }
 
-void MainWindow::refresh_user_list_table(void)
+void MainWindow::GESUSER_refresh_user_list_table(void)
 {
     this->ui->listWidget->clear();
     for(const auto& toto : this->userList)
@@ -231,7 +218,7 @@ void MainWindow::refresh_user_list_table(void)
 void MainWindow::on_pushButton_getkit_clicked()
 {
     /* refresh the user list by cleaning and loading it again */
-    this->clearKitList(&this->kitList);
+    g_utils.clearList(&this->kitList);
 
     /* if user enterd a code, then search for Kits with this code */
     if (ui->lineEdit_findkitbycode->text()!="")
@@ -249,10 +236,10 @@ void MainWindow::on_pushButton_getkit_clicked()
     }
 
 
-    MainWindow::refresh_kit_list_table();
+    MainWindow::GESKIT_refresh_kit_list_table();
 }
 
-void MainWindow::refresh_kit_list_table(void)
+void MainWindow::GESKIT_refresh_kit_list_table(void)
 {
     vector<Kit*>::iterator it;
     int row = 0;
@@ -260,11 +247,11 @@ void MainWindow::refresh_kit_list_table(void)
     for (it = kitList.begin(); it != kitList.end(); it++)
     {
         row++;
-        push_back_new_kit_on_table((*it), row);
+        GESKIT_push_back_new_kit_on_table((*it), row);
     }
 }
 
-void MainWindow::push_back_new_kit_on_table(Kit* kit, int row)
+void MainWindow::GESKIT_push_back_new_kit_on_table(Kit* kit, int row)
 {
     ui->tableWidget_kit->setRowCount(row);
     QTableWidgetItem* p_widget_item_nom;
@@ -300,16 +287,6 @@ void MainWindow::push_back_new_kit_on_table(Kit* kit, int row)
     ui->tableWidget_kit->setItem(row-1, 5, p_widget_item_etat);
 }
 
-void MainWindow::clearItemList(Kit* k)
-{
-    for(const auto& elem : k->item_list)
-    {
-        delete (elem);
-    }
-    k->item_list.clear();
-}
-
-
 
 
 void MainWindow::on_tableWidget_kit_cellClicked(int row, int column)
@@ -318,10 +295,10 @@ void MainWindow::on_tableWidget_kit_cellClicked(int row, int column)
     Kit* k = this->kitList[row];
     if (k->item_list.empty())
     {
-        clearItemList(k);
+        g_utils.clearList(&k->item_list);
         g_connect_db.select_items_by_kit(k);
     }
-    refresh_item_list_table(k);
+    GESKIT_refresh_item_list_table(k);
     GESKIT_refresh_descritption(k);
 }
 
@@ -334,7 +311,7 @@ void MainWindow::GESKIT_refresh_descritption(Kit* kit)
 This Function updates the item table with every items
 associated with the currently selected kit
 */
-void MainWindow::refresh_item_list_table(Kit* kit)
+void MainWindow::GESKIT_refresh_item_list_table(Kit* kit)
 {
     vector<Item*>::iterator it;
     int row = 0;
@@ -342,11 +319,11 @@ void MainWindow::refresh_item_list_table(Kit* kit)
     for (it = kit->item_list.begin(); it != kit->item_list.end(); it++)
     {
         row++;
-        push_back_new_item_on_table((*it), row);
+        GESKIT_push_back_new_item_on_table((*it), row);
     }
 }
 
-void MainWindow::push_back_new_item_on_table(Item* item, int row)
+void MainWindow::GESKIT_push_back_new_item_on_table(Item* item, int row)
 {
     ui->tableWidget_item->setRowCount(row);
     QTableWidgetItem* p_widget_item_name;
@@ -497,11 +474,27 @@ void MainWindow::on_dateEdit_deb_resa_userDateChanged(const QDate &date)
     {
 
         ui->pushButton_reserver->setEnabled(true);
+        ui->pushButton_getkit_resa->setEnabled(true);
+
+        /* clean the kit list and delete objects pointed by element of this list */
+        g_utils.clearList(&this->kitListResa);
+
+        /* clean the other list containing pointer to elements already deleted by the previous instruction */
+        this->kitListResa_view.clear();
+        this->kitListBasket.clear();
+        this->ui->listWidget_panierResa->clear();
+        this->ui->listWidget_resa->clear();
+
+        //Get every kits on server
+        g_connect_db.select_all_kits(&this->kitListResa);
+        //Find out if kits in resa_list are already booked
+        g_connect_db.set_kit_booked_status(&this->kitListResa, this->ui->dateEdit_deb_resa->date());
     }
     else
     {
         qInfo()<< "Date de début: Vous devez choisir un vendredi!";
         ui->pushButton_reserver->setEnabled(false);
+        ui->pushButton_getkit_resa->setEnabled(false);
     }
 }
 
@@ -509,41 +502,158 @@ void MainWindow::on_dateEdit_deb_resa_userDateChanged(const QDate &date)
 
 void MainWindow::on_pushButton_getkit_resa_clicked()
 {
-    /* refresh the user list by cleaning and loading it again */
-    this->clearKitList(&this->kitListResa);
+
+    // Set property "is_in_resa_view"" of items in kitListResa_view to "false"
+    for(const auto& kit_elem : this->kitListResa_view)
+    {
+        kit_elem->setIs_in_resa_view(false);
+    }
+    this->kitListResa_view.clear();
 
     /* if user enterd a code, then search for Kits with this code */
     if (ui->lineEdit_findkitbycode_resa->text()!="")
     {
-        g_connect_db.select_kits_by_code(&this->kitListResa,ui->lineEdit_findkitbycode_resa->text() );
+        RESA_get_kits_by_code(&this->kitListResa,&this->kitListResa_view,ui->lineEdit_findkitbycode_resa->text() );
     }
     /* if user enterd a text, then search for Kits with this code */
     else if (ui->lineEdit_findkitbyname_resa->text()!="")
     {
-        g_connect_db.select_kits_by_name(&this->kitListResa,ui->lineEdit_findkitbyname_resa->text() );
+        RESA_get_kits_by_name(&this->kitListResa,&this->kitListResa_view,ui->lineEdit_findkitbyname_resa->text() );
     }
     else
     {
-        g_connect_db.select_all_kits(&this->kitListResa);
+        //
     }
 
-    qDebug() << "Iterate: ";
 
     MainWindow::RESA_refresh_kit_list_table();
 }
+
+//Function finding every kit with a specific name in from_kit list, and store those kit in to_kits list
+void MainWindow::RESA_get_kits_by_name(std::vector<Kit*> *from_kits, std::vector<Kit*> *to_kits, QString code)
+{
+    QRegularExpression re;
+    QRegularExpressionMatch match;
+    for(const auto& kit_elem : *from_kits)
+    {
+        if (kit_elem->getIs_in_resa_view())
+        {
+            //do nothing, already in resa view
+        }
+        else
+        {
+            re.setPattern(code);
+            match = re.match(kit_elem->getNom());
+            if ( match.hasMatch() )
+            {
+                to_kits->push_back(kit_elem);
+                kit_elem->setIs_in_resa_view(true);
+            }
+        }
+    }
+}
+
+//Function finding every kit with a specific code in from_kit list, and store those kit in to_kits list
+void MainWindow::RESA_get_kits_by_code(std::vector<Kit*> *from_kits, std::vector<Kit*> *to_kits, QString code)
+{
+
+    QRegularExpression re;
+    QRegularExpressionMatch match;
+    for(const auto& kit_elem : *from_kits)
+    {
+        if (kit_elem->getIs_in_resa_view())
+        {
+            //do nothing, already in resa view
+        }
+        else
+        {
+            re.setPattern(code);
+            match = re.match(kit_elem->getCode());
+            if ( match.hasMatch() )
+            {
+                to_kits->push_back(kit_elem);
+                kit_elem->setIs_in_resa_view(true);
+            }
+        }
+    }
+}
+
 
 void MainWindow::RESA_refresh_kit_list_table(void)
 {
     vector<Kit*>::iterator it;
     int row = 0;
+    QBrush brush_booked;
+    QBrush brush_free;
+    QBrush brush_basket;
+    // Define brush to display kit booked in kit reservation list
+    brush_booked.setColor(Qt::GlobalColor::gray);
+    brush_booked.setStyle(Qt::SolidPattern);
+    // Define brush to display kit free in kit reservation list
+    brush_free.setColor(Qt::GlobalColor::green);
+    brush_free.setStyle(Qt::SolidPattern);
+    // Define brush to display kit in basket
+    brush_basket.setColor(Qt::GlobalColor::yellow);
+    brush_basket.setStyle(Qt::SolidPattern);
     this->ui->listWidget_resa->clear();
-    for(const auto& kit_elem : this->kitListResa)
+    for(const auto& kit_elem : this->kitListResa_view)
     {
-        new QListWidgetItem(kit_elem->toString(), this->ui->listWidget_resa);
+        QListWidgetItem* p_item = new QListWidgetItem(kit_elem->toString(), this->ui->listWidget_resa);
+        if (kit_elem->getIs_booked())
+        {
+            p_item->setBackground(brush_booked);
+        }
+        else if(kit_elem->getIs_in_basket())
+        {
+            p_item->setBackground(brush_basket);
+        }
+        else
+        {
+            p_item->setBackground(brush_free);
+        }
+    }
+}
+
+void MainWindow::on_listWidget_resa_itemDoubleClicked(QListWidgetItem *item)
+{
+    int row = this->ui->listWidget_resa->row(item);
+    Kit* p_kit = this->kitListResa_view.at(row);
+
+    if (p_kit->getIs_booked() || p_kit->getIs_in_basket())
+    {
+        //do nothing
+    }
+    else
+    {
+        p_kit->setIs_in_basket(true);
+        this->kitListBasket.push_back(p_kit);
+    }
+    RESA_refresh_kit_list_table();
+    RESA_refresh_basket_kit_list_table();
+}
+
+void MainWindow::RESA_refresh_basket_kit_list_table(void)
+{
+    this->ui->listWidget_panierResa->clear();
+    for(const auto& kit_elem : this->kitListBasket)
+    {
+        QListWidgetItem* p_item = new QListWidgetItem(kit_elem->toString(), this->ui->listWidget_panierResa);
     }
 }
 
 
+void MainWindow::on_listWidget_panierResa_itemDoubleClicked(QListWidgetItem *item)
+{
+    int row = this->ui->listWidget_panierResa->row(item);
+    Kit* p_kit = this->kitListBasket.at(row);
+    p_kit->setIs_in_basket(false);
+
+    this->ui->listWidget_panierResa->removeItemWidget(item);//supprime le kit de l'affichage panier
+    this->kitListBasket.erase(this->kitListBasket.begin()+row);//supprime le kit de la liste
+
+    RESA_refresh_kit_list_table();
+    RESA_refresh_basket_kit_list_table();
+}
 // ^^^^^^ MAIN WINDOW "Gestion Reservation" ^^^^^^
 //---------------------------------------------------------
 

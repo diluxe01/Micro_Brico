@@ -21,10 +21,14 @@ private:
     QString code;
     Money caution;
 
+    bool is_booked;
+    bool is_out;
+    bool is_in_basket;
+    bool is_in_resa_view;
+
 
 public:
     explicit Kit(QObject *parent = nullptr);
-    Kit(uint idkit, const QString &nom, const QString &description, const QDate &date_achat, const Money &prix_achat, const QString &texte_libre, bool en_panne, const QString &code, const Money &caution);
     Kit(uint idkit, const QString &nom, const QString &description, const QString &date_achat, const QString &prix_achat, const QString &texte_libre, const bool en_panne, const QString &code, const QString &caution);
 
     std::vector<Item*> item_list;
@@ -54,6 +58,18 @@ public:
     QString getEn_panne_str() const;
     ~Kit();
     QString toString();
+    bool getIs_booked() const;
+    void setIs_booked(bool newIs_booked);
+
+    bool getIs_out() const;
+    void setIs_out(bool newIs_out);
+
+    bool getIs_in_basket() const;
+    void setIs_in_basket(bool newIs_in_basket);
+
+    bool getIs_in_resa_view() const;
+    void setIs_in_resa_view(bool newIs_in_resa_view);
+
 signals:
 };
 

@@ -44,6 +44,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         kit.h kit.cpp
         item.h item.cpp
         money.h money.cpp
+        resa.h resa.cpp
+        utils.h utils.cpp
+
+
 
 
 

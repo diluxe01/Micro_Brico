@@ -7,6 +7,8 @@
 #include "utilisateur.h"
 #include "kit.h"
 #include "item.h"
+#include "resa.h"
+#include "utils.h"
 
 #include <list>
 #include <iterator>
@@ -24,6 +26,7 @@ private:
     bool get_querry_errors(QSqlQuery &query);
     void populate_kit_list_from_query(std::vector<Kit *> *kits, QSqlQuery query);
     bool runQuery(QSqlQuery &query, QString query_string);
+    void populate_resa_list_from_query(std::vector<Resa *> *i_resa, QSqlQuery query);
 public:
 
     QSqlDatabase db;
@@ -37,12 +40,12 @@ public:
     QString get_sha1_from_Qstring(QString mdp);
     QString get_unique_token(void);
     void update_user_token_on_db(Utilisateur *login_user);
-    void select_kits_by_code(std::vector<Kit *> *kits, QString code);
-    void select_kits_by_name(std::vector<Kit *> *kits, QString code);
     void setActiveUser(Utilisateur * p_user);
     void select_items_by_kit (Kit * kit);
     void populate_item_list_from_query(Kit * kit, QSqlQuery query);
 
+    void set_kit_booked_status(std::vector<Kit*> *i_kits, QDate i_date);
+    void select_all_resa(std::vector<Resa *> *i_resa);
 signals:
     void log_value_changed(bool is_user_logged);
 };

@@ -130,21 +130,50 @@ Kit::~Kit()
     }
 }
 
+bool Kit::getIs_booked() const
+{
+    return is_booked;
+}
+
+void Kit::setIs_booked(bool newIs_booked)
+{
+    is_booked = newIs_booked;
+}
+
+bool Kit::getIs_out() const
+{
+    return is_out;
+}
+
+void Kit::setIs_out(bool newIs_out)
+{
+    is_out = newIs_out;
+}
+
+bool Kit::getIs_in_basket() const
+{
+    return is_in_basket;
+}
+
+void Kit::setIs_in_basket(bool newIs_in_basket)
+{
+    is_in_basket = newIs_in_basket;
+}
+
+bool Kit::getIs_in_resa_view() const
+{
+    return is_in_resa_view;
+}
+
+void Kit::setIs_in_resa_view(bool newIs_in_resa_view)
+{
+    is_in_resa_view = newIs_in_resa_view;
+}
+
 Kit::Kit(QObject *parent)
     : QObject{parent}
 {}
 
-Kit::Kit(uint idkit, const QString &nom, const QString &description, const QDate &date_achat, const Money &prix_achat, const QString &texte_libre, bool en_panne, const QString &code, const Money &caution) :
-    idkit(std::move(idkit)),
-    nom(nom),
-    description(description),
-    date_achat(date_achat),
-    prix_achat(prix_achat),
-    texte_libre(texte_libre),
-    en_panne(en_panne),
-    code(code),
-    caution(caution)
-{}
 
 Kit::Kit(uint idkit, const QString &nom, const QString &description, const QString &date_achat, const QString &prix_achat, const QString &texte_libre, const bool en_panne, const QString &code, const QString &caution)
 {
@@ -157,4 +186,8 @@ Kit::Kit(uint idkit, const QString &nom, const QString &description, const QStri
     this->setEn_panne(en_panne);
     this->setCode(code);
     this->setCaution(caution);
+    this->is_booked = false;
+    this->is_out = false;
+    this->is_in_basket = false;
+    this->is_in_resa_view = false;
 }

@@ -259,19 +259,6 @@ void  Connect_db::select_all_kits (std::vector<Kit *> *kits)
     populate_kit_list_from_query(kits, query);
 }
 
-void  Connect_db::select_kits_by_code (std::vector<Kit*> *kits, QString code)
-{
-    QSqlQuery query(this->db);
-    runQuery(query, "SELECT idkit, nom, description, date_achat, prix_achat, texte_libre, en_panne, code_kit, caution from kit where code_kit REGEXP '"+code+"'");
-    populate_kit_list_from_query(kits, query);
-}
-
-void  Connect_db::select_kits_by_name (std::vector<Kit*> *kits, QString code)
-{
-    QSqlQuery query(this->db);
-    runQuery(query, "SELECT idkit, nom, description, date_achat, prix_achat, texte_libre, en_panne, code_kit, caution from kit where nom REGEXP '"+code+"'");
-    populate_kit_list_from_query(kits, query);
-}
 
 void Connect_db::setActiveUser(Utilisateur *p_user)
 {
@@ -300,5 +287,58 @@ void Connect_db::populate_kit_list_from_query(std::vector<Kit*> *kits, QSqlQuery
         Kit * k = new Kit(id,nom, description,date_achat,prix_achat,texte_libre, bool_panne,code_kit, caution);
 
         kits->push_back(k);
+    }
+}
+
+
+void  Connect_db::set_kit_booked_status (std::vector<Kit*> *i_kits, QDate i_date)
+{
+    std::vector<Resa *> resa_list;
+    select_all_resa(&resa_list);
+    bool is_booked = false;
+
+    // Determine if id kit is in resa table at given date. If so, set "is_booked" var to true and break "for" loop.
+    for(const auto& elem_kit : *i_kits)
+    {
+        is_booked = false;
+        for(const auto& elem_resa : resa_list)
+        {
+            if ((elem_kit->getIdKit() == elem_resa->getId_kit())
+                &&(i_date == elem_resa->getStart_date()))
+            {
+                is_booked = true;
+                break;
+            }
+        }
+
+        elem_kit->setIs_booked(is_booked);
+    }
+
+
+}
+
+void  Connect_db::select_all_resa (std::vector<Resa *> *i_resa)
+{
+    QSqlQuery query(this->db);
+    runQuery(query, "SELECT * from resa");
+
+    populate_resa_list_from_query(i_resa, query);
+}
+
+void Connect_db::populate_resa_list_from_query(std::vector<Resa *> *i_resa, QSqlQuery query)
+{
+    QDate qdate;
+    while (query.next())
+    {
+        int id = query.value("id").toInt();
+        QString start_date = query.value("start_date").toString();
+        int id_kit = query.value("id_kit").toInt();
+        int id_user = query.value("id_user").toInt();
+
+        qdate = QDate::fromString(start_date,"yyyy-MM-dd");
+
+        Resa * k = new Resa(id,qdate,id_kit,id_user);
+
+        i_resa->push_back(k);
     }
 }

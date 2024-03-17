@@ -8,6 +8,9 @@
 #include "./popups/delete_user.h"
 #include "./popups/poppupaddkit.h"
 #include <list>
+
+#include <QListWidgetItem>
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -35,28 +38,26 @@ private slots:
     void on_actionSe_connecter_triggered();
     void on_deleteUser_clicked();
     void on_actionSe_d_connecter_triggered();
-
     void on_actionAfficher_les_logs_triggered();
-
     void on_pushButton_addkit_clicked();
     void on_popupAddKit_destroyed();
     void on_popupAddKit_ok();
-
     void on_pushButton_getkit_clicked();
-
     void on_tableWidget_kit_cellClicked(int row, int column);
-
-
-
     void on_dateEdit_deb_resa_userDateChanged(const QDate &date);
-
     void on_pushButton_getkit_resa_clicked();
+    void on_listWidget_resa_itemDoubleClicked(QListWidgetItem *item);
+    void on_listWidget_panierResa_itemDoubleClicked(QListWidgetItem *item);
 
 private:
     Ui::MainWindow *ui;
     std::vector<Utilisateur*> userList;
     std::vector<Kit*> kitList; //List of kits only for "Gestion Kits" tab
-    std::vector<Kit*> kitListResa; //List of kits only for "Gestion Kits Resa" tab
+    std::vector<Kit*> kitListResa; //List of every  kits only for "Gestion Kits Resa" tab
+    std::vector<Kit*> kitListResa_view; //List of kits to be displayed in "listWidget_resa"
+
+    std::vector<Kit*> kitListBasket; //List of kits to be displayed in "listWidget_panierResa"
+
     Utilisateur new_user;
     Utilisateur login_user;
     popupAddUsers *p_popupAddUser;
@@ -64,10 +65,8 @@ private:
     Delete_user *p_popupDeleteUser;
     PoppupAddKit *p_popupAddKit;
     void closeEvent (QCloseEvent *event);
-    void add_user_to_DB(void);
-    void clearUserList(void);
-    void refresh_user_list_table(void);
-
+    void GESUSER_add_user_to_DB(void);
+    void GESUSER_refresh_user_list_table(void);
     void activateWidgets(bool);
 
     void on_popupLogin_destroyed();
@@ -75,14 +74,15 @@ private:
     void on_popupDelete_ok();
     void on_popupDelete_destroyed();
 
-    void refresh_kit_list_table();
-    void push_back_new_kit_on_table(Kit *kit, int row);
-    void clearKitList(std::vector<Kit*> *);
+    void GESKIT_refresh_kit_list_table();
+    void GESKIT_push_back_new_kit_on_table(Kit *kit, int row);
 
-    void refresh_item_list_table(Kit *kit);
-    void push_back_new_item_on_table(Item *item, int row);
-    void clearItemList(Kit *k);
-    void RESA_refresh_kit_list_table();
+    void GESKIT_refresh_item_list_table(Kit *kit);
     void GESKIT_refresh_descritption(Kit *kit);
+    void GESKIT_push_back_new_item_on_table(Item *item, int row);
+    void RESA_refresh_kit_list_table();
+    void RESA_refresh_basket_kit_list_table();
+    void RESA_get_kits_by_code(std::vector<Kit *> *from_kits, std::vector<Kit *> *to_kits, QString code);
+    void RESA_get_kits_by_name(std::vector<Kit *> *from_kits, std::vector<Kit *> *to_kits, QString code);
 };
 #endif // MAINWINDOW_H
