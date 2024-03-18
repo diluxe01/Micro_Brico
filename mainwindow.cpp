@@ -522,7 +522,11 @@ void MainWindow::on_pushButton_getkit_resa_clicked()
     }
     else
     {
-        //
+        /* if user enterd nothing, get every available kits */
+        for(const auto& kit_elem : this->kitListResa)
+        {
+            this->kitListResa_view.push_back(kit_elem);
+        }
     }
 
 
@@ -532,8 +536,6 @@ void MainWindow::on_pushButton_getkit_resa_clicked()
 //Function finding every kit with a specific name in from_kit list, and store those kit in to_kits list
 void MainWindow::RESA_get_kits_by_name(std::vector<Kit*> *from_kits, std::vector<Kit*> *to_kits, QString code)
 {
-    QRegularExpression re;
-    QRegularExpressionMatch match;
     for(const auto& kit_elem : *from_kits)
     {
         if (kit_elem->getIs_in_resa_view())
@@ -542,9 +544,7 @@ void MainWindow::RESA_get_kits_by_name(std::vector<Kit*> *from_kits, std::vector
         }
         else
         {
-            re.setPattern(code);
-            match = re.match(kit_elem->getNom());
-            if ( match.hasMatch() )
+            if (kit_elem->getNom().contains(code, Qt::CaseInsensitive))
             {
                 to_kits->push_back(kit_elem);
                 kit_elem->setIs_in_resa_view(true);
@@ -567,9 +567,7 @@ void MainWindow::RESA_get_kits_by_code(std::vector<Kit*> *from_kits, std::vector
         }
         else
         {
-            re.setPattern(code);
-            match = re.match(kit_elem->getCode());
-            if ( match.hasMatch() )
+            if (kit_elem->getCode().contains(code, Qt::CaseInsensitive))
             {
                 to_kits->push_back(kit_elem);
                 kit_elem->setIs_in_resa_view(true);
@@ -648,12 +646,40 @@ void MainWindow::on_listWidget_panierResa_itemDoubleClicked(QListWidgetItem *ite
     Kit* p_kit = this->kitListBasket.at(row);
     p_kit->setIs_in_basket(false);
 
-    this->ui->listWidget_panierResa->removeItemWidget(item);//supprime le kit de l'affichage panier
-    this->kitListBasket.erase(this->kitListBasket.begin()+row);//supprime le kit de la liste
+    this->ui->listWidget_panierResa->removeItemWidget(item);//Delete kit from basket view
+    this->kitListBasket.erase(this->kitListBasket.begin()+row);//Delete kit from basket list
 
     RESA_refresh_kit_list_table();
     RESA_refresh_basket_kit_list_table();
 }
+
+
+
+
+void MainWindow::on_pushButton_reserver_clicked()
+{
+    int resa_nb = 0;
+    QDate start_date = QDate::currentDate();
+    start_date = this->ui->dateEdit_deb_resa->date();
+
+    if (this->kitListBasket.empty() == false)
+    {
+        resa_nb = g_connect_db.guess_next_resa_nb();
+
+        for(const auto& kit_elem : this->kitListBasket)
+        {
+            g_connect_db.add_resa_from_kit(kit_elem,&this->login_user,start_date, resa_nb );
+            kit_elem->setIs_in_basket(false);
+            kit_elem->setIs_booked(true);
+        }
+
+
+        this->ui->listWidget_panierResa->clear();
+        this->kitListBasket.clear();
+        RESA_refresh_kit_list_table();
+    }
+}
+
 // ^^^^^^ MAIN WINDOW "Gestion Reservation" ^^^^^^
 //---------------------------------------------------------
 

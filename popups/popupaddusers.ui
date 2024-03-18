@@ -154,7 +154,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Mot de passe:</string>
+           <string>Mot de passe: *</string>
           </property>
          </widget>
         </item>
@@ -165,6 +165,9 @@
             <width>100</width>
             <height>0</height>
            </size>
+          </property>
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
           </property>
          </widget>
         </item>
@@ -181,7 +184,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Confirmer Mot de passe:</string>
+           <string>Confirmer Mot de passe: *</string>
           </property>
          </widget>
         </item>
@@ -192,6 +195,9 @@
             <width>100</width>
             <height>0</height>
            </size>
+          </property>
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
           </property>
          </widget>
         </item>

@@ -259,6 +259,20 @@ void  Connect_db::select_all_kits (std::vector<Kit *> *kits)
     populate_kit_list_from_query(kits, query);
 }
 
+void  Connect_db::select_kits_by_code (std::vector<Kit*> *kits, QString code)
+{
+    QSqlQuery query(this->db);
+    runQuery(query, "SELECT idkit, nom, description, date_achat, prix_achat, texte_libre, en_panne, code_kit, caution from kit where code_kit REGEXP '"+code+"'");
+    populate_kit_list_from_query(kits, query);
+}
+
+void  Connect_db::select_kits_by_name (std::vector<Kit*> *kits, QString code)
+{
+    QSqlQuery query(this->db);
+    runQuery(query, "SELECT idkit, nom, description, date_achat, prix_achat, texte_libre, en_panne, code_kit, caution from kit where nom REGEXP '"+code+"'");
+    populate_kit_list_from_query(kits, query);
+}
+
 
 void Connect_db::setActiveUser(Utilisateur *p_user)
 {
@@ -341,4 +355,29 @@ void Connect_db::populate_resa_list_from_query(std::vector<Resa *> *i_resa, QSql
 
         i_resa->push_back(k);
     }
+}
+
+//Returns next reservation number by incr. the last number inserted.
+// Updates uid_resa table with incremented number
+uint32_t Connect_db::guess_next_resa_nb(void)
+{
+    QSqlQuery query(this->db);
+    runQuery(query, "SELECT iduid_resa from uid_resa order by iduid_resa DESC limit 1");
+    query.next();
+
+    int id = query.value("iduid_resa").toInt();
+    id += 1 ;
+    runQuery(query, "insert into uid_resa (iduid_resa) values  ("+QString::number(id)+")");
+    return id;
+}
+
+
+void Connect_db::add_resa_from_kit(Kit *i_p_kit, Utilisateur *i_p_user, QDate i_start_date, int i_resa_nb)
+{
+    QSqlQuery query(this->db);
+    runQuery(query,"insert into resa (start_date, id_user, id_kit, id_resa) values("
+                                                               "'"+i_start_date.toString("yyyy-MM-dd")+"', "
+                                                               "'"+QString::number(i_p_user->getId())+"', "
+                                                               "'"+QString::number(i_p_kit->getIdKit())+"',"
+                                                               "'"+QString::number(i_resa_nb)+"')");
 }

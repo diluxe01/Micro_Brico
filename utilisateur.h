@@ -43,6 +43,8 @@ public:
 
     void setToken(const QString &newToken);
 
+    int getId() const;
+
 private:
     int id;
     QString nom;

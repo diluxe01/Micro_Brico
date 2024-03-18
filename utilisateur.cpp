@@ -115,6 +115,11 @@ void Utilisateur::setToken(const QString &newToken)
     token = newToken;
 }
 
+int Utilisateur::getId() const
+{
+    return id;
+}
+
 QString Utilisateur::ToString() {
 
     QString ret = " nom: " + this->nom +

@@ -49,13 +49,14 @@ private slots:
     void on_listWidget_resa_itemDoubleClicked(QListWidgetItem *item);
     void on_listWidget_panierResa_itemDoubleClicked(QListWidgetItem *item);
 
+    void on_pushButton_reserver_clicked();
+
 private:
     Ui::MainWindow *ui;
     std::vector<Utilisateur*> userList;
     std::vector<Kit*> kitList; //List of kits only for "Gestion Kits" tab
     std::vector<Kit*> kitListResa; //List of every  kits only for "Gestion Kits Resa" tab
     std::vector<Kit*> kitListResa_view; //List of kits to be displayed in "listWidget_resa"
-
     std::vector<Kit*> kitListBasket; //List of kits to be displayed in "listWidget_panierResa"
 
     Utilisateur new_user;
