@@ -121,11 +121,11 @@ QString Connect_db::get_unique_token(void)
     return token;
 }
 
-void Connect_db::update_user_token_on_db(Utilisateur *login_user)
+void Connect_db::update_user_token_on_db(void)
 {
-    QString query_string =  "update utilisateur set token ='"+login_user->getToken()+"'where email ='"+login_user->getEmail()+"'";
+    QString query_string =  "update utilisateur set token ='"+this->active_user->getToken()+"'where email ='"+this->active_user->getEmail()+"'";
     QSqlQuery query(this->db);
-    runQuery(query, query_string);
+    query.exec(query_string);
 }
 
 bool Connect_db::is_user_connected(void)
@@ -136,7 +136,6 @@ bool Connect_db::is_user_connected(void)
     QString query_string =  "SELECT token from utilisateur where email ='"+this->active_user->getEmail()+"'";
     QSqlQuery query(this->db);
 
-    return true;
     // If no error in query
     query.exec(query_string);
     query.first();
@@ -159,7 +158,7 @@ bool Connect_db::connect_user(void)
     QString mdp_db = "";
     QString mdp_user_sha1 = "";
     bool returnVal = false;
-    runQuery(query, query_string);
+    query.exec(query_string);
     query.next();
     mdp_db = query.value("mdp").toString();
     qDebug() <<  query_string;
@@ -167,20 +166,24 @@ bool Connect_db::connect_user(void)
 
     //Convert user mdp to sha1
     mdp_user_sha1 = get_sha1_from_Qstring(this->active_user->getMdp());
-
-    qDebug() <<  "MDP from USER is: "<<mdp_user_sha1;
+    qDebug() <<  "MDP from USER is: " << mdp_user_sha1;
 
     if (mdp_db == mdp_user_sha1)
     {
-        qInfo() << "User is identified";
+        //Update connection token for user on server
+        this->active_user->setToken(this->get_unique_token());
+        this->update_user_token_on_db();
         returnVal = true;
+        // Retrieve every informations about connected user
         update_user_infos_from_db(this->active_user);
+        // Send connection status change to main appli
         emit log_value_changed(true);
     }
     else
     {
         qInfo() << "Utilisateur non identifié. Mauvais mdp ou email.";
         returnVal = false;
+        // Send connection status change to main appli
         emit log_value_changed(false);
     }
     return returnVal;
@@ -375,9 +378,25 @@ uint32_t Connect_db::guess_next_resa_nb(void)
 void Connect_db::add_resa_from_kit(Kit *i_p_kit, Utilisateur *i_p_user, QDate i_start_date, int i_resa_nb)
 {
     QSqlQuery query(this->db);
-    runQuery(query,"insert into resa (start_date, id_user, id_kit, id_resa) values("
-                                                               "'"+i_start_date.toString("yyyy-MM-dd")+"', "
-                                                               "'"+QString::number(i_p_user->getId())+"', "
-                                                               "'"+QString::number(i_p_kit->getIdKit())+"',"
-                                                               "'"+QString::number(i_resa_nb)+"')");
+    QSqlQuery query2(this->db);
+    //First check if kit is not already booked at this date:
+    runQuery(query,"select id from resa where start_date = "
+                            "'"+i_start_date.toString("yyyy-MM-dd")+"' and  id_kit = "
+                            "'"+QString::number(i_p_kit->getIdKit())+"'");
+    if (query.next())
+    {
+        qWarning()<< "Le Kit " << i_p_kit->getNom() <<" que vous souhaitez reserver a été reservé par un autre utilisateur pendant que vous constituiez votre panier. Pas de chance.";
+    }
+    else
+    {
+        //The kit is free at this date, it is ok to book it.
+        // query.clear();
+        runQuery(query2,"insert into resa (start_date, id_user, id_kit, id_resa) values("
+                        "'"+i_start_date.toString("yyyy-MM-dd")+"', "
+                        "'"+QString::number(i_p_user->getId())+"', "
+                        "'"+QString::number(i_p_kit->getIdKit())+"',"
+                        "'"+QString::number(i_resa_nb)+"')");
+
+        qInfo()<< "Le Kit " << i_p_kit->getNom() <<" a été reservé avec succès. N° de réservation: " << QString::number(i_resa_nb) ;
+    }
 }

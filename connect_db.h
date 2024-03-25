@@ -39,7 +39,7 @@ public:
     bool connect_user();
     QString get_sha1_from_Qstring(QString mdp);
     QString get_unique_token(void);
-    void update_user_token_on_db(Utilisateur *login_user);
+    void update_user_token_on_db(void);
     void select_kits_by_code(std::vector<Kit *> *kits, QString code);
     void select_kits_by_name(std::vector<Kit *> *kits, QString code);
     void setActiveUser(Utilisateur * p_user);

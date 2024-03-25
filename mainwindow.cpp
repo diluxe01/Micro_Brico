@@ -31,6 +31,8 @@ MainWindow::MainWindow(QWidget *parent)
     // Set active user in g_db_connect
     g_connect_db.setActiveUser(&(this->login_user));
 
+
+
     // Init date Edit in resa tab to current date
     QDate maxDate;
     maxDate.setDate(9999,12,30);
@@ -67,6 +69,13 @@ MainWindow::MainWindow(QWidget *parent)
     header_list.append("Nom");
     header_list.append("Etat");
     ui->tableWidget_item->setHorizontalHeaderLabels(header_list);
+
+
+    // A SUPPRIMER Connection automatique avec l'utilisateur "a" à chaque démarrage
+    this->p_loginConnect = new (Login_connect);
+    this->login_user.setEmail("a");
+    this->login_user.setMdp("a");
+    this-> on_popupLogin_ok();
 
 }
 
@@ -158,14 +167,8 @@ void MainWindow::on_popupLogin_destroyed()
 void MainWindow::on_popupLogin_ok()
 {
     qDebug() << "OK popup! ;)";
-    if (g_connect_db.connect_user())
-    {
-        this->login_user.setToken(g_connect_db.get_unique_token());
-        g_connect_db.update_user_token_on_db(&this->login_user);
-    }
-    else
-    {
-    }
+    g_connect_db.connect_user();
+
     delete (this->p_loginConnect);
 }
 
@@ -376,7 +379,6 @@ void MainWindow::on_popupDelete_ok()
 // vvvvvv SLOTS SECTION vvvvvv
 void MainWindow::update_connection_status(bool is_user_logged)
 {
-    is_user_logged = 1;
     if (is_user_logged != this->login_user.getIs_logged_on())
     {
         if (is_user_logged)
@@ -394,6 +396,9 @@ void MainWindow::update_connection_status(bool is_user_logged)
         this->ui->actionSe_connecter->setEnabled(!is_user_logged);
         this->ui->actionSe_d_connecter->setEnabled(is_user_logged);
         this->ui->listWidget->clear();
+
+        this->ui->lineEdit_resa_email_user->setText(this->login_user.getEmail());
+        this->ui->lineEdit_resa_email_user->setEnabled(false);
     }
 }
 
@@ -666,6 +671,7 @@ void MainWindow::on_pushButton_reserver_clicked()
     {
         resa_nb = g_connect_db.guess_next_resa_nb();
 
+        //
         for(const auto& kit_elem : this->kitListBasket)
         {
             g_connect_db.add_resa_from_kit(kit_elem,&this->login_user,start_date, resa_nb );
