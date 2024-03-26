@@ -36,8 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Init date Edit in resa tab to current date
     QDate maxDate;
     maxDate.setDate(9999,12,30);
-    ui->dateEdit_deb_resa->setDate(QDate::currentDate());
-    ui->dateEdit_deb_resa->setDateRange(QDate::currentDate(), maxDate);
+    ui->calendarWidget->setDateRange(QDate::currentDate(), maxDate);
 
     // Init of the connection status slot
     this->login_user.setIs_logged_on(true);
@@ -218,26 +217,44 @@ void MainWindow::GESUSER_refresh_user_list_table(void)
 //---------------------------------------------------------
 // vvvvvv MAIN WINDOW "Gestion Kits" SECTION vvvvvv
 
+void MainWindow::GESKIT_refresh_kit_list_from_server(std::vector<Kit*> *i_list)
+{
+    /* clean the kit list and delete objects pointed by element of this list */
+    g_utils.clearList(i_list);
+    // clear every depending lists
+    this->kitListBasket_view.clear();
+    this->kitListGeskit_view.clear();
+    this->kitListResa_view.clear();
+    this->ui->tableWidget_kit->clearContents();
+
+    this->ui->listWidget_panierResa->clear();
+    this->ui->listWidget_resa->clear();
+
+    //Get every kits on server
+    g_connect_db.select_all_kits(i_list);
+}
 void MainWindow::on_pushButton_getkit_clicked()
 {
-    /* refresh the user list by cleaning and loading it again */
-    g_utils.clearList(&this->kitList);
-
+    this->kitListGeskit_view.clear();
+    this->ui->tableWidget_kit->clearContents();
     /* if user enterd a code, then search for Kits with this code */
     if (ui->lineEdit_findkitbycode->text()!="")
     {
-        g_connect_db.select_kits_by_code(&this->kitList,ui->lineEdit_findkitbycode->text() );
+        RESA_get_kits_by_code(&this->kitList,&this->kitListGeskit_view,ui->lineEdit_findkitbycode->text() );
     }
+
     /* if user enterd a text, then search for Kits with this code */
     else if (ui->lineEdit_findkitbyname->text()!="")
     {
-        g_connect_db.select_kits_by_name(&this->kitList,ui->lineEdit_findkitbyname->text() );
+        RESA_get_kits_by_name(&this->kitList,&this->kitListGeskit_view,ui->lineEdit_findkitbyname->text() );
     }
     else
-    {
-        g_connect_db.select_all_kits(&this->kitList);
+    {        /* if user enterd nothing, get every available kits */
+        for(const auto& kit_elem : this->kitList)
+        {
+            this->kitListGeskit_view.push_back(kit_elem);
+        }
     }
-
 
     MainWindow::GESKIT_refresh_kit_list_table();
 }
@@ -247,10 +264,11 @@ void MainWindow::GESKIT_refresh_kit_list_table(void)
     vector<Kit*>::iterator it;
     int row = 0;
     this->ui->tableWidget_kit->clearContents();
-    for (it = kitList.begin(); it != kitList.end(); it++)
+
+    for(const auto& kit_elem : this->kitListGeskit_view)
     {
         row++;
-        GESKIT_push_back_new_kit_on_table((*it), row);
+        GESKIT_push_back_new_kit_on_table(kit_elem, row);
     }
 }
 
@@ -399,6 +417,12 @@ void MainWindow::update_connection_status(bool is_user_logged)
 
         this->ui->lineEdit_resa_email_user->setText(this->login_user.getEmail());
         this->ui->lineEdit_resa_email_user->setEnabled(false);
+
+        //Refresh kit list every time a user logs in
+        if (is_user_logged == true)
+        {
+            this->GESKIT_refresh_kit_list_from_server(&this->kitList);
+        }
     }
 }
 
@@ -464,6 +488,8 @@ void MainWindow::on_popupAddKit_ok()
         g_connect_db.add_kit(p_kit);
         this->p_popupAddKit->close();
         delete (this->p_popupAddKit);
+        /* refresh the user list by cleaning and loading it again */
+        this->GESKIT_refresh_kit_list_from_server(&this->kitList);
     }
 }
 // ^^^^^^ POPUP Add_kit SECTION ^^^^^^
@@ -473,7 +499,10 @@ void MainWindow::on_popupAddKit_ok()
 //---------------------------------------------------------
 // vvvvvv MAIN WINDOW "Gestion Reservation" vvvvvv
 
-void MainWindow::on_dateEdit_deb_resa_userDateChanged(const QDate &date)
+
+
+
+void MainWindow::on_calendarWidget_clicked(const QDate &date)
 {
     if(date.dayOfWeek() == 5) // if friday
     {
@@ -481,19 +510,13 @@ void MainWindow::on_dateEdit_deb_resa_userDateChanged(const QDate &date)
         ui->pushButton_reserver->setEnabled(true);
         ui->pushButton_getkit_resa->setEnabled(true);
 
-        /* clean the kit list and delete objects pointed by element of this list */
-        g_utils.clearList(&this->kitListResa);
 
-        /* clean the other list containing pointer to elements already deleted by the previous instruction */
-        this->kitListResa_view.clear();
-        this->kitListBasket.clear();
-        this->ui->listWidget_panierResa->clear();
-        this->ui->listWidget_resa->clear();
+        //Find out if kits in basket are already booked
+        g_connect_db.set_kit_booked_status(&this->kitList, this->ui->calendarWidget->selectedDate());
 
-        //Get every kits on server
-        g_connect_db.select_all_kits(&this->kitListResa);
-        //Find out if kits in resa_list are already booked
-        g_connect_db.set_kit_booked_status(&this->kitListResa, this->ui->dateEdit_deb_resa->date());
+
+        RESA_refresh_kit_list_table();
+        RESA_refresh_basket_kit_list_table();
     }
     else
     {
@@ -502,8 +525,6 @@ void MainWindow::on_dateEdit_deb_resa_userDateChanged(const QDate &date)
         ui->pushButton_getkit_resa->setEnabled(false);
     }
 }
-
-
 
 void MainWindow::on_pushButton_getkit_resa_clicked()
 {
@@ -518,17 +539,17 @@ void MainWindow::on_pushButton_getkit_resa_clicked()
     /* if user enterd a code, then search for Kits with this code */
     if (ui->lineEdit_findkitbycode_resa->text()!="")
     {
-        RESA_get_kits_by_code(&this->kitListResa,&this->kitListResa_view,ui->lineEdit_findkitbycode_resa->text() );
+        RESA_get_kits_by_code(&this->kitList,&this->kitListResa_view,ui->lineEdit_findkitbycode_resa->text() );
     }
     /* if user enterd a text, then search for Kits with this code */
     else if (ui->lineEdit_findkitbyname_resa->text()!="")
     {
-        RESA_get_kits_by_name(&this->kitListResa,&this->kitListResa_view,ui->lineEdit_findkitbyname_resa->text() );
+        RESA_get_kits_by_name(&this->kitList,&this->kitListResa_view,ui->lineEdit_findkitbyname_resa->text() );
     }
     else
     {
         /* if user enterd nothing, get every available kits */
-        for(const auto& kit_elem : this->kitListResa)
+        for(const auto& kit_elem : this->kitList)
         {
             this->kitListResa_view.push_back(kit_elem);
         }
@@ -589,12 +610,12 @@ void MainWindow::RESA_refresh_kit_list_table(void)
     QBrush brush_booked;
     QBrush brush_free;
     QBrush brush_basket;
-    // Define brush to display kit booked in kit reservation list
-    brush_booked.setColor(Qt::GlobalColor::gray);
-    brush_booked.setStyle(Qt::SolidPattern);
     // Define brush to display kit free in kit reservation list
     brush_free.setColor(Qt::GlobalColor::green);
     brush_free.setStyle(Qt::SolidPattern);
+    // Define brush to display kit booked in kit reservation list
+    brush_booked.setColor(Qt::GlobalColor::gray);
+    brush_booked.setStyle(Qt::SolidPattern);
     // Define brush to display kit in basket
     brush_basket.setColor(Qt::GlobalColor::yellow);
     brush_basket.setStyle(Qt::SolidPattern);
@@ -602,13 +623,13 @@ void MainWindow::RESA_refresh_kit_list_table(void)
     for(const auto& kit_elem : this->kitListResa_view)
     {
         QListWidgetItem* p_item = new QListWidgetItem(kit_elem->toString(), this->ui->listWidget_resa);
-        if (kit_elem->getIs_booked())
-        {
-            p_item->setBackground(brush_booked);
-        }
-        else if(kit_elem->getIs_in_basket())
+        if(kit_elem->getIs_in_basket())
         {
             p_item->setBackground(brush_basket);
+        }
+        else if (kit_elem->getIs_booked())
+        {
+            p_item->setBackground(brush_booked);
         }
         else
         {
@@ -622,14 +643,14 @@ void MainWindow::on_listWidget_resa_itemDoubleClicked(QListWidgetItem *item)
     int row = this->ui->listWidget_resa->row(item);
     Kit* p_kit = this->kitListResa_view.at(row);
 
-    if (p_kit->getIs_booked() || p_kit->getIs_in_basket())
+    if (p_kit->getIs_in_basket())
     {
         //do nothing
     }
     else
     {
         p_kit->setIs_in_basket(true);
-        this->kitListBasket.push_back(p_kit);
+        this->kitListBasket_view.push_back(p_kit);
     }
     RESA_refresh_kit_list_table();
     RESA_refresh_basket_kit_list_table();
@@ -637,10 +658,27 @@ void MainWindow::on_listWidget_resa_itemDoubleClicked(QListWidgetItem *item)
 
 void MainWindow::RESA_refresh_basket_kit_list_table(void)
 {
+    vector<Kit*>::iterator it;
+    QBrush brush_booked;
+    QBrush brush_free;
+    // Define brush to display kit booked in kit reservation list
+    brush_booked.setColor(Qt::GlobalColor::gray);
+    brush_booked.setStyle(Qt::SolidPattern);
+    // Define brush to display kit free in kit reservation list
+    brush_free.setColor(Qt::GlobalColor::green);
+    brush_free.setStyle(Qt::SolidPattern);
     this->ui->listWidget_panierResa->clear();
-    for(const auto& kit_elem : this->kitListBasket)
+    for(const auto& kit_elem : this->kitListBasket_view)
     {
         QListWidgetItem* p_item = new QListWidgetItem(kit_elem->toString(), this->ui->listWidget_panierResa);
+        if (kit_elem->getIs_booked())
+        {
+            p_item->setBackground(brush_booked);
+        }
+        else
+        {
+            p_item->setBackground(brush_free);
+        }
     }
 }
 
@@ -648,11 +686,11 @@ void MainWindow::RESA_refresh_basket_kit_list_table(void)
 void MainWindow::on_listWidget_panierResa_itemDoubleClicked(QListWidgetItem *item)
 {
     int row = this->ui->listWidget_panierResa->row(item);
-    Kit* p_kit = this->kitListBasket.at(row);
+    Kit* p_kit = this->kitListBasket_view.at(row);
     p_kit->setIs_in_basket(false);
 
     this->ui->listWidget_panierResa->removeItemWidget(item);//Delete kit from basket view
-    this->kitListBasket.erase(this->kitListBasket.begin()+row);//Delete kit from basket list
+    this->kitListBasket_view.erase(this->kitListBasket_view.begin()+row);//Delete kit from basket list
 
     RESA_refresh_kit_list_table();
     RESA_refresh_basket_kit_list_table();
@@ -665,14 +703,14 @@ void MainWindow::on_pushButton_reserver_clicked()
 {
     int resa_nb = 0;
     QDate start_date = QDate::currentDate();
-    start_date = this->ui->dateEdit_deb_resa->date();
+    start_date = this->ui->calendarWidget->selectedDate();
 
-    if (this->kitListBasket.empty() == false)
+    if (this->kitListBasket_view.empty() == false)
     {
         resa_nb = g_connect_db.guess_next_resa_nb();
 
         //
-        for(const auto& kit_elem : this->kitListBasket)
+        for(const auto& kit_elem : this->kitListBasket_view)
         {
             g_connect_db.add_resa_from_kit(kit_elem,&this->login_user,start_date, resa_nb );
             kit_elem->setIs_in_basket(false);
@@ -681,13 +719,16 @@ void MainWindow::on_pushButton_reserver_clicked()
 
 
         this->ui->listWidget_panierResa->clear();
-        this->kitListBasket.clear();
+        this->kitListBasket_view.clear();
         RESA_refresh_kit_list_table();
     }
 }
 
+
+
 // ^^^^^^ MAIN WINDOW "Gestion Reservation" ^^^^^^
 //---------------------------------------------------------
+
 
 
 

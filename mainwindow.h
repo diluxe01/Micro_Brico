@@ -44,20 +44,21 @@ private slots:
     void on_popupAddKit_ok();
     void on_pushButton_getkit_clicked();
     void on_tableWidget_kit_cellClicked(int row, int column);
-    void on_dateEdit_deb_resa_userDateChanged(const QDate &date);
     void on_pushButton_getkit_resa_clicked();
     void on_listWidget_resa_itemDoubleClicked(QListWidgetItem *item);
     void on_listWidget_panierResa_itemDoubleClicked(QListWidgetItem *item);
 
     void on_pushButton_reserver_clicked();
 
+    void on_calendarWidget_clicked(const QDate &date);
+
 private:
     Ui::MainWindow *ui;
     std::vector<Utilisateur*> userList;
     std::vector<Kit*> kitList; //List of kits only for "Gestion Kits" tab
-    std::vector<Kit*> kitListResa; //List of every  kits only for "Gestion Kits Resa" tab
+    std::vector<Kit*> kitListGeskit_view; //List of kits to be displayed in "listWidget_resa"
     std::vector<Kit*> kitListResa_view; //List of kits to be displayed in "listWidget_resa"
-    std::vector<Kit*> kitListBasket; //List of kits to be displayed in "listWidget_panierResa"
+    std::vector<Kit*> kitListBasket_view; //List of kits to be displayed in "listWidget_panierResa"
 
     Utilisateur new_user;
     Utilisateur login_user;
@@ -75,6 +76,7 @@ private:
     void on_popupDelete_ok();
     void on_popupDelete_destroyed();
 
+    void GESKIT_refresh_kit_list_from_server(std::vector<Kit*> *i_list);
     void GESKIT_refresh_kit_list_table();
     void GESKIT_push_back_new_kit_on_table(Kit *kit, int row);
 

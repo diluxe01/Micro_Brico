@@ -318,6 +318,7 @@ void  Connect_db::set_kit_booked_status (std::vector<Kit*> *i_kits, QDate i_date
     for(const auto& elem_kit : *i_kits)
     {
         is_booked = false;
+        elem_kit->setIs_booked(false);
         for(const auto& elem_resa : resa_list)
         {
             if ((elem_kit->getIdKit() == elem_resa->getId_kit())
