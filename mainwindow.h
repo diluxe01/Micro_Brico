@@ -10,6 +10,7 @@
 #include <list>
 
 #include <QListWidgetItem>
+#include <QDate>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -87,5 +88,6 @@ private:
     void RESA_refresh_basket_kit_list_table();
     void RESA_get_kits_by_code(std::vector<Kit *> *from_kits, std::vector<Kit *> *to_kits, QString code);
     void RESA_get_kits_by_name(std::vector<Kit *> *from_kits, std::vector<Kit *> *to_kits, QString code);
+    QDate RESA_get_next_resa_day(QDate start_date);
 };
 #endif // MAINWINDOW_H

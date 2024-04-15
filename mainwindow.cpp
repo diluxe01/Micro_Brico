@@ -14,6 +14,8 @@
 #include <QMessageBox>
 #include <QRegularExpression>
 
+
+#define DAY_OF_RESA 5
 QPointer<LogBrowser> logBrowser;
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
@@ -36,7 +38,8 @@ MainWindow::MainWindow(QWidget *parent)
     // Init date Edit in resa tab to current date
     QDate maxDate;
     maxDate.setDate(9999,12,30);
-    ui->calendarWidget->setDateRange(QDate::currentDate(), maxDate);
+    this->ui->calendarWidget->setDateRange(QDate::currentDate(), maxDate);
+    this->ui->calendarWidget->setSelectedDate(this->RESA_get_next_resa_day(QDate::currentDate())); // Set Selected date to next friday
 
     // Init of the connection status slot
     this->login_user.setIs_logged_on(true);
@@ -99,12 +102,6 @@ void MainWindow::closeEvent (QCloseEvent *event)
     // }
 }
 
-void MainWindow::GESUSER_add_user_to_DB(void)
-{
-    g_connect_db.add_user(&this->new_user);
-
-    qDebug() << "MGMT: AddUser to DB;)";
-}
 void MainWindow::on_actionAfficher_les_logs_triggered()
 {
     logBrowser->show();
@@ -189,6 +186,12 @@ void MainWindow::on_actionSe_d_connecter_triggered()
 //---------------------------------------------------------
 // vvvvvv MAIN WINDOW "Gestion Utilisateur" SECTION vvvvvv
 
+void MainWindow::GESUSER_add_user_to_DB(void)
+{
+    g_connect_db.add_user(&this->new_user);
+
+    qDebug() << "MGMT: AddUser to DB;)";
+}
 void MainWindow::on_getUsers_clicked()
 {
     /* refresh the user list by cleaning and loading it again */
@@ -399,14 +402,6 @@ void MainWindow::update_connection_status(bool is_user_logged)
 {
     if (is_user_logged != this->login_user.getIs_logged_on())
     {
-        if (is_user_logged)
-        {
-            qInfo() << "Vous êtes maintenant connecté.";
-        }
-        else
-        {
-            qInfo() << "Vous êtes maintenant déconnecté.";
-        }
         this->login_user.setIs_logged_on(is_user_logged);
         this->ui->tabWidget->setEnabled(is_user_logged);
         this->ui->TAB_ges_user->setEnabled(is_user_logged);
@@ -415,13 +410,29 @@ void MainWindow::update_connection_status(bool is_user_logged)
         this->ui->actionSe_d_connecter->setEnabled(is_user_logged);
         this->ui->listWidget->clear();
 
-        this->ui->lineEdit_resa_email_user->setText(this->login_user.getEmail());
-        this->ui->lineEdit_resa_email_user->setEnabled(false);
-
-        //Refresh kit list every time a user logs in
         if (is_user_logged == true)
         {
+            qInfo() << "Vous êtes maintenant connecté.";
+            //Refresh kit list every time a user logs in
             this->GESKIT_refresh_kit_list_from_server(&this->kitList);
+
+            //Refresh resa lineEdit_resa_email_use with user name and enable it only if user is admin
+            this->ui->lineEdit_resa_email_user->setText(this->login_user.getEmail());
+            if (this->login_user.getPrivilege() == E_admin)
+            {
+                this->ui->lineEdit_resa_email_user->setEnabled(true);
+            }
+            else
+            {
+                this->ui->lineEdit_resa_email_user->setEnabled(false);
+            }
+
+        }
+        else
+        {
+            qInfo() << "Vous êtes maintenant déconnecté.";
+            //Clear lineEdit_resa_email_use
+            this->ui->lineEdit_resa_email_user->setText("");
         }
     }
 }
@@ -501,17 +512,41 @@ void MainWindow::on_popupAddKit_ok()
 
 
 
+///
+/// \brief MainWindow::RESA_get_next_resa_day. Seek next "RESA_DAY" relatively to start_date.
+/// \param start_date: day of the week from which "RESA_DAY" must be searched
+/// \return
+///
+QDate MainWindow::RESA_get_next_resa_day(QDate start_date)
+{
+    QDate next_friday;
+    int remaining_days_to_resa_day = 0;
+    remaining_days_to_resa_day = DAY_OF_RESA - start_date.dayOfWeek();
+    if (remaining_days_to_resa_day < 0)// saturday or sunday
+    {
+        next_friday = start_date.addDays(remaining_days_to_resa_day+7);
+    }
+    else if (remaining_days_to_resa_day > 0) //every days except friday
+    {
+        next_friday = start_date.addDays(remaining_days_to_resa_day);
+    }
+    else
+    {
+        next_friday = start_date;
+    }
+    return next_friday;
+}
 
 void MainWindow::on_calendarWidget_clicked(const QDate &date)
 {
-    if(date.dayOfWeek() == 5) // if friday
+    if(date.dayOfWeek() == DAY_OF_RESA) // if Day_of_resa
     {
 
         ui->pushButton_reserver->setEnabled(true);
         ui->pushButton_getkit_resa->setEnabled(true);
 
 
-        //Find out if kits in basket are already booked
+        //Find out if kits in kit list are already booked
         g_connect_db.set_kit_booked_status(&this->kitList, this->ui->calendarWidget->selectedDate());
 
 
@@ -521,8 +556,9 @@ void MainWindow::on_calendarWidget_clicked(const QDate &date)
     else
     {
         qInfo()<< "Date de début: Vous devez choisir un vendredi!";
-        ui->pushButton_reserver->setEnabled(false);
-        ui->pushButton_getkit_resa->setEnabled(false);
+        //Force date to next friday from selected day
+        this->ui->calendarWidget->setSelectedDate(this->RESA_get_next_resa_day(this->ui->calendarWidget->selectedDate()));
+        this->on_calendarWidget_clicked(this->ui->calendarWidget->selectedDate());
     }
 }
 
@@ -702,26 +738,40 @@ void MainWindow::on_listWidget_panierResa_itemDoubleClicked(QListWidgetItem *ite
 void MainWindow::on_pushButton_reserver_clicked()
 {
     int resa_nb = 0;
-    QDate start_date = QDate::currentDate();
+    uint user_id = 0;
+    bool has_errors = false;
+    QDate start_date;
     start_date = this->ui->calendarWidget->selectedDate();
 
-    if (this->kitListBasket_view.empty() == false)
+    //Retrieve user id
+    has_errors = g_connect_db.get_user_id_by_mail(this->ui->lineEdit_resa_email_user->text(), &user_id);
+
+    if (has_errors == true)
     {
-        resa_nb = g_connect_db.guess_next_resa_nb();
-
-        //
-        for(const auto& kit_elem : this->kitListBasket_view)
-        {
-            g_connect_db.add_resa_from_kit(kit_elem,&this->login_user,start_date, resa_nb );
-            kit_elem->setIs_in_basket(false);
-            kit_elem->setIs_booked(true);
-        }
-
-
-        this->ui->listWidget_panierResa->clear();
-        this->kitListBasket_view.clear();
-        RESA_refresh_kit_list_table();
+        //throw a popup here
     }
+    else
+    {
+        // Proceed booking
+        if (this->kitListBasket_view.empty() == false)
+        {
+            resa_nb = g_connect_db.guess_next_resa_nb();
+
+            //
+            for(const auto& kit_elem : this->kitListBasket_view)
+            {
+                g_connect_db.add_resa_from_kit(kit_elem,&this->login_user,start_date, resa_nb );
+                kit_elem->setIs_in_basket(false);
+                kit_elem->setIs_booked(true);
+            }
+
+
+            this->ui->listWidget_panierResa->clear();
+            this->kitListBasket_view.clear();
+            RESA_refresh_kit_list_table();
+        }
+    }
+
 }
 
 

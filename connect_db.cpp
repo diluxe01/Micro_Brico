@@ -22,12 +22,14 @@ Connect_db::Connect_db() {
 
 bool Connect_db::runQuery(QSqlQuery &query, QString query_string)
 {
+    bool querry_had_errors = false;
     qDebug() << query_string;
     if (is_user_connected() == true)
     {
         query.exec(query_string);
-        get_querry_errors(query);
+        querry_had_errors = get_querry_errors(query);
     }
+    return querry_had_errors;
 }
 
 /*Returns true if last query had an error
@@ -102,6 +104,38 @@ bool Connect_db::delete_user(Utilisateur *user_to_delete)
     return true;
 }
 
+///
+/// \brief Connect_db::get_user_id_by_mail safely gives the user id, given its mail.
+/// \param mail: user booking email
+/// \param o_user_id: pointer where iser id is to be stored
+/// \return true if an error occured, false otherwise
+///
+bool Connect_db::get_user_id_by_mail(QString mail, uint * o_user_id)
+{
+    QSqlQuery query  = QSqlQuery(this->db);
+    uint user_id = 0;
+    QString user_id_str = "";
+    bool querry_had_errors = false;
+    querry_had_errors = runQuery(query, "SELECT id from utilisateur where email='"+mail+"'");
+    if (querry_had_errors == true)
+    {
+        qDebug() <<  "get_user_id_by_mail: Une erreur s'est produite, l'email fourni est inconnu.";
+    }
+    else
+    {   //no errors
+        query.first();
+        user_id = query.value("id").toUInt();
+        user_id_str = query.value("id").toString();
+        qDebug() <<  "get_user_id_by_mail: ID of user is: "<<user_id_str;
+        //Set user id to user pointer
+        *o_user_id = user_id;
+    }
+
+
+    return querry_had_errors;
+}
+
+
 QString Connect_db::get_sha1_from_Qstring(QString mdp)
 {
     QString mdp_sha1 = "";
@@ -127,6 +161,7 @@ void Connect_db::update_user_token_on_db(void)
     QSqlQuery query(this->db);
     query.exec(query_string);
 }
+
 
 bool Connect_db::is_user_connected(void)
 {
