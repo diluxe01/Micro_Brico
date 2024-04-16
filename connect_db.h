@@ -56,7 +56,7 @@ public:
     //-----------Resa-------------------
     void select_all_resa(std::vector<Resa *> *i_resa);
     uint32_t guess_next_resa_nb(void);
-    void add_resa_from_kit(Kit *i_p_kit, Utilisateur *i_p_user, QDate i_start_date, int i_resa_nb);
+    void add_resa_from_kit(Kit *i_p_kit, uint user_id, QDate i_start_date, int i_resa_nb);
 
 
 signals:

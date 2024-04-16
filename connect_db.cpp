@@ -116,9 +116,10 @@ bool Connect_db::get_user_id_by_mail(QString mail, uint * o_user_id)
     uint user_id = 0;
     QString user_id_str = "";
     bool querry_had_errors = false;
-    querry_had_errors = runQuery(query, "SELECT id from utilisateur where email='"+mail+"'");
-    if (querry_had_errors == true)
+    runQuery(query, "SELECT id from utilisateur where email='"+mail+"'");
+    if (query.size() == 0)
     {
+        querry_had_errors = true;
         qDebug() <<  "get_user_id_by_mail: Une erreur s'est produite, l'email fourni est inconnu.";
     }
     else
@@ -411,7 +412,7 @@ uint32_t Connect_db::guess_next_resa_nb(void)
 }
 
 
-void Connect_db::add_resa_from_kit(Kit *i_p_kit, Utilisateur *i_p_user, QDate i_start_date, int i_resa_nb)
+void Connect_db::add_resa_from_kit(Kit *i_p_kit, uint user_id, QDate i_start_date, int i_resa_nb)
 {
     QSqlQuery query(this->db);
     QSqlQuery query2(this->db);
@@ -429,7 +430,7 @@ void Connect_db::add_resa_from_kit(Kit *i_p_kit, Utilisateur *i_p_user, QDate i_
         // query.clear();
         runQuery(query2,"insert into resa (start_date, id_user, id_kit, id_resa) values("
                         "'"+i_start_date.toString("yyyy-MM-dd")+"', "
-                        "'"+QString::number(i_p_user->getId())+"', "
+                        "'"+QString::number(user_id)+"', "
                         "'"+QString::number(i_p_kit->getIdKit())+"',"
                         "'"+QString::number(i_resa_nb)+"')");
 

@@ -35,11 +35,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-    // Init date Edit in resa tab to current date
-    QDate maxDate;
-    maxDate.setDate(9999,12,30);
-    this->ui->calendarWidget->setDateRange(QDate::currentDate(), maxDate);
-    this->ui->calendarWidget->setSelectedDate(this->RESA_get_next_resa_day(QDate::currentDate())); // Set Selected date to next friday
 
     // Init of the connection status slot
     this->login_user.setIs_logged_on(true);
@@ -79,6 +74,12 @@ MainWindow::MainWindow(QWidget *parent)
     this->login_user.setMdp("a");
     this-> on_popupLogin_ok();
 
+    // Init date Edit in resa tab to current date
+    QDate maxDate;
+    maxDate.setDate(9999,12,30);
+    this->ui->calendarWidget->setDateRange(QDate::currentDate(), maxDate);
+    this->ui->calendarWidget->setSelectedDate(this->RESA_get_next_resa_day(QDate::currentDate())); // Set Selected date to next friday
+    this->on_calendarWidget_clicked(this->RESA_get_next_resa_day(QDate::currentDate()));
 }
 
 MainWindow::~MainWindow()
@@ -107,7 +108,34 @@ void MainWindow::on_actionAfficher_les_logs_triggered()
     logBrowser->show();
 }
 
+void MainWindow::GEN_raise_popup_info(QString msg)
+{
 
+    QMessageBox msgBox;
+    msgBox.setIcon(QMessageBox::Information);
+    msgBox.setText(msg);
+    msgBox.setTextFormat(Qt::TextFormat::MarkdownText);
+    msgBox.setWindowTitle("Informations");
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.exec();
+
+    qDebug() << msg;
+}
+
+
+void MainWindow::GEN_raise_popup_warning(QString msg)
+{
+
+    QMessageBox msgBox;
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.setText(msg);
+    msgBox.setTextFormat(Qt::TextFormat::MarkdownText);
+    msgBox.setWindowTitle("Attention");
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.exec();
+
+    qDebug() << msg;
+}
 
 //---------------------------------------------------------
 // vvvvvv POPUP ADD USER SECTION vvvvvv
@@ -697,6 +725,8 @@ void MainWindow::RESA_refresh_basket_kit_list_table(void)
     vector<Kit*>::iterator it;
     QBrush brush_booked;
     QBrush brush_free;
+    this->isBasketReadyToBook = true;
+
     // Define brush to display kit booked in kit reservation list
     brush_booked.setColor(Qt::GlobalColor::gray);
     brush_booked.setStyle(Qt::SolidPattern);
@@ -710,6 +740,7 @@ void MainWindow::RESA_refresh_basket_kit_list_table(void)
         if (kit_elem->getIs_booked())
         {
             p_item->setBackground(brush_booked);
+            isBasketReadyToBook = false;
         }
         else
         {
@@ -748,27 +779,30 @@ void MainWindow::on_pushButton_reserver_clicked()
 
     if (has_errors == true)
     {
-        //throw a popup here
+        this->GEN_raise_popup_warning("Impossible de réserver pour l'utilisateur: **" + this->ui->lineEdit_resa_email_user->text()+"**");
     }
     else
     {
         // Proceed booking
-        if (this->kitListBasket_view.empty() == false)
+        if (this->isBasketReadyToBook == true)
         {
-            resa_nb = g_connect_db.guess_next_resa_nb();
-
-            //
-            for(const auto& kit_elem : this->kitListBasket_view)
+            if (this->kitListBasket_view.empty() == false)
             {
-                g_connect_db.add_resa_from_kit(kit_elem,&this->login_user,start_date, resa_nb );
-                kit_elem->setIs_in_basket(false);
-                kit_elem->setIs_booked(true);
+                resa_nb = g_connect_db.guess_next_resa_nb();
+                for(const auto& kit_elem : this->kitListBasket_view)
+                {
+                    g_connect_db.add_resa_from_kit(kit_elem, user_id, start_date, resa_nb );
+                    kit_elem->setIs_in_basket(false);
+                    kit_elem->setIs_booked(true);
+                }
+                this->ui->listWidget_panierResa->clear();
+                this->kitListBasket_view.clear();
+                RESA_refresh_kit_list_table();
             }
-
-
-            this->ui->listWidget_panierResa->clear();
-            this->kitListBasket_view.clear();
-            RESA_refresh_kit_list_table();
+        }
+        else
+        {
+            this->GEN_raise_popup_warning("Impossible de réserver car un Kit n'est pas disponible à la date souhaitée.");
         }
     }
 

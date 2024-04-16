@@ -67,6 +67,10 @@ private:
     Login_connect *p_loginConnect;
     Delete_user *p_popupDeleteUser;
     PoppupAddKit *p_popupAddKit;
+    bool isBasketReadyToBook; //Variable remembering if the basket contains an already booked kit
+
+    void GEN_raise_popup_info(QString msg);
+    void GEN_raise_popup_warning(QString msg);
     void closeEvent (QCloseEvent *event);
     void GESUSER_add_user_to_DB(void);
     void GESUSER_refresh_user_list_table(void);
@@ -80,10 +84,10 @@ private:
     void GESKIT_refresh_kit_list_from_server(std::vector<Kit*> *i_list);
     void GESKIT_refresh_kit_list_table();
     void GESKIT_push_back_new_kit_on_table(Kit *kit, int row);
-
     void GESKIT_refresh_item_list_table(Kit *kit);
     void GESKIT_refresh_descritption(Kit *kit);
     void GESKIT_push_back_new_item_on_table(Item *item, int row);
+
     void RESA_refresh_kit_list_table();
     void RESA_refresh_basket_kit_list_table();
     void RESA_get_kits_by_code(std::vector<Kit *> *from_kits, std::vector<Kit *> *to_kits, QString code);
