@@ -379,6 +379,15 @@ void  Connect_db::select_all_resa (std::vector<Resa *> *i_resa)
     populate_resa_list_from_query(i_resa, query);
 }
 
+void Connect_db::select_resa_by_user(std::vector<Resa *> *o_resa, uint user_id)
+{
+
+    QSqlQuery query(this->db);
+    runQuery(query, "SELECT * from resa WHERE id_user="+QString::number(user_id));
+
+    populate_resa_list_from_query(o_resa, query);
+}
+
 void Connect_db::populate_resa_list_from_query(std::vector<Resa *> *i_resa, QSqlQuery query)
 {
     QDate qdate;
@@ -388,19 +397,32 @@ void Connect_db::populate_resa_list_from_query(std::vector<Resa *> *i_resa, QSql
         QString start_date = query.value("start_date").toString();
         int id_kit = query.value("id_kit").toInt();
         int id_user = query.value("id_user").toInt();
+        int id_resa = query.value("id_resa").toInt();
 
         qdate = QDate::fromString(start_date,"yyyy-MM-dd");
 
-        Resa * k = new Resa(id,qdate,id_kit,id_user);
+        Resa * k = new Resa(id,qdate,id_kit,id_user, id_resa);
 
         i_resa->push_back(k);
     }
+}
+
+///
+/// \brief Connect_db::start_resa:
+///    Lock resa table and uid_resa in write mode
+///
+///
+void  Connect_db::start_resa(void)
+{
+    QSqlQuery query(this->db);
+    runQuery(query, "LOCK TABLES uid_resa WRITE, resa WRITE, utilisateur READ");
 }
 
 //Returns next reservation number by incr. the last number inserted.
 // Updates uid_resa table with incremented number
 uint32_t Connect_db::guess_next_resa_nb(void)
 {
+
     QSqlQuery query(this->db);
     runQuery(query, "SELECT iduid_resa from uid_resa order by iduid_resa DESC limit 1");
     query.next();
@@ -408,6 +430,7 @@ uint32_t Connect_db::guess_next_resa_nb(void)
     int id = query.value("iduid_resa").toInt();
     id += 1 ;
     runQuery(query, "insert into uid_resa (iduid_resa) values  ("+QString::number(id)+")");
+
     return id;
 }
 
@@ -416,24 +439,22 @@ void Connect_db::add_resa_from_kit(Kit *i_p_kit, uint user_id, QDate i_start_dat
 {
     QSqlQuery query(this->db);
     QSqlQuery query2(this->db);
-    //First check if kit is not already booked at this date:
-    runQuery(query,"select id from resa where start_date = "
-                            "'"+i_start_date.toString("yyyy-MM-dd")+"' and  id_kit = "
-                            "'"+QString::number(i_p_kit->getIdKit())+"'");
-    if (query.next())
-    {
-        qWarning()<< "Le Kit " << i_p_kit->getNom() <<" que vous souhaitez reserver a été reservé par un autre utilisateur pendant que vous constituiez votre panier. Pas de chance.";
-    }
-    else
-    {
-        //The kit is free at this date, it is ok to book it.
-        // query.clear();
-        runQuery(query2,"insert into resa (start_date, id_user, id_kit, id_resa) values("
-                        "'"+i_start_date.toString("yyyy-MM-dd")+"', "
-                        "'"+QString::number(user_id)+"', "
-                        "'"+QString::number(i_p_kit->getIdKit())+"',"
-                        "'"+QString::number(i_resa_nb)+"')");
 
-        qInfo()<< "Le Kit " << i_p_kit->getNom() <<" a été reservé avec succès. N° de réservation: " << QString::number(i_resa_nb) ;
-    }
+    runQuery(query2,"insert into resa (start_date, id_user, id_kit, id_resa) values("
+                    "'"+i_start_date.toString("yyyy-MM-dd")+"', "
+                    "'"+QString::number(user_id)+"', "
+                    "'"+QString::number(i_p_kit->getIdKit())+"',"
+                    "'"+QString::number(i_resa_nb)+"')");
+
+    qInfo()<< "Le Kit " << i_p_kit->getNom() <<" a été reservé avec succès. N° de réservation: " << QString::number(i_resa_nb) ;
+}
+
+
+///
+/// \brief Connect_db::end_resa
+///
+void  Connect_db::end_resa(void)
+{
+    QSqlQuery query(this->db);
+    runQuery(query, "UNLOCK TABLES");
 }

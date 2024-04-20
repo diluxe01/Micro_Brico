@@ -593,6 +593,7 @@ void MainWindow::on_calendarWidget_clicked(const QDate &date)
 void MainWindow::on_pushButton_getkit_resa_clicked()
 {
 
+
     // Set property "is_in_resa_view"" of items in kitListResa_view to "false"
     for(const auto& kit_elem : this->kitListResa_view)
     {
@@ -620,6 +621,8 @@ void MainWindow::on_pushButton_getkit_resa_clicked()
     }
 
 
+    // Refresh kits in basket to see if none booked them
+    g_connect_db.set_kit_booked_status(&this->kitListResa_view, this->ui->calendarWidget->selectedDate());
     MainWindow::RESA_refresh_kit_list_table();
 }
 
@@ -716,6 +719,10 @@ void MainWindow::on_listWidget_resa_itemDoubleClicked(QListWidgetItem *item)
         p_kit->setIs_in_basket(true);
         this->kitListBasket_view.push_back(p_kit);
     }
+    // Refresh kits booked status
+    g_connect_db.set_kit_booked_status(&this->kitListBasket_view, this->ui->calendarWidget->selectedDate());
+
+    // Refresh list displays
     RESA_refresh_kit_list_table();
     RESA_refresh_basket_kit_list_table();
 }
@@ -774,9 +781,14 @@ void MainWindow::on_pushButton_reserver_clicked()
     QDate start_date;
     start_date = this->ui->calendarWidget->selectedDate();
 
+    g_connect_db.start_resa();// Start of LOCK
+
+    // Refresh kits in basket to see if none booked them
+    g_connect_db.set_kit_booked_status(&this->kitListBasket_view, this->ui->calendarWidget->selectedDate());
+    RESA_refresh_basket_kit_list_table();
+
     //Retrieve user id
     has_errors = g_connect_db.get_user_id_by_mail(this->ui->lineEdit_resa_email_user->text(), &user_id);
-
     if (has_errors == true)
     {
         this->GEN_raise_popup_warning("Impossible de réserver pour l'utilisateur: **" + this->ui->lineEdit_resa_email_user->text()+"**");
@@ -795,6 +807,7 @@ void MainWindow::on_pushButton_reserver_clicked()
                     kit_elem->setIs_in_basket(false);
                     kit_elem->setIs_booked(true);
                 }
+                GEN_raise_popup_info("Votre réservation n° **"+QString::number(resa_nb)+"** est bien prise en compte.");
                 this->ui->listWidget_panierResa->clear();
                 this->kitListBasket_view.clear();
                 RESA_refresh_kit_list_table();
@@ -805,10 +818,43 @@ void MainWindow::on_pushButton_reserver_clicked()
             this->GEN_raise_popup_warning("Impossible de réserver car un Kit n'est pas disponible à la date souhaitée.");
         }
     }
+    g_connect_db.end_resa();// End of LOCK
 
 }
 
 
+void MainWindow::on_pushButton_resa_showResa_clicked()
+{
+    uint user_id = 0;
+
+    bool has_errors = false;
+
+     g_utils.clearList(&this->resaList);
+    //Retrieve user id
+    has_errors = g_connect_db.get_user_id_by_mail(this->ui->lineEdit_resa_email_user->text(), &user_id);
+    g_connect_db.select_resa_by_user(&this->resaList, user_id);
+    RESA_refresh_current_resa_list_table();
+}
+
+
+void MainWindow::RESA_refresh_current_resa_list_table(void)
+{
+    int prev_id_resa = 0;
+
+    this->ui->listWidget_resa_currentResa->clear();
+    for(const auto& resa_elem : this->resaList)
+    {
+        if (resa_elem->getId_resa() == prev_id_resa)
+        {
+            //pass
+        }
+        else
+        {
+            QListWidgetItem* p_item = new QListWidgetItem(resa_elem->toString(), this->ui->listWidget_resa_currentResa);
+            prev_id_resa = resa_elem->getId_resa();
+        }
+    }
+}
 
 // ^^^^^^ MAIN WINDOW "Gestion Reservation" ^^^^^^
 //---------------------------------------------------------

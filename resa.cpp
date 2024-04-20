@@ -40,10 +40,26 @@ void Resa::setId_user(int newId_user)
     id_user = newId_user;
 }
 
+QString Resa::toString(void)
+{
+    return "("+QString::number(id_resa)+") Date début "+start_date.toString();
+}
+
+int Resa::getId_resa() const
+{
+    return id_resa;
+}
+
+void Resa::setId_resa(int newId_resa)
+{
+    id_resa = newId_resa;
+}
+
 Resa::Resa() {}
 
-Resa::Resa(int id, const QDate &start_date, int id_kit, int id_user) : id(id),
+Resa::Resa(int id, const QDate &start_date, int id_kit, int id_user, int id_resa) : id(id),
     start_date(start_date),
     id_kit(id_kit),
-    id_user(id_user)
+    id_user(id_user),
+    id_resa(id_resa)
 {}

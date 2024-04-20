@@ -9,6 +9,7 @@
 #include "./popups/poppupaddkit.h"
 #include <list>
 
+#include "resa.h"
 #include <QListWidgetItem>
 #include <QDate>
 
@@ -53,6 +54,8 @@ private slots:
 
     void on_calendarWidget_clicked(const QDate &date);
 
+    void on_pushButton_resa_showResa_clicked();
+
 private:
     Ui::MainWindow *ui;
     std::vector<Utilisateur*> userList;
@@ -60,6 +63,7 @@ private:
     std::vector<Kit*> kitListGeskit_view; //List of kits to be displayed in "listWidget_resa"
     std::vector<Kit*> kitListResa_view; //List of kits to be displayed in "listWidget_resa"
     std::vector<Kit*> kitListBasket_view; //List of kits to be displayed in "listWidget_panierResa"
+    std::vector<Resa*> resaList; //List of kits to be displayed in "listWidget_panierResa"
 
     Utilisateur new_user;
     Utilisateur login_user;
@@ -93,5 +97,6 @@ private:
     void RESA_get_kits_by_code(std::vector<Kit *> *from_kits, std::vector<Kit *> *to_kits, QString code);
     void RESA_get_kits_by_name(std::vector<Kit *> *from_kits, std::vector<Kit *> *to_kits, QString code);
     QDate RESA_get_next_resa_day(QDate start_date);
+    void RESA_refresh_current_resa_list_table();
 };
 #endif // MAINWINDOW_H

@@ -12,11 +12,12 @@ private:
     QDate start_date;
     int id_kit;
     int id_user;
+    int id_resa;
 
 
 public:
     Resa();
-    Resa(int id, const QDate &start_date, int id_kit, int id_user);
+    Resa(int id, const QDate &start_date, int id_kit, int id_user, int id_resa);
     int getId() const;
     void setId(int newId);
     QDate getStart_date() const;
@@ -25,6 +26,9 @@ public:
     void setId_kit(int newId_kit);
     int getId_user() const;
     void setId_user(int newId_user);
+    int getId_resa() const;
+    void setId_resa(int newId_resa);
+    QString toString();
 };
 
 #endif // RESA_H
