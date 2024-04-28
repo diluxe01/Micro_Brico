@@ -34,7 +34,8 @@ MainWindow::MainWindow(QWidget *parent)
     g_connect_db.setActiveUser(&(this->login_user));
 
 
-
+    //Init default buttons status
+    this->ui->pushButton_suppr_resa->setEnabled(false);
 
     // Init of the connection status slot
     this->login_user.setIs_logged_on(true);
@@ -50,14 +51,15 @@ MainWindow::MainWindow(QWidget *parent)
     QStringList header_list;
     ui->tableWidget_kit->setRowCount(0);
     ui->tableWidget_kit->setColumnCount(6);
-    header_list.append("Nom");
     header_list.append("Code");
+    header_list.append("Nom");
     header_list.append("Caution");
     header_list.append("Date achat");
     header_list.append("Prix d'achat");
     header_list.append("En Panne?");
     ui->tableWidget_kit->setHorizontalHeaderLabels(header_list);
 
+    ui->tableWidget_kit->setColumnWidth(1, 250);
 
     // Init of items display table
     header_list.clear();
@@ -208,6 +210,7 @@ void MainWindow::on_actionSe_connecter_triggered()
 void MainWindow::on_actionSe_d_connecter_triggered()
 {
     update_connection_status(false);
+    clean_HMI();
 }
 
 // ^^^^^^ POPUP LOGIN SECTION ^^^^^^
@@ -305,6 +308,7 @@ void MainWindow::GESKIT_refresh_kit_list_table(void)
 
 void MainWindow::GESKIT_push_back_new_kit_on_table(Kit* kit, int row)
 {
+    uint column_index = 0;
     ui->tableWidget_kit->setRowCount(row);
     QTableWidgetItem* p_widget_item_nom;
     QTableWidgetItem* p_widget_item_code;
@@ -313,30 +317,36 @@ void MainWindow::GESKIT_push_back_new_kit_on_table(Kit* kit, int row)
     QTableWidgetItem* p_widget_item_prix;
     QTableWidgetItem* p_widget_item_etat;
 
-    // Set first item of last row (name)
-    p_widget_item_nom= new QTableWidgetItem(kit->getNom());
-    ui->tableWidget_kit->setItem(row-1, 0, p_widget_item_nom);
-
     // Set second item of last row (code)
     p_widget_item_code= new QTableWidgetItem(kit->getCode());
-    ui->tableWidget_kit->setItem(row-1, 1, p_widget_item_code);
+    ui->tableWidget_kit->setItem(row-1, column_index, p_widget_item_code);
+    column_index ++;
+
+    // Set first item of last row (name)
+    p_widget_item_nom= new QTableWidgetItem(kit->getNom());
+    ui->tableWidget_kit->setItem(row-1, column_index, p_widget_item_nom);
+    column_index ++;
 
     // Set third item of last row (caution)
     p_widget_item_caution= new QTableWidgetItem(kit->getCaution().getStringValue());
-    ui->tableWidget_kit->setItem(row-1, 2, p_widget_item_caution);
+    ui->tableWidget_kit->setItem(row-1, column_index, p_widget_item_caution);
+    column_index ++;
 
     // Set fourth item of last row (date)
     QString date = kit->getDate_achat().toString("dd.MM.yyyy");
     p_widget_item_date= new QTableWidgetItem(date);
-    ui->tableWidget_kit->setItem(row-1, 3, p_widget_item_date);
+    ui->tableWidget_kit->setItem(row-1, column_index, p_widget_item_date);
+    column_index ++;
 
     // Set fifth item of last row (prix)
     p_widget_item_prix= new QTableWidgetItem(kit->getPrix_achat().getStringValue());
-    ui->tableWidget_kit->setItem(row-1, 4, p_widget_item_prix);
+    ui->tableWidget_kit->setItem(row-1, column_index, p_widget_item_prix);
+    column_index ++;
 
     // Set sixth item of last row (etat)
     p_widget_item_etat= new QTableWidgetItem(kit->getEn_panne_str());
-    ui->tableWidget_kit->setItem(row-1, 5, p_widget_item_etat);
+    ui->tableWidget_kit->setItem(row-1, column_index, p_widget_item_etat);
+    column_index ++;
 }
 
 
@@ -437,6 +447,28 @@ void MainWindow::on_popupDelete_ok()
 
 //---------------------------------------------------------
 // vvvvvv SLOTS SECTION vvvvvv
+void MainWindow::clean_HMI(void)
+{
+    //Clear every table, list and line edit
+    this->ui->lineEdit_findkitbycode->clear();
+    this->ui->lineEdit_findkitbycode_resa->clear();
+    this->ui->lineEdit_findkitbyname->clear();
+    this->ui->lineEdit_findkitbyname_resa->clear();
+    this->ui->lineEdit_resa_email_user->clear();
+    this->ui->tableWidget_item->clear();
+    this->ui->tableWidget_kit->clear();
+    this->ui->listWidget_panierResa->clear();
+    this->ui->listWidget_resa->clear();
+    this->ui->listWidget_resa_currentResa->clear();
+    this->ui->listWidget_resa_kitsOfResa->clear();
+
+    //Clear every vector lists
+    g_utils.clearList(&this->userList);
+    g_utils.clearList(&this->kitList);
+    g_utils.clearList(&this->resaList);
+
+}
+
 void MainWindow::update_connection_status(bool is_user_logged)
 {
     if (is_user_logged != this->login_user.getIs_logged_on())
@@ -542,6 +574,27 @@ void MainWindow::on_popupAddKit_ok()
         this->GESKIT_refresh_kit_list_from_server(&this->kitList);
     }
 }
+
+
+void MainWindow::on_pushButton_duplicate_kit_clicked()
+{
+    //First get kit selected by user
+    QList<QTableWidgetSelectionRange> items = this->ui->tableWidget_kit->selectedRanges();
+    QTableWidgetSelectionRange  selectedRange = items.first();
+    int row = selectedRange.topRow();
+
+    qInfo()<< "row: " << QString::number(row);
+    Kit* p_kit = kitListGeskit_view.at(row);
+
+    qInfo()<< "Code: " << p_kit->getCode();
+
+    this->p_popupAddKit = new (PoppupAddKit);
+    this->p_popupAddKit->set_form_from_kit(p_kit);
+    this->p_popupAddKit->show();
+    QObject::connect(this->p_popupAddKit->getOkButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_ok);
+    QObject::connect(this->p_popupAddKit->getCancelButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_destroyed);
+}
+
 // ^^^^^^ POPUP Add_kit SECTION ^^^^^^
 //---------------------------------------------------------
 
@@ -880,6 +933,8 @@ void MainWindow::on_listWidget_resa_currentResa_itemClicked(QListWidgetItem *ite
     //clear kit list
     this->ui->listWidget_resa_kitsOfResa->clear();
 
+    this->ui->pushButton_suppr_resa->setEnabled(true);
+
     match = re.match(item->text());
     if (match.hasMatch())
     {
@@ -913,6 +968,8 @@ void MainWindow::on_pushButton_suppr_resa_clicked()
 
 // ^^^^^^ MAIN WINDOW "Gestion Reservation" ^^^^^^
 //---------------------------------------------------------
+
+
 
 
 

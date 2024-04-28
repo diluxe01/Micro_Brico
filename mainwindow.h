@@ -26,9 +26,10 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void clean_HMI(void);
+    void update_connection_status(bool is_user_logged);
 
 public slots:
-    void update_connection_status(bool is_user_logged);
     void log_stuffs(QtMsgType type, const QString &msg);
 
 private slots:
@@ -44,6 +45,8 @@ private slots:
     void on_pushButton_addkit_clicked();
     void on_popupAddKit_destroyed();
     void on_popupAddKit_ok();
+    void on_pushButton_duplicate_kit_clicked();
+
     void on_pushButton_getkit_clicked();
     void on_tableWidget_kit_cellClicked(int row, int column);
     void on_pushButton_getkit_resa_clicked();
@@ -61,6 +64,7 @@ private slots:
 
 
     void on_pushButton_suppr_resa_clicked();
+
 
 private:
     Ui::MainWindow *ui;

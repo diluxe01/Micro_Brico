@@ -27,7 +27,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="TAB_ges_user">
        <property name="enabled">
@@ -151,8 +151,8 @@
                 <property name="title">
                  <string>Kits</string>
                 </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_10">
-                 <item>
+                <layout class="QGridLayout" name="gridLayout">
+                 <item row="0" column="0">
                   <widget class="QTableWidget" name="tableWidget_kit">
                    <property name="editTriggers">
                     <set>QAbstractItemView::NoEditTriggers</set>
@@ -165,6 +165,31 @@
                    </property>
                   </widget>
                  </item>
+                 <item row="1" column="0">
+                  <widget class="QGroupBox" name="groupBox_9">
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>150</height>
+                    </size>
+                   </property>
+                   <property name="title">
+                    <string>Description</string>
+                   </property>
+                   <layout class="QHBoxLayout" name="horizontalLayout_12">
+                    <item>
+                     <widget class="QTextEdit" name="textEdit_descritpionKit">
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>150</height>
+                       </size>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
                 </layout>
                </widget>
               </item>
@@ -172,7 +197,7 @@
                <widget class="QGroupBox" name="groupBox_8">
                 <property name="maximumSize">
                  <size>
-                  <width>230</width>
+                  <width>250</width>
                   <height>16777215</height>
                  </size>
                 </property>
@@ -184,7 +209,7 @@
                   <widget class="QTableWidget" name="tableWidget_item">
                    <property name="maximumSize">
                     <size>
-                     <width>600</width>
+                     <width>800</width>
                      <height>16777215</height>
                     </size>
                    </property>
@@ -203,36 +228,22 @@
                <widget class="QGroupBox" name="groupBox_11">
                 <property name="maximumSize">
                  <size>
-                  <width>300</width>
+                  <width>250</width>
                   <height>16777215</height>
                  </size>
                 </property>
                 <property name="title">
-                 <string>Infos du Kit</string>
+                 <string>Détails du Kit</string>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_9">
                  <item>
-                  <widget class="QGroupBox" name="groupBox_9">
-                   <property name="title">
-                    <string>Description</string>
+                  <widget class="QTextEdit" name="textEdit_detailsKit">
+                   <property name="maximumSize">
+                    <size>
+                     <width>300</width>
+                     <height>16777215</height>
+                    </size>
                    </property>
-                   <layout class="QHBoxLayout" name="horizontalLayout_12">
-                    <item>
-                     <widget class="QTextEdit" name="textEdit_descritpionKit"/>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QGroupBox" name="groupBox_10">
-                   <property name="title">
-                    <string>Détails</string>
-                   </property>
-                   <layout class="QHBoxLayout" name="horizontalLayout_13">
-                    <item>
-                     <widget class="QTextEdit" name="textEdit_detailsKit"/>
-                    </item>
-                   </layout>
                   </widget>
                  </item>
                 </layout>
@@ -303,6 +314,13 @@
             <widget class="QPushButton" name="pushButton_addkit">
              <property name="text">
               <string>Ajouter un Kit</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButton_duplicate_kit">
+             <property name="text">
+              <string>Dupliquer le Kit</string>
              </property>
             </widget>
            </item>
@@ -503,13 +521,6 @@
                   <widget class="QListWidget" name="listWidget_resa_currentResa"/>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="pushButton_suppr_resa">
-                   <property name="text">
-                    <string>Annuler la réservation</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
                   <widget class="QPushButton" name="pushButton_resa_showResa">
                    <property name="text">
                     <string>Afficher Réservations</string>
@@ -527,6 +538,19 @@
                 <layout class="QVBoxLayout" name="verticalLayout_13">
                  <item>
                   <widget class="QListWidget" name="listWidget_resa_kitsOfResa"/>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButton_suppr_resa">
+                   <property name="font">
+                    <font>
+                     <bold>true</bold>
+                     <underline>false</underline>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>Annuler la réservation</string>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>

@@ -60,7 +60,7 @@ bool Connect_db::add_kit (Kit *kit)  {
     //add a kit in DB
     QString exec_string = "insert into kit "
                           "( nom, description, date_achat, prix_achat, texte_libre, en_panne, code_kit, caution) "
-                          "values('"+kit->getNom()+"','"+kit->getDescription()+"','"+kit->getDate_achat().toString(Qt::ISODateWithMs)+"','"+kit->getPrix_achat().getStringValue()+"','"+kit->getTexte_libre()+"','0','"+kit->getCode()+"','"+kit->getCaution().getStringValue()+"')";
+                          "values(\""+kit->getNom()+"\",\""+kit->getDescription()+"\",'"+kit->getDate_achat().toString(Qt::ISODateWithMs)+"','"+kit->getPrix_achat().getStringValue()+"','"+kit->getTexte_libre()+"','0','"+kit->getCode()+"','"+kit->getCaution().getStringValue()+"')";
 
     runQuery(query, exec_string);
     //Add associated items to DB if no errors

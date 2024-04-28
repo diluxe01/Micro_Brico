@@ -121,7 +121,7 @@ Kit * PoppupAddKit::get_kit_from_form()
     Money caution_formatted;
     QDate date_formatted;
 
-    QRegularExpression re("^(\\d\\d)/(\\d\\d)/(\\d\\d\\d\\d)$");
+    QRegularExpression re("^(\\d\\d)[/ .]+(\\d\\d)[/ .]+(\\d\\d\\d\\d)$");
     QRegularExpressionMatch match = re.match(dateAchat);
 
 
@@ -196,6 +196,18 @@ Kit * PoppupAddKit::get_kit_from_form()
 
         return NULL;
     }
+}
+
+void PoppupAddKit::set_form_from_kit(Kit * p_kit)
+{
+    this->ui->lineEdit_kitcaution->setText(p_kit->getCaution().getStringValue());
+    this->ui->lineEdit_kitprix->setText(p_kit->getPrix_achat().getStringValue());
+    this->ui->lineEdit_kit_code->setText(p_kit->getCode());
+    this->ui->lineEdit_kit_dateachat->setText(p_kit->getDate_achat().toString("dd.MM.yyyy"));
+    this->ui->lineEdit_kit_name->setText(p_kit->getNom());
+    this->ui->textEdit_kit_description->setText(p_kit->getDescription());
+    this->ui->textEdit_kit_texte_libre->setText(p_kit->getTexte_libre());
+
 }
 
 

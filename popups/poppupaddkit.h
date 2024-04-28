@@ -22,6 +22,7 @@ public:
     ~PoppupAddKit();
 
     Kit *get_kit_from_form();
+    void set_form_from_kit(Kit *);
 
 private slots:
     void on_pushButton_addobject_clicked();
