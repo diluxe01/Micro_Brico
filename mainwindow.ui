@@ -503,7 +503,7 @@
                   <widget class="QListWidget" name="listWidget_resa_currentResa"/>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="pushButton">
+                  <widget class="QPushButton" name="pushButton_suppr_resa">
                    <property name="text">
                     <string>Annuler la réservation</string>
                    </property>

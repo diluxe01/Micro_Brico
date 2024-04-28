@@ -42,7 +42,7 @@ void Resa::setId_user(int newId_user)
 
 QString Resa::toString(void)
 {
-    return "("+QString::number(id_resa)+") Date début "+start_date.toString();
+    return QString::number(id_resa)+" - Date début "+start_date.toString();
 }
 
 int Resa::getId_resa() const

@@ -389,6 +389,17 @@ void MainWindow::GESKIT_push_back_new_item_on_table(Item* item, int row)
     ui->tableWidget_item->setItem(row-1, 1, p_widget_item_etat);
 }
 
+Kit *MainWindow::GESKIT_find_kit_by_id(uint id)
+{
+    for(const auto& kit_elem : this->kitList)
+    {
+        if (kit_elem->getIdKit() == id)
+        {
+            return kit_elem;
+        }
+    }
+}
+
 // ^^^^^^ MAIN WINDOW "Gestion Kits" ^^^^^^
 //---------------------------------------------------------
 
@@ -650,8 +661,6 @@ void MainWindow::RESA_get_kits_by_name(std::vector<Kit*> *from_kits, std::vector
 void MainWindow::RESA_get_kits_by_code(std::vector<Kit*> *from_kits, std::vector<Kit*> *to_kits, QString code)
 {
 
-    QRegularExpression re;
-    QRegularExpressionMatch match;
     for(const auto& kit_elem : *from_kits)
     {
         if (kit_elem->getIs_in_resa_view())
@@ -856,8 +865,56 @@ void MainWindow::RESA_refresh_current_resa_list_table(void)
     }
 }
 
+
+
+
+void MainWindow::on_listWidget_resa_currentResa_itemClicked(QListWidgetItem *item)
+{
+    QRegularExpression re;
+    QRegularExpressionMatch match;
+    Kit * p_kit;
+    int resa_nb = 0;
+    // Find resa nb
+    re.setPattern("(\\d*) -");
+
+    //clear kit list
+    this->ui->listWidget_resa_kitsOfResa->clear();
+
+    match = re.match(item->text());
+    if (match.hasMatch())
+    {
+        qInfo()<< "There is a match: " << match.captured(1);
+        resa_nb = match.captured(1).toInt();
+
+        //iter through resa list to find every reservation with resa_nb and get their associated kits
+        for(const auto& resa_elem : this->resaList)
+        {
+            if (resa_elem->getId_resa() == resa_nb)
+            {
+                p_kit = GESKIT_find_kit_by_id(resa_elem->getId_kit());
+                QListWidgetItem* p_item = new QListWidgetItem(p_kit->toString(), this->ui->listWidget_resa_kitsOfResa);
+            }
+        }
+    }
+}
+
+void MainWindow::on_pushButton_suppr_resa_clicked()
+{
+    QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Suppression de réservation.",
+                                                               tr("Êtes-vous sûr de vouloir supprimer votre réservation ?"),
+                                                               QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
+                                                               QMessageBox::Yes);
+    if (resBtn != QMessageBox::Yes) {
+        // event->ignore();
+    } else {
+        // event->accept();
+    }
+}
+
 // ^^^^^^ MAIN WINDOW "Gestion Reservation" ^^^^^^
 //---------------------------------------------------------
+
+
 
 
 

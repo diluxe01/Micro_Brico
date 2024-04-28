@@ -56,6 +56,12 @@ private slots:
 
     void on_pushButton_resa_showResa_clicked();
 
+
+    void on_listWidget_resa_currentResa_itemClicked(QListWidgetItem *item);
+
+
+    void on_pushButton_suppr_resa_clicked();
+
 private:
     Ui::MainWindow *ui;
     std::vector<Utilisateur*> userList;
@@ -91,6 +97,7 @@ private:
     void GESKIT_refresh_item_list_table(Kit *kit);
     void GESKIT_refresh_descritption(Kit *kit);
     void GESKIT_push_back_new_item_on_table(Item *item, int row);
+    Kit* GESKIT_find_kit_by_id(uint id);
 
     void RESA_refresh_kit_list_table();
     void RESA_refresh_basket_kit_list_table();
