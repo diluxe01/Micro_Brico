@@ -75,7 +75,7 @@ bool Connect_db::add_kit (Kit *kit)  {
             for (it = kit->item_list.begin(); it != kit->item_list.end(); it++)
             {
 
-                exec_string = "insert into item (name,forkey, etat) values('"+(*it)->getName()+"', '"+idkit+"', '"+(*it)->getEtatStr()+"')";
+                exec_string = "insert into item (name,forkey) values('"+(*it)->getName()+"', '"+idkit+"')";
                 query.exec(exec_string);
                 if (!get_querry_errors(query))
                 {
@@ -279,12 +279,10 @@ void Connect_db::populate_item_list_from_query(Kit * kit, QSqlQuery query)
     {
         int id = query.value("id").toInt();
         QString name = query.value("name").toString();
-        QString etat = query.value("etat").toString();
 
         Item * i = new Item();
         i->setid((uint)id);
         i->setName(name);
-        i->setEtatStr(etat);
 
         kit->item_list.push_back(i);
     }

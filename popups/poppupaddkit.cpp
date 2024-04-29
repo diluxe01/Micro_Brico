@@ -4,6 +4,7 @@
 #include <QTableWidgetItem>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
+#include <QListWidgetItem>
 
 #include "../money.h"
 
@@ -13,11 +14,6 @@ PoppupAddKit::PoppupAddKit(QWidget *parent)
 {
     QStringList header_list;
     ui->setupUi(this);
-    ui->tableWidget_itemBasket->setRowCount(0);
-    ui->tableWidget_itemBasket->setColumnCount(2);
-    header_list.append("Nom");
-    header_list.append("Etat");
-    ui->tableWidget_itemBasket->setHorizontalHeaderLabels(header_list);
     this->kit = new Kit();
 }
 
@@ -41,53 +37,24 @@ void PoppupAddKit::on_pushButton_addobject_clicked()
 
     QString item_text = ui->lineEdit_new_item->text();
     int tmp_int_etat;
-    T_etat_item item_etat;
     // If user entered text
     if (item_text!= "")
     {
-        tmp_int_etat = ui->comboBox->currentIndex();
-
-        // Find corresponding item state from combobox
-        switch (tmp_int_etat)
-        {
-            case 0:
-                item_etat = E_NEW;
-                break;
-            case 1:
-                item_etat = E_WORN;
-                break;
-            case 2:
-                item_etat = E_BROKEN;
-                break;
-            case 3:
-                item_etat = E_LOST;
-                break;
-
-        }
         //Push_back new item into private item list
-        Item* item = new Item(0, item_text, 0, item_etat);
-        this->kit->item_list.push_back(item);
+        Item* p_item = new Item(0, item_text, 0);
+        this->kit->item_list.push_back(p_item);
 
         //Push_back new item into display tab
-        push_back_new_item_on_tabWidget(item);
+        push_back_new_item_on_tabWidget(p_item);
 
     }
 
 }
 
-void PoppupAddKit::push_back_new_item_on_tabWidget(Item* item)
+void PoppupAddKit::push_back_new_item_on_tabWidget(Item* p_item)
 {
-    int nb_row = this->kit->item_list.size();
-    ui->tableWidget_itemBasket->setRowCount(nb_row);
-    QTableWidgetItem* p_widget_item_name;
-    QTableWidgetItem* p_widget_item_state;
-    // Set first item of last row (name)
-    p_widget_item_name= new QTableWidgetItem(item->getName());
-    ui->tableWidget_itemBasket->setItem(nb_row-1, 0, p_widget_item_name);
 
-    // Set second item of last row (Etat)
-    p_widget_item_state = new QTableWidgetItem(item->getEtatStr());
-    ui->tableWidget_itemBasket->setItem(nb_row-1, 1, p_widget_item_state);
+    QListWidgetItem* p_WidegtItem = new QListWidgetItem(p_item->getName(), this->ui->listWidget_itemBasket);
 }
 
 void PoppupAddKit::on_pushButton_deleteitemfromlist_clicked()
@@ -95,10 +62,10 @@ void PoppupAddKit::on_pushButton_deleteitemfromlist_clicked()
     if (this->kit->item_list.empty() == false)
     {
         //Get current row
-        int currentRow = ui->tableWidget_itemBasket->currentRow();
+        int currentRow = ui->listWidget_itemBasket->currentRow();
 
         //Delete element on tab widget
-        ui->tableWidget_itemBasket->removeRow(currentRow);
+        ui->listWidget_itemBasket->takeItem(currentRow);
 
         //Delete element on the list at given index
         this->kit->item_list.erase(this->kit->item_list.begin()+currentRow);
@@ -208,6 +175,15 @@ void PoppupAddKit::set_form_from_kit(Kit * p_kit)
     this->ui->textEdit_kit_description->setText(p_kit->getDescription());
     this->ui->textEdit_kit_texte_libre->setText(p_kit->getTexte_libre());
 
+
+    // Add items of kit
+    for(const auto& item_elem : p_kit->item_list)
+    {
+        //Push_back new item into private item list
+        Item* p_item = new Item(0, item_elem->getName(), 0);
+        this->kit->item_list.push_back(p_item);
+        push_back_new_item_on_tabWidget(item_elem);
+    }
 }
 
 

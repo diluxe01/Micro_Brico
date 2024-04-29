@@ -64,9 +64,8 @@ MainWindow::MainWindow(QWidget *parent)
     // Init of items display table
     header_list.clear();
     ui->tableWidget_item->setRowCount(0);
-    ui->tableWidget_item->setColumnCount(2);
+    ui->tableWidget_item->setColumnCount(1);
     header_list.append("Nom");
-    header_list.append("Etat");
     ui->tableWidget_item->setHorizontalHeaderLabels(header_list);
 
 
@@ -394,9 +393,6 @@ void MainWindow::GESKIT_push_back_new_item_on_table(Item* item, int row)
     p_widget_item_name= new QTableWidgetItem(item->getName());
     ui->tableWidget_item->setItem(row-1, 0, p_widget_item_name);
 
-    // Set second item of last row (etat)
-    p_widget_item_etat= new QTableWidgetItem(item->getEtatStr());
-    ui->tableWidget_item->setItem(row-1, 1, p_widget_item_etat);
 }
 
 Kit *MainWindow::GESKIT_find_kit_by_id(uint id)
@@ -582,12 +578,9 @@ void MainWindow::on_pushButton_duplicate_kit_clicked()
     QList<QTableWidgetSelectionRange> items = this->ui->tableWidget_kit->selectedRanges();
     QTableWidgetSelectionRange  selectedRange = items.first();
     int row = selectedRange.topRow();
-
-    qInfo()<< "row: " << QString::number(row);
     Kit* p_kit = kitListGeskit_view.at(row);
 
-    qInfo()<< "Code: " << p_kit->getCode();
-
+    //Open popup pre filled with selected kit informations
     this->p_popupAddKit = new (PoppupAddKit);
     this->p_popupAddKit->set_form_from_kit(p_kit);
     this->p_popupAddKit->show();
