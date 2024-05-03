@@ -325,6 +325,13 @@
             </widget>
            </item>
            <item>
+            <widget class="QPushButton" name="pushButton_modify_kit">
+             <property name="text">
+              <string>Modifier le Kit</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QFrame" name="frame">
              <property name="frameShape">
               <enum>QFrame::StyledPanel</enum>

@@ -175,12 +175,16 @@ void PoppupAddKit::set_form_from_kit(Kit * p_kit)
     this->ui->textEdit_kit_description->setText(p_kit->getDescription());
     this->ui->textEdit_kit_texte_libre->setText(p_kit->getTexte_libre());
 
+    // copies "to_duplicate" to know if it is a kit to duplicate or to modify
+    this->kit->setTo_duplicate(p_kit->getTo_duplicate());
+    // copies idkit
+    this->kit->setIdkit(p_kit->getIdKit());
 
     // Add items of kit
     for(const auto& item_elem : p_kit->item_list)
     {
         //Push_back new item into private item list
-        Item* p_item = new Item(0, item_elem->getName(), 0);
+        Item* p_item = new Item(item_elem->getId(), item_elem->getName(), 0);
         this->kit->item_list.push_back(p_item);
         push_back_new_item_on_tabWidget(item_elem);
     }

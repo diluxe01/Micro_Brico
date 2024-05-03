@@ -170,6 +170,17 @@ void Kit::setIs_in_resa_view(bool newIs_in_resa_view)
     is_in_resa_view = newIs_in_resa_view;
 }
 
+
+bool Kit::getTo_duplicate() const
+{
+    return to_duplicate;
+}
+
+void Kit::setTo_duplicate(bool newTo_duplicate)
+{
+    to_duplicate = newTo_duplicate;
+}
+
 Kit::Kit(QObject *parent)
     : QObject{parent}
 {}
@@ -190,4 +201,5 @@ Kit::Kit(uint idkit, const QString &nom, const QString &description, const QStri
     this->is_out = false;
     this->is_in_basket = false;
     this->is_in_resa_view = false;
+    this->to_duplicate = false;
 }

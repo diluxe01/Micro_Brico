@@ -46,6 +46,7 @@ private slots:
     void on_popupAddKit_destroyed();
     void on_popupAddKit_ok();
     void on_pushButton_duplicate_kit_clicked();
+    void on_pushButton_modify_kit_clicked();
 
     void on_pushButton_getkit_clicked();
     void on_tableWidget_kit_cellClicked(int row, int column);
@@ -64,6 +65,7 @@ private slots:
 
 
     void on_pushButton_suppr_resa_clicked();
+
 
 
 private:
@@ -95,6 +97,9 @@ private:
     void on_popupDelete_ok();
     void on_popupDelete_destroyed();
 
+    void GESKIT_clear_display();
+    void GESKIT_enable_geskit_buttons(bool i_enable);
+    Kit* GESKIT_get_kit_selected();
     void GESKIT_refresh_kit_list_from_server(std::vector<Kit*> *i_list);
     void GESKIT_refresh_kit_list_table();
     void GESKIT_push_back_new_kit_on_table(Kit *kit, int row);

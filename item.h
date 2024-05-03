@@ -35,6 +35,8 @@ public:
 
     // QString getEtatStr() const;
     // void setEtatStr(QString etat_str);
+    uint getId() const;
+
 signals:
 };
 

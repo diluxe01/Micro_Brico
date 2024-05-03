@@ -35,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     //Init default buttons status
-    this->ui->pushButton_suppr_resa->setEnabled(false);
+    this->GESKIT_enable_geskit_buttons(false);
 
     // Init of the connection status slot
     this->login_user.setIs_logged_on(true);
@@ -250,15 +250,48 @@ void MainWindow::GESUSER_refresh_user_list_table(void)
 //---------------------------------------------------------
 // vvvvvv MAIN WINDOW "Gestion Kits" SECTION vvvvvv
 
+///
+/// \brief MainWindow::GESKIT_clear_display
+/// Clears every tables and textEdit in GESKIT tab
+///
+void MainWindow::GESKIT_clear_display(void)
+{
+    this->ui->textEdit_descritpionKit->clear();
+    this->ui->textEdit_detailsKit->clear();
+    this->ui->tableWidget_item->clearContents();
+    this->ui->tableWidget_item->setRowCount(0);
+    this->ui->tableWidget_kit->clearContents();
+    this->ui->tableWidget_kit->setRowCount(0);
+}
+
+void MainWindow::GESKIT_enable_geskit_buttons(bool i_enable)
+{
+    bool l_enable = false;
+    //Enable buttons only if user is admin
+    if (this->login_user.getPrivilege() == E_admin)
+    {
+        l_enable = i_enable;
+        this->ui->pushButton_addkit->setEnabled(true); // always enable this one when admin
+    }
+    else
+    {
+        l_enable = false;
+    }
+
+    this->ui->pushButton_duplicate_kit->setEnabled(l_enable);
+    this->ui->pushButton_modify_kit->setEnabled(l_enable);
+}
+
 void MainWindow::GESKIT_refresh_kit_list_from_server(std::vector<Kit*> *i_list)
 {
+    // clear GUI display
+    this->GESKIT_clear_display();
     /* clean the kit list and delete objects pointed by element of this list */
     g_utils.clearList(i_list);
     // clear every depending lists
     this->kitListBasket_view.clear();
     this->kitListGeskit_view.clear();
     this->kitListResa_view.clear();
-    this->ui->tableWidget_kit->clearContents();
 
     this->ui->listWidget_panierResa->clear();
     this->ui->listWidget_resa->clear();
@@ -269,7 +302,6 @@ void MainWindow::GESKIT_refresh_kit_list_from_server(std::vector<Kit*> *i_list)
 void MainWindow::on_pushButton_getkit_clicked()
 {
     this->kitListGeskit_view.clear();
-    this->ui->tableWidget_kit->clearContents();
     /* if user enterd a code, then search for Kits with this code */
     if (ui->lineEdit_findkitbycode->text()!="")
     {
@@ -289,6 +321,11 @@ void MainWindow::on_pushButton_getkit_clicked()
         }
     }
 
+    // If user gives an input that leads to 0 matches, then disable duplicate button
+    if(this->kitListGeskit_view.size() == 0)
+    {
+        this->GESKIT_enable_geskit_buttons(false);
+    }
     MainWindow::GESKIT_refresh_kit_list_table();
 }
 
@@ -296,7 +333,7 @@ void MainWindow::GESKIT_refresh_kit_list_table(void)
 {
     vector<Kit*>::iterator it;
     int row = 0;
-    this->ui->tableWidget_kit->clearContents();
+    this->GESKIT_clear_display();
 
     for(const auto& kit_elem : this->kitListGeskit_view)
     {
@@ -359,6 +396,9 @@ void MainWindow::on_tableWidget_kit_cellClicked(int row, int column)
         g_utils.clearList(&k->item_list);
         g_connect_db.select_items_by_kit(k);
     }
+
+    GESKIT_enable_geskit_buttons(true);
+
     GESKIT_refresh_item_list_table(k);
     GESKIT_refresh_descritption(k);
 }
@@ -446,13 +486,12 @@ void MainWindow::on_popupDelete_ok()
 void MainWindow::clean_HMI(void)
 {
     //Clear every table, list and line edit
+    this->GESKIT_clear_display();
     this->ui->lineEdit_findkitbycode->clear();
     this->ui->lineEdit_findkitbycode_resa->clear();
     this->ui->lineEdit_findkitbyname->clear();
     this->ui->lineEdit_findkitbyname_resa->clear();
     this->ui->lineEdit_resa_email_user->clear();
-    this->ui->tableWidget_item->clear();
-    this->ui->tableWidget_kit->clear();
     this->ui->listWidget_panierResa->clear();
     this->ui->listWidget_resa->clear();
     this->ui->listWidget_resa_currentResa->clear();
@@ -500,6 +539,8 @@ void MainWindow::update_connection_status(bool is_user_logged)
             qInfo() << "Vous êtes maintenant déconnecté.";
             //Clear lineEdit_resa_email_use
             this->ui->lineEdit_resa_email_user->setText("");
+            this->ui->pushButton_suppr_resa->setEnabled(false);
+            this->GESKIT_enable_geskit_buttons(false);
         }
     }
 }
@@ -561,7 +602,7 @@ void MainWindow::on_popupAddKit_ok()
     {
 
     }
-    else
+    else if (p_kit->getTo_duplicate() == true)
     {
         g_connect_db.add_kit(p_kit);
         this->p_popupAddKit->close();
@@ -569,16 +610,31 @@ void MainWindow::on_popupAddKit_ok()
         /* refresh the user list by cleaning and loading it again */
         this->GESKIT_refresh_kit_list_from_server(&this->kitList);
     }
+    else //if (p_kit->getTo_duplicate() == false)
+    {
+        g_connect_db.update_kit(p_kit);
+        this->p_popupAddKit->close();
+        delete (this->p_popupAddKit);
+        /* refresh the user list by cleaning and loading it again */
+        this->GESKIT_refresh_kit_list_from_server(&this->kitList);
+    }
 }
 
-
-void MainWindow::on_pushButton_duplicate_kit_clicked()
+Kit* MainWindow::GESKIT_get_kit_selected()
 {
     //First get kit selected by user
     QList<QTableWidgetSelectionRange> items = this->ui->tableWidget_kit->selectedRanges();
     QTableWidgetSelectionRange  selectedRange = items.first();
     int row = selectedRange.topRow();
     Kit* p_kit = kitListGeskit_view.at(row);
+    return p_kit;
+}
+
+void MainWindow::on_pushButton_duplicate_kit_clicked()
+{
+    //First get kit selected by user
+    Kit* p_kit = GESKIT_get_kit_selected();
+    p_kit->setTo_duplicate(true);
 
     //Open popup pre filled with selected kit informations
     this->p_popupAddKit = new (PoppupAddKit);
@@ -586,6 +642,21 @@ void MainWindow::on_pushButton_duplicate_kit_clicked()
     this->p_popupAddKit->show();
     QObject::connect(this->p_popupAddKit->getOkButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_ok);
     QObject::connect(this->p_popupAddKit->getCancelButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_destroyed);
+}
+
+void MainWindow::on_pushButton_modify_kit_clicked()
+{
+    //First get kit selected by user
+    Kit* p_kit = GESKIT_get_kit_selected();
+    p_kit->setTo_duplicate(false);
+
+    //Open popup pre filled with selected kit informations
+    this->p_popupAddKit = new (PoppupAddKit);
+    this->p_popupAddKit->set_form_from_kit(p_kit);
+    this->p_popupAddKit->show();
+    QObject::connect(this->p_popupAddKit->getOkButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_ok);
+    QObject::connect(this->p_popupAddKit->getCancelButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_destroyed);
+
 }
 
 // ^^^^^^ POPUP Add_kit SECTION ^^^^^^
@@ -961,6 +1032,7 @@ void MainWindow::on_pushButton_suppr_resa_clicked()
 
 // ^^^^^^ MAIN WINDOW "Gestion Reservation" ^^^^^^
 //---------------------------------------------------------
+
 
 
 

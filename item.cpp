@@ -15,6 +15,11 @@ void Item::setForkey(uint newForkey)
     forkey = newForkey;
 }
 
+uint Item::getId() const
+{
+    return id;
+}
+
 Item::Item(QObject *parent)
     : QObject{parent}
 {}
@@ -85,4 +90,6 @@ uint Item::getForkey() const
 Item::Item(uint id, const QString &name, uint forkey) : id(std::move(id)),
     name(name),
     forkey(std::move(forkey))
-{}
+{
+
+}

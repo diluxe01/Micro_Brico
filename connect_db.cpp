@@ -23,7 +23,7 @@ Connect_db::Connect_db() {
 bool Connect_db::runQuery(QSqlQuery &query, QString query_string)
 {
     bool querry_had_errors = false;
-    qDebug() << query_string;
+    qDebug().noquote() << query_string;
     if (is_user_connected() == true)
     {
         query.exec(query_string);
@@ -60,7 +60,7 @@ bool Connect_db::add_kit (Kit *kit)  {
     //add a kit in DB
     QString exec_string = "insert into kit "
                           "( nom, description, date_achat, prix_achat, texte_libre, en_panne, code_kit, caution) "
-                          "values(\""+kit->getNom()+"\",\""+kit->getDescription()+"\",'"+kit->getDate_achat().toString(Qt::ISODateWithMs)+"','"+kit->getPrix_achat().getStringValue()+"','"+kit->getTexte_libre()+"','0','"+kit->getCode()+"','"+kit->getCaution().getStringValue()+"')";
+                          "values(\""+kit->getNom()+"\",\""+kit->getDescription()+"\",'"+kit->getDate_achat().toString(Qt::ISODateWithMs)+"','"+kit->getPrix_achat().getStringValue()+"',\""+kit->getTexte_libre()+"\",'0','"+kit->getCode()+"','"+kit->getCaution().getStringValue()+"')";
 
     runQuery(query, exec_string);
     //Add associated items to DB if no errors
@@ -83,12 +83,80 @@ bool Connect_db::add_kit (Kit *kit)  {
                 }
             }
         }
-
-
     }
-
     return returnValue;
 }
+
+void Connect_db::update_kit (Kit *i_kit)  {
+    vector<Item*>::iterator it;
+    Kit l_tmp_kit;
+    bool item_matching = false;
+
+    QSqlQuery query  = QSqlQuery(this->db);
+    //add a kit in DB
+    QString exec_string = "update kit set  nom = \"%1\" ,  description = \"%2\", date_achat = \"%3\",  prix_achat = \"%4\", texte_libre = \"%5\",en_panne = \"%6\", code_kit = \"%7\", caution = \"%8\" where idkit = %9";
+    exec_string = exec_string .arg(i_kit->getNom())
+                              .arg(i_kit->getDescription())
+                              .arg(i_kit->getDate_achat().toString(Qt::ISODateWithMs))
+                              .arg(i_kit->getPrix_achat().getStringValue())
+                              .arg(i_kit->getTexte_libre())
+                              .arg("0")
+                              .arg(i_kit->getCode())
+                              .arg(i_kit->getCaution().getStringValue())
+                              .arg(QString::number(i_kit->getIdKit()));
+
+    runQuery(query, exec_string);
+    //Add associated items to DB if no errors
+    if (!get_querry_errors(query))
+    {
+        //Get every items of kit in DB
+        l_tmp_kit.setIdkit(i_kit->getIdKit());
+        this->select_items_by_kit(&l_tmp_kit);
+
+        // Iterate through items of db, and compare to new items to find those: deleted or edited
+        for(const auto& elem_item_db : l_tmp_kit.item_list)
+        {
+            item_matching = false;
+            for(const auto& elem_item_new : i_kit->item_list)
+            {
+                // 1) There is a matching edited item => do nothing
+                if (elem_item_db->getId() == elem_item_new->getId())
+                {
+                    item_matching = true;
+                    // exec_string = "update item set name = \""+elem_item_new->getName()+"\" where id =  "+ QString::number(elem_item_new->getId());
+                    // runQuery(query, exec_string);
+                    break;
+                }
+            }
+            // 2) There is no matching edited item => delete item
+            if (item_matching == false)
+            {
+                exec_string = "delete from item where id =  "+ QString::number(elem_item_db->getId());
+                runQuery(query, exec_string);
+            }
+        }
+
+        // Iterate through new items, and compare to items on db to find those : added
+        for(const auto& elem_item_new : i_kit->item_list)
+        {
+            item_matching = false;
+            for(const auto& elem_item_db : l_tmp_kit.item_list)
+            {
+                if (elem_item_db->getId() == elem_item_new->getId())
+                {
+                    item_matching = true;
+                }
+            }
+            // 3) if no item is matching then it is a new item => add item
+            if (item_matching == false)
+            {
+                exec_string = "insert into item (name,forkey) values(\""+elem_item_new->getName()+"\", '"+QString::number(i_kit->getIdKit())+"')";
+                runQuery(query,exec_string);
+            }
+        }
+    }
+}
+
 
 bool Connect_db::delete_user(Utilisateur *user_to_delete)
 {

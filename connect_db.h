@@ -48,9 +48,10 @@ public:
     //-----------Kit-------------------
     void select_kits_by_code(std::vector<Kit *> *kits, QString code);
     void select_kits_by_name(std::vector<Kit *> *kits, QString code);
-    bool add_kit (Kit *kit);
+    bool add_kit (Kit *);
+    void update_kit (Kit *);
     void select_all_kits(std::vector<Kit*> *kits);
-    void select_items_by_kit (Kit * kit);
+    void select_items_by_kit (Kit * );
     void populate_item_list_from_query(Kit * kit, QSqlQuery query);
     void set_kit_booked_status(std::vector<Kit*> *i_kits, QDate i_date);
     //-----------Resa-------------------

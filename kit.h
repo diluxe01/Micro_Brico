@@ -21,6 +21,10 @@ private:
     QString code;
     Money caution;
 
+    //GES_KIT related variables
+    bool to_duplicate;
+
+    //RESA related variables
     bool is_booked;
     bool is_out;
     bool is_in_basket;
@@ -69,6 +73,13 @@ public:
 
     bool getIs_in_resa_view() const;
     void setIs_in_resa_view(bool newIs_in_resa_view);
+
+    void setIs_already_in_DB(bool newIs_already_in_DB);
+    bool getIs_already_in_DB() const;
+
+    bool getTo_duplicate() const;
+
+    void setTo_duplicate(bool newTo_duplicate);
 
 signals:
 };
