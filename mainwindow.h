@@ -42,40 +42,35 @@ private slots:
     void on_deleteUser_clicked();
     void on_actionSe_d_connecter_triggered();
     void on_actionAfficher_les_logs_triggered();
-    void on_pushButton_addkit_clicked();
     void on_popupAddKit_destroyed();
     void on_popupAddKit_ok();
-    void on_pushButton_duplicate_kit_clicked();
-    void on_pushButton_modify_kit_clicked();
 
-    void on_pushButton_getkit_clicked();
-    void on_tableWidget_kit_cellClicked(int row, int column);
-    void on_pushButton_getkit_resa_clicked();
-    void on_listWidget_resa_itemDoubleClicked(QListWidgetItem *item);
-    void on_listWidget_panierResa_itemDoubleClicked(QListWidgetItem *item);
+    //-----------Slots GESKIT-------------------
+    void on_GESKIT_pushButton_addkit_clicked();
+    void on_GESKIT_pushButton_duplicate_kit_clicked();
+    void on_GESKIT_pushButton_modify_kit_clicked();
+    void on_GESKIT_pushButton_getkit_clicked();
+    void on_GESKIT_tableWidget_kit_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
 
-    void on_pushButton_reserver_clicked();
-
-    void on_calendarWidget_clicked(const QDate &date);
-
-    void on_pushButton_resa_showResa_clicked();
-
-
-    void on_listWidget_resa_currentResa_itemClicked(QListWidgetItem *item);
-
-
-    void on_pushButton_suppr_resa_clicked();
-
+    //-----------Slots RESA-------------------
+    void on_RESA_pushButton_getkit_resa_clicked();
+    void on_RESA_listWidget_resa_itemDoubleClicked(QListWidgetItem *item);
+    void on_RESA_listWidget_panierResa_itemDoubleClicked(QListWidgetItem *item);
+    void on_RESA_calendarWidget_clicked(const QDate &date);
+    void on_RESA_pushButton_resa_showResa_clicked();
+    void on_RESA_listWidget_resa_currentResa_itemClicked(QListWidgetItem *item);
+    void on_RESA_pushButton_suppr_resa_clicked();
+    void on_RESA_pushButton_reserver_clicked();
 
 
 private:
     Ui::MainWindow *ui;
     std::vector<Utilisateur*> userList;
     std::vector<Kit*> kitList; //List of kits only for "Gestion Kits" tab
-    std::vector<Kit*> kitListGeskit_view; //List of kits to be displayed in "listWidget_resa"
-    std::vector<Kit*> kitListResa_view; //List of kits to be displayed in "listWidget_resa"
-    std::vector<Kit*> kitListBasket_view; //List of kits to be displayed in "listWidget_panierResa"
-    std::vector<Resa*> resaList; //List of kits to be displayed in "listWidget_panierResa"
+    std::vector<Kit*> kitListGeskit_view; //List of kits to be displayed in "RESA_listWidget_resa"
+    std::vector<Kit*> kitListResa_view; //List of kits to be displayed in "RESA_listWidget_resa"
+    std::vector<Kit*> kitListBasket_view; //List of kits to be displayed in "RESA_listWidget_panierResa"
+    std::vector<Resa*> resaList; //List of kits to be displayed in "RESA_listWidget_panierResa"
 
     Utilisateur new_user;
     Utilisateur login_user;
@@ -97,6 +92,7 @@ private:
     void on_popupDelete_ok();
     void on_popupDelete_destroyed();
 
+    //-----------Kit-------------------
     void GESKIT_clear_display();
     void GESKIT_enable_geskit_buttons(bool i_enable);
     Kit* GESKIT_get_kit_selected();
@@ -108,11 +104,13 @@ private:
     void GESKIT_push_back_new_item_on_table(Item *item, int row);
     Kit* GESKIT_find_kit_by_id(uint id);
 
+    //-----------Resa-------------------
     void RESA_refresh_kit_list_table();
     void RESA_refresh_basket_kit_list_table();
     void RESA_get_kits_by_code(std::vector<Kit *> *from_kits, std::vector<Kit *> *to_kits, QString code);
     void RESA_get_kits_by_name(std::vector<Kit *> *from_kits, std::vector<Kit *> *to_kits, QString code);
     QDate RESA_get_next_resa_day(QDate start_date);
     void RESA_refresh_current_resa_list_table();
+    int RESA_find_resa_nb_selected(QListWidgetItem *item);
 };
 #endif // MAINWINDOW_H

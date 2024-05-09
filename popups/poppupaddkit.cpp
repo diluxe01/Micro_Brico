@@ -5,6 +5,7 @@
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QListWidgetItem>
+#include <QMessageBox>
 
 #include "../money.h"
 
@@ -32,16 +33,31 @@ QPushButton* PoppupAddKit::getCancelButton(void)
     return ui->pushButton_annuler;
 }
 
+void PoppupAddKit::GEN_raise_popup_warning(QString msg)
+{
+
+    QMessageBox msgBox;
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.setText(msg);
+    msgBox.setTextFormat(Qt::TextFormat::MarkdownText);
+    msgBox.setWindowTitle("Attention");
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.exec();
+
+    qDebug() << msg;
+}
+
 void PoppupAddKit::on_pushButton_addobject_clicked()
 {
 
     QString item_text = ui->lineEdit_new_item->text();
+    int item_qty = ui->spinBox_item_quantity->value();
     int tmp_int_etat;
     // If user entered text
     if (item_text!= "")
     {
         //Push_back new item into private item list
-        Item* p_item = new Item(0, item_text, 0);
+        Item* p_item = new Item(0, item_text, 0, item_qty);
         this->kit->item_list.push_back(p_item);
 
         //Push_back new item into display tab
@@ -54,7 +70,7 @@ void PoppupAddKit::on_pushButton_addobject_clicked()
 void PoppupAddKit::push_back_new_item_on_tabWidget(Item* p_item)
 {
 
-    QListWidgetItem* p_WidegtItem = new QListWidgetItem(p_item->getName(), this->ui->listWidget_itemBasket);
+    QListWidgetItem* p_WidegtItem = new QListWidgetItem(p_item->getName()+ " ("+ QString::number(p_item->getQuantity())+")", this->ui->listWidget_itemBasket);
 }
 
 void PoppupAddKit::on_pushButton_deleteitemfromlist_clicked()
@@ -91,17 +107,18 @@ Kit * PoppupAddKit::get_kit_from_form()
     QRegularExpression re("^(\\d\\d)[/ .]+(\\d\\d)[/ .]+(\\d\\d\\d\\d)$");
     QRegularExpressionMatch match = re.match(dateAchat);
 
+    QStringList error_string_list;
 
     //-----------Verifie le nom------------
     if (nom =="")
     {
-        qInfo() << "Erreur dans le format du nom: Veuillez nommer le kit";
+        error_string_list.append("Erreur dans le format du nom: Veuillez nommer le kit");
         ok_to_make_a_kit = false;
     }
     //-----------Verifie le code------------
     if (code =="")
     {
-        qInfo() << "Erreur dans le format du code: Veuillez donner un code";
+        error_string_list.append("Erreur dans le format du code: Veuillez donner un code");
         ok_to_make_a_kit = false;
     }
     //-----------Verifie la date------------
@@ -112,37 +129,37 @@ Kit * PoppupAddKit::get_kit_from_form()
         if (date_formatted.setDate(year.toInt(),month.toInt(),day.toInt()) == false)
         {
             ok_to_make_a_kit = false;
-            qInfo() << "Erreur dans le format de la date: Doit avoir le format: JJ/MM/AAAA";
+            error_string_list.append("Erreur dans le format de la date: Doit avoir le format: JJ/MM/AAAA");
         }
     }
     else
     {
         ok_to_make_a_kit = false;
-        qInfo() << "Erreur dans le format de la date: Doit avoir le format: JJ/MM/AAAA";
+        error_string_list.append("Erreur dans le format de la date: Doit avoir le format: JJ/MM/AAAA");
     }
 
     //-----------Verifie le prix-----------
     if (prix_formatted.setValue(prix) == false)
     {
-        qInfo() << "Erreur dans le format du prix: Doit avoir le format: xxxx,yy";
+        error_string_list.append("Erreur dans le format du prix: Doit avoir le format: xxxx,yy");
         ok_to_make_a_kit = false;
     }else if (prix_formatted.getPartie_entiere().toInt()>9999999)
     {
-        qInfo() << "Erreur dans le format du prix: Le prix dépasse la limite autorisée.";
+        error_string_list.append("Erreur dans le format du prix: Le prix dépasse la limite autorisée.");
         ok_to_make_a_kit = false;
-
     }
+
     //-----------Verifie la caution -----------
     if (caution_formatted.setValue(caution) == false)
     {
-        qInfo() << "Erreur dans le format de la caution: Doit avoir le format: xxxx,yy";
+        error_string_list.append("Erreur dans le format de la caution: Doit avoir le format: xxxx,yy");
         ok_to_make_a_kit = false;
     }
 
     //-----------Verifie qu'il y a au moins un item -----------
     if (this->kit->item_list.empty())
     {
-        qInfo() << "Erreur. Vous devez ajouter au moins un sous-objet.";
+        error_string_list.append("Erreur. Vous devez ajouter au moins un sous-objet.");
         ok_to_make_a_kit = false;
     }
 
@@ -160,7 +177,12 @@ Kit * PoppupAddKit::get_kit_from_form()
     }
     else
     {
-
+        QString pop_msg_errors;
+        for(const auto& str_elem : error_string_list)
+        {
+            pop_msg_errors += "\n\r" + str_elem;
+        }
+        GEN_raise_popup_warning(pop_msg_errors);
         return NULL;
     }
 }
@@ -177,6 +199,7 @@ void PoppupAddKit::set_form_from_kit(Kit * p_kit)
 
     // copies "to_duplicate" to know if it is a kit to duplicate or to modify
     this->kit->setTo_duplicate(p_kit->getTo_duplicate());
+
     // copies idkit
     this->kit->setIdkit(p_kit->getIdKit());
 
@@ -184,7 +207,7 @@ void PoppupAddKit::set_form_from_kit(Kit * p_kit)
     for(const auto& item_elem : p_kit->item_list)
     {
         //Push_back new item into private item list
-        Item* p_item = new Item(item_elem->getId(), item_elem->getName(), 0);
+        Item* p_item = new Item(item_elem->getId(), item_elem->getName(), 0, item_elem->getQuantity());
         this->kit->item_list.push_back(p_item);
         push_back_new_item_on_tabWidget(item_elem);
     }

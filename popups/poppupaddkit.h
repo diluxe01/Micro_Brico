@@ -34,6 +34,7 @@ private:
     Ui::PoppupAddKit *ui;
     Kit * kit;
     void push_back_new_item_on_tabWidget(Item *item);
+    void GEN_raise_popup_warning(QString msg);
 };
 
 #endif // POPPUPADDKIT_H

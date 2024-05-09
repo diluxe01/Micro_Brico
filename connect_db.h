@@ -37,7 +37,7 @@ public:
     Connect_db();
     //-----------User-------------------
     void select_all_users(std::vector<Utilisateur*> *list);
-    bool add_user (Utilisateur *user);
+    void add_user (Utilisateur *user);
     void setActiveUser(Utilisateur * p_user);
     bool delete_user(Utilisateur *user_to_delete);
     bool connect_user();
@@ -48,8 +48,9 @@ public:
     //-----------Kit-------------------
     void select_kits_by_code(std::vector<Kit *> *kits, QString code);
     void select_kits_by_name(std::vector<Kit *> *kits, QString code);
-    bool add_kit (Kit *);
+    void add_kit (Kit *);
     void update_kit (Kit *);
+    void add_item(Item *p_item, QString i_idkit);
     void select_all_kits(std::vector<Kit*> *kits);
     void select_items_by_kit (Kit * );
     void populate_item_list_from_query(Kit * kit, QSqlQuery query);
@@ -61,7 +62,9 @@ public:
     void add_resa_from_kit(Kit *i_p_kit, uint user_id, QDate i_start_date, int i_resa_nb);
     void start_resa();
     void end_resa();
+    void delete_resa(int i_resa_nb);
 
+public slots:
 signals:
     void log_value_changed(bool is_user_logged);
 };

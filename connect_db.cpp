@@ -44,17 +44,27 @@ bool Connect_db::get_querry_errors(QSqlQuery &query)
     return false;
 }
 
-bool Connect_db::add_user (Utilisateur *user)  {
+void Connect_db::add_user (Utilisateur *user)  {
     QSqlQuery query  = QSqlQuery(this->db);
     runQuery(query, "insert into utilisateur "
                "( nom, mdp, prenom, email, token, utinfo)"
                " values('"+user->getNom()+"','"+user->getMdp()+"','"+user->getPrenom()+"','"+user->getEmail()+"','"+user->getToken()+"','"+user->getUtinfo()+"')");
-    return true;
+}
+///
+/// \brief Connect_db::add_item adds item to database,
+/// \param p_item: pointer to item to add to db
+/// \param i_idkit: idkit (foreign key of item) associated to added item
+///
+void Connect_db::add_item (Item *p_item, QString i_idkit)  {
+
+    QSqlQuery query  = QSqlQuery(this->db);
+    QString exec_string = "insert into item (name, forkey, quantity) values('"+p_item->getName()+"', '"+i_idkit+"', '"+QString::number(p_item->getQuantity())+"')";
+
+    runQuery(query, exec_string);
 }
 
-bool Connect_db::add_kit (Kit *kit)  {
+void Connect_db::add_kit (Kit *kit)  {
     vector<Item*>::iterator it;
-    bool returnValue = false;
     QString idkit;
     QSqlQuery query  = QSqlQuery(this->db);
     //add a kit in DB
@@ -74,22 +84,15 @@ bool Connect_db::add_kit (Kit *kit)  {
             idkit = query.value("idkit").toString();
             for (it = kit->item_list.begin(); it != kit->item_list.end(); it++)
             {
-
-                exec_string = "insert into item (name,forkey) values('"+(*it)->getName()+"', '"+idkit+"')";
-                query.exec(exec_string);
-                if (!get_querry_errors(query))
-                {
-                    returnValue = true;
-                }
+                add_item(*it, idkit);
             }
         }
     }
-    return returnValue;
 }
 
 void Connect_db::update_kit (Kit *i_kit)  {
     vector<Item*>::iterator it;
-    Kit l_tmp_kit;
+    Kit l_db_kit;
     bool item_matching = false;
 
     QSqlQuery query  = QSqlQuery(this->db);
@@ -110,11 +113,11 @@ void Connect_db::update_kit (Kit *i_kit)  {
     if (!get_querry_errors(query))
     {
         //Get every items of kit in DB
-        l_tmp_kit.setIdkit(i_kit->getIdKit());
-        this->select_items_by_kit(&l_tmp_kit);
+        l_db_kit.setIdkit(i_kit->getIdKit());
+        this->select_items_by_kit(&l_db_kit);
 
         // Iterate through items of db, and compare to new items to find those: deleted or edited
-        for(const auto& elem_item_db : l_tmp_kit.item_list)
+        for(const auto& elem_item_db : l_db_kit.item_list)
         {
             item_matching = false;
             for(const auto& elem_item_new : i_kit->item_list)
@@ -140,7 +143,7 @@ void Connect_db::update_kit (Kit *i_kit)  {
         for(const auto& elem_item_new : i_kit->item_list)
         {
             item_matching = false;
-            for(const auto& elem_item_db : l_tmp_kit.item_list)
+            for(const auto& elem_item_db : l_db_kit.item_list)
             {
                 if (elem_item_db->getId() == elem_item_new->getId())
                 {
@@ -150,8 +153,7 @@ void Connect_db::update_kit (Kit *i_kit)  {
             // 3) if no item is matching then it is a new item => add item
             if (item_matching == false)
             {
-                exec_string = "insert into item (name,forkey) values(\""+elem_item_new->getName()+"\", '"+QString::number(i_kit->getIdKit())+"')";
-                runQuery(query,exec_string);
+                add_item(elem_item_new, QString::number(i_kit->getIdKit()));
             }
         }
     }
@@ -337,7 +339,7 @@ void  Connect_db::select_all_users (std::vector<Utilisateur*> *list)
 void  Connect_db::select_items_by_kit (Kit * kit)
 {
     QSqlQuery query(this->db);
-    runQuery(query,"SELECT id, name, etat from item where forkey ='"+QString::number(kit->getIdKit())+"'");
+    runQuery(query,"SELECT id, name, quantity from item where forkey ='"+QString::number(kit->getIdKit())+"'");
     populate_item_list_from_query(kit, query);
 }
 
@@ -347,10 +349,12 @@ void Connect_db::populate_item_list_from_query(Kit * kit, QSqlQuery query)
     {
         int id = query.value("id").toInt();
         QString name = query.value("name").toString();
+        int quantity = query.value("quantity").toInt();
 
         Item * i = new Item();
         i->setid((uint)id);
         i->setName(name);
+        i->setQuantity(quantity);
 
         kit->item_list.push_back(i);
     }
@@ -523,4 +527,11 @@ void  Connect_db::end_resa(void)
 {
     QSqlQuery query(this->db);
     runQuery(query, "UNLOCK TABLES");
+}
+
+void Connect_db::delete_resa(int i_resa_nb)
+{
+    QSqlQuery query(this->db);
+    runQuery(query, "delete from resa where id_resa = "+ QString::number(i_resa_nb));
+
 }

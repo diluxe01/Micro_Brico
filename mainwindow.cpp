@@ -49,38 +49,40 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Init of Kit display table
     QStringList header_list;
-    ui->tableWidget_kit->setRowCount(0);
-    ui->tableWidget_kit->setColumnCount(6);
+    ui->GESKIT_tableWidget_kit->setRowCount(0);
+    ui->GESKIT_tableWidget_kit->setColumnCount(6);
     header_list.append("Code");
     header_list.append("Nom");
     header_list.append("Caution");
     header_list.append("Date achat");
     header_list.append("Prix d'achat");
     header_list.append("En Panne?");
-    ui->tableWidget_kit->setHorizontalHeaderLabels(header_list);
-
-    ui->tableWidget_kit->setColumnWidth(1, 250);
+    ui->GESKIT_tableWidget_kit->setHorizontalHeaderLabels(header_list);
+    ui->GESKIT_tableWidget_kit->setColumnWidth(1, 250);
 
     // Init of items display table
     header_list.clear();
-    ui->tableWidget_item->setRowCount(0);
-    ui->tableWidget_item->setColumnCount(1);
+    ui->GESKIT_tableWidget_item->setRowCount(0);
+    ui->GESKIT_tableWidget_item->setColumnCount(2);
     header_list.append("Nom");
-    ui->tableWidget_item->setHorizontalHeaderLabels(header_list);
+    header_list.append("Quantité");
+    ui->GESKIT_tableWidget_item->setHorizontalHeaderLabels(header_list);
+    ui->GESKIT_tableWidget_item->setColumnWidth(0, 150);
+    ui->GESKIT_tableWidget_item->setColumnWidth(1, 70);
 
 
-    // A SUPPRIMER Connection automatique avec l'utilisateur "a" à chaque démarrage
+    // A SUPPRIMER Connection automatique avec l'utilisateur "admin" à chaque démarrage
     this->p_loginConnect = new (Login_connect);
-    this->login_user.setEmail("a");
-    this->login_user.setMdp("a");
+    this->login_user.setEmail("admin");
+    this->login_user.setMdp("admin");
     this-> on_popupLogin_ok();
 
     // Init date Edit in resa tab to current date
     QDate maxDate;
     maxDate.setDate(9999,12,30);
-    this->ui->calendarWidget->setDateRange(QDate::currentDate(), maxDate);
-    this->ui->calendarWidget->setSelectedDate(this->RESA_get_next_resa_day(QDate::currentDate())); // Set Selected date to next friday
-    this->on_calendarWidget_clicked(this->RESA_get_next_resa_day(QDate::currentDate()));
+    this->ui->RESA_calendarWidget->setDateRange(QDate::currentDate(), maxDate);
+    this->ui->RESA_calendarWidget->setSelectedDate(this->RESA_get_next_resa_day(QDate::currentDate())); // Set Selected date to next friday
+    this->on_RESA_calendarWidget_clicked(this->RESA_get_next_resa_day(QDate::currentDate()));
 }
 
 MainWindow::~MainWindow()
@@ -256,12 +258,16 @@ void MainWindow::GESUSER_refresh_user_list_table(void)
 ///
 void MainWindow::GESKIT_clear_display(void)
 {
-    this->ui->textEdit_descritpionKit->clear();
-    this->ui->textEdit_detailsKit->clear();
-    this->ui->tableWidget_item->clearContents();
-    this->ui->tableWidget_item->setRowCount(0);
-    this->ui->tableWidget_kit->clearContents();
-    this->ui->tableWidget_kit->setRowCount(0);
+    this->ui->GESKIT_textEdit_descritpionKit->clear();
+    this->ui->GESKIT_textEdit_detailsKit->clear();
+    this->ui->GESKIT_tableWidget_item->clearContents();
+    this->ui->GESKIT_tableWidget_item->setRowCount(0);
+
+    // Block signal because the clearing of contents when "currentCellChanged" signal is activated causes crash for some reasons
+    this->ui->GESKIT_tableWidget_kit->blockSignals(true);
+    this->ui->GESKIT_tableWidget_kit->clearContents();
+    this->ui->GESKIT_tableWidget_kit->setRowCount(0);
+    this->ui->GESKIT_tableWidget_kit->blockSignals(false);
 }
 
 void MainWindow::GESKIT_enable_geskit_buttons(bool i_enable)
@@ -271,21 +277,20 @@ void MainWindow::GESKIT_enable_geskit_buttons(bool i_enable)
     if (this->login_user.getPrivilege() == E_admin)
     {
         l_enable = i_enable;
-        this->ui->pushButton_addkit->setEnabled(true); // always enable this one when admin
+        this->ui->GESKIT_pushButton_addkit->setEnabled(true); // always enable this one when admin
     }
     else
     {
         l_enable = false;
+        this->ui->GESKIT_pushButton_addkit->setEnabled(false); // always enable this one when admin
     }
 
-    this->ui->pushButton_duplicate_kit->setEnabled(l_enable);
-    this->ui->pushButton_modify_kit->setEnabled(l_enable);
+    this->ui->GESKIT_pushButton_duplicate_kit->setEnabled(l_enable);
+    this->ui->GESKIT_pushButton_modify_kit->setEnabled(l_enable);
 }
 
 void MainWindow::GESKIT_refresh_kit_list_from_server(std::vector<Kit*> *i_list)
 {
-    // clear GUI display
-    this->GESKIT_clear_display();
     /* clean the kit list and delete objects pointed by element of this list */
     g_utils.clearList(i_list);
     // clear every depending lists
@@ -293,25 +298,25 @@ void MainWindow::GESKIT_refresh_kit_list_from_server(std::vector<Kit*> *i_list)
     this->kitListGeskit_view.clear();
     this->kitListResa_view.clear();
 
-    this->ui->listWidget_panierResa->clear();
-    this->ui->listWidget_resa->clear();
+    this->ui->RESA_listWidget_panierResa->clear();
+    this->ui->RESA_listWidget_resa->clear();
 
     //Get every kits on server
     g_connect_db.select_all_kits(i_list);
 }
-void MainWindow::on_pushButton_getkit_clicked()
+void MainWindow::on_GESKIT_pushButton_getkit_clicked()
 {
     this->kitListGeskit_view.clear();
     /* if user enterd a code, then search for Kits with this code */
-    if (ui->lineEdit_findkitbycode->text()!="")
+    if (ui->GESKIT_lineEdit_findkitbycode->text()!="")
     {
-        RESA_get_kits_by_code(&this->kitList,&this->kitListGeskit_view,ui->lineEdit_findkitbycode->text() );
+        RESA_get_kits_by_code(&this->kitList,&this->kitListGeskit_view,ui->GESKIT_lineEdit_findkitbycode->text() );
     }
 
     /* if user enterd a text, then search for Kits with this code */
-    else if (ui->lineEdit_findkitbyname->text()!="")
+    else if (ui->GESKIT_lineEdit_findkitbyname->text()!="")
     {
-        RESA_get_kits_by_name(&this->kitList,&this->kitListGeskit_view,ui->lineEdit_findkitbyname->text() );
+        RESA_get_kits_by_name(&this->kitList,&this->kitListGeskit_view,ui->GESKIT_lineEdit_findkitbyname->text() );
     }
     else
     {        /* if user enterd nothing, get every available kits */
@@ -333,7 +338,7 @@ void MainWindow::GESKIT_refresh_kit_list_table(void)
 {
     vector<Kit*>::iterator it;
     int row = 0;
-    this->GESKIT_clear_display();
+    // this->GESKIT_clear_display();
 
     for(const auto& kit_elem : this->kitListGeskit_view)
     {
@@ -345,7 +350,7 @@ void MainWindow::GESKIT_refresh_kit_list_table(void)
 void MainWindow::GESKIT_push_back_new_kit_on_table(Kit* kit, int row)
 {
     uint column_index = 0;
-    ui->tableWidget_kit->setRowCount(row);
+    ui->GESKIT_tableWidget_kit->setRowCount(row);
     QTableWidgetItem* p_widget_item_nom;
     QTableWidgetItem* p_widget_item_code;
     QTableWidgetItem* p_widget_item_caution;
@@ -355,58 +360,64 @@ void MainWindow::GESKIT_push_back_new_kit_on_table(Kit* kit, int row)
 
     // Set second item of last row (code)
     p_widget_item_code= new QTableWidgetItem(kit->getCode());
-    ui->tableWidget_kit->setItem(row-1, column_index, p_widget_item_code);
+    ui->GESKIT_tableWidget_kit->setItem(row-1, column_index, p_widget_item_code);
     column_index ++;
 
     // Set first item of last row (name)
     p_widget_item_nom= new QTableWidgetItem(kit->getNom());
-    ui->tableWidget_kit->setItem(row-1, column_index, p_widget_item_nom);
+    ui->GESKIT_tableWidget_kit->setItem(row-1, column_index, p_widget_item_nom);
     column_index ++;
 
     // Set third item of last row (caution)
     p_widget_item_caution= new QTableWidgetItem(kit->getCaution().getStringValue());
-    ui->tableWidget_kit->setItem(row-1, column_index, p_widget_item_caution);
+    ui->GESKIT_tableWidget_kit->setItem(row-1, column_index, p_widget_item_caution);
     column_index ++;
 
     // Set fourth item of last row (date)
     QString date = kit->getDate_achat().toString("dd.MM.yyyy");
     p_widget_item_date= new QTableWidgetItem(date);
-    ui->tableWidget_kit->setItem(row-1, column_index, p_widget_item_date);
+    ui->GESKIT_tableWidget_kit->setItem(row-1, column_index, p_widget_item_date);
     column_index ++;
 
     // Set fifth item of last row (prix)
     p_widget_item_prix= new QTableWidgetItem(kit->getPrix_achat().getStringValue());
-    ui->tableWidget_kit->setItem(row-1, column_index, p_widget_item_prix);
+    ui->GESKIT_tableWidget_kit->setItem(row-1, column_index, p_widget_item_prix);
     column_index ++;
 
     // Set sixth item of last row (etat)
     p_widget_item_etat= new QTableWidgetItem(kit->getEn_panne_str());
-    ui->tableWidget_kit->setItem(row-1, column_index, p_widget_item_etat);
+    ui->GESKIT_tableWidget_kit->setItem(row-1, column_index, p_widget_item_etat);
     column_index ++;
 }
 
 
 
-void MainWindow::on_tableWidget_kit_cellClicked(int row, int column)
+
+
+
+void MainWindow::on_GESKIT_tableWidget_kit_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn)
 {
-
-    Kit* k = this->kitList[row];
-    if (k->item_list.empty())
+    if (currentRow != previousRow)
     {
-        g_utils.clearList(&k->item_list);
-        g_connect_db.select_items_by_kit(k);
+        Kit* k = this->kitListGeskit_view[currentRow];
+        // Get every items associated with kit from server
+        if (k->item_list.empty())
+        {
+            g_utils.clearList(&k->item_list);
+            g_connect_db.select_items_by_kit(k);
+        }
+
+        GESKIT_enable_geskit_buttons(true);
+
+        GESKIT_refresh_item_list_table(k);
+        GESKIT_refresh_descritption(k);
     }
-
-    GESKIT_enable_geskit_buttons(true);
-
-    GESKIT_refresh_item_list_table(k);
-    GESKIT_refresh_descritption(k);
 }
 
 void MainWindow::GESKIT_refresh_descritption(Kit* kit)
 {
-    this->ui->textEdit_detailsKit->setText(kit->getTexte_libre());
-    this->ui->textEdit_descritpionKit->setText(kit->getDescription());
+    this->ui->GESKIT_textEdit_detailsKit->setText(kit->getTexte_libre());
+    this->ui->GESKIT_textEdit_descritpionKit->setText(kit->getDescription());
 }
 /*
 This Function updates the item table with every items
@@ -416,7 +427,7 @@ void MainWindow::GESKIT_refresh_item_list_table(Kit* kit)
 {
     vector<Item*>::iterator it;
     int row = 0;
-    this->ui->tableWidget_item->clearContents();
+    this->ui->GESKIT_tableWidget_item->clearContents();
     for (it = kit->item_list.begin(); it != kit->item_list.end(); it++)
     {
         row++;
@@ -426,13 +437,18 @@ void MainWindow::GESKIT_refresh_item_list_table(Kit* kit)
 
 void MainWindow::GESKIT_push_back_new_item_on_table(Item* item, int row)
 {
-    ui->tableWidget_item->setRowCount(row);
-    QTableWidgetItem* p_widget_item_name;
-    QTableWidgetItem* p_widget_item_etat;
-    // Set first item of last row (name)
-    p_widget_item_name= new QTableWidgetItem(item->getName());
-    ui->tableWidget_item->setItem(row-1, 0, p_widget_item_name);
+    uint8_t column_index = 0;
+    ui->GESKIT_tableWidget_item->setRowCount(row);
 
+    // Set first item of last row (name)
+    QTableWidgetItem* p_widget_item_name = new QTableWidgetItem(item->getName());
+    ui->GESKIT_tableWidget_item->setItem(row-1, column_index, p_widget_item_name);
+    column_index++;
+
+    // Set second item of last row (Quantity)
+    QTableWidgetItem* p_widget_item_quantity= new QTableWidgetItem(QString::number(item->getQuantity()));
+    ui->GESKIT_tableWidget_item->setItem(row-1, column_index, p_widget_item_quantity);
+    column_index++;
 }
 
 Kit *MainWindow::GESKIT_find_kit_by_id(uint id)
@@ -487,15 +503,15 @@ void MainWindow::clean_HMI(void)
 {
     //Clear every table, list and line edit
     this->GESKIT_clear_display();
-    this->ui->lineEdit_findkitbycode->clear();
-    this->ui->lineEdit_findkitbycode_resa->clear();
-    this->ui->lineEdit_findkitbyname->clear();
-    this->ui->lineEdit_findkitbyname_resa->clear();
-    this->ui->lineEdit_resa_email_user->clear();
-    this->ui->listWidget_panierResa->clear();
-    this->ui->listWidget_resa->clear();
-    this->ui->listWidget_resa_currentResa->clear();
-    this->ui->listWidget_resa_kitsOfResa->clear();
+    this->ui->GESKIT_lineEdit_findkitbycode->clear();
+    this->ui->GESKIT_lineEdit_findkitbyname->clear();
+    this->ui->RESA_lineEdit_findkitbycode->clear();
+    this->ui->RESA_lineEdit_findkitbyname->clear();
+    this->ui->RESA_lineEdit_resa_email_user->clear();
+    this->ui->RESA_listWidget_panierResa->clear();
+    this->ui->RESA_listWidget_resa->clear();
+    this->ui->RESA_listWidget_resa_currentResa->clear();
+    this->ui->RESA_listWidget_resa_kitsOfResa->clear();
 
     //Clear every vector lists
     g_utils.clearList(&this->userList);
@@ -516,6 +532,8 @@ void MainWindow::update_connection_status(bool is_user_logged)
         this->ui->actionSe_d_connecter->setEnabled(is_user_logged);
         this->ui->listWidget->clear();
 
+        this->GESKIT_enable_geskit_buttons(false);
+
         if (is_user_logged == true)
         {
             qInfo() << "Vous êtes maintenant connecté.";
@@ -523,24 +541,24 @@ void MainWindow::update_connection_status(bool is_user_logged)
             this->GESKIT_refresh_kit_list_from_server(&this->kitList);
 
             //Refresh resa lineEdit_resa_email_use with user name and enable it only if user is admin
-            this->ui->lineEdit_resa_email_user->setText(this->login_user.getEmail());
+            this->ui->RESA_lineEdit_resa_email_user->setText(this->login_user.getEmail());
             if (this->login_user.getPrivilege() == E_admin)
             {
-                this->ui->lineEdit_resa_email_user->setEnabled(true);
+                this->ui->RESA_lineEdit_resa_email_user->setEnabled(true);
             }
             else
             {
-                this->ui->lineEdit_resa_email_user->setEnabled(false);
+                this->ui->RESA_lineEdit_resa_email_user->setEnabled(false);
             }
+
 
         }
         else
         {
             qInfo() << "Vous êtes maintenant déconnecté.";
             //Clear lineEdit_resa_email_use
-            this->ui->lineEdit_resa_email_user->setText("");
-            this->ui->pushButton_suppr_resa->setEnabled(false);
-            this->GESKIT_enable_geskit_buttons(false);
+            this->ui->RESA_lineEdit_resa_email_user->setText("");
+            this->ui->RESA_pushButton_suppr_resa->setEnabled(false);
         }
     }
 }
@@ -576,7 +594,7 @@ void MainWindow::log_stuffs(QtMsgType type, const QString &msg)
 // vvvvvv POPUP Add_kit SECTION vvvvvv
 
 
-void MainWindow::on_pushButton_addkit_clicked()
+void MainWindow::on_GESKIT_pushButton_addkit_clicked()
 {
     this->p_popupAddKit = new (PoppupAddKit);
     this->p_popupAddKit->show();
@@ -597,7 +615,6 @@ void MainWindow::on_popupAddKit_ok()
     Kit * p_kit;
     std::list<Item*> p_list_item;
     p_kit = this->p_popupAddKit->get_kit_from_form();
-    // p_list_item = this->p_popupAddKit->get_items_from_form();
     if (p_kit == NULL)
     {
 
@@ -609,6 +626,9 @@ void MainWindow::on_popupAddKit_ok()
         delete (this->p_popupAddKit);
         /* refresh the user list by cleaning and loading it again */
         this->GESKIT_refresh_kit_list_from_server(&this->kitList);
+
+        //Refresh display of kits
+        on_GESKIT_pushButton_getkit_clicked();
     }
     else //if (p_kit->getTo_duplicate() == false)
     {
@@ -617,20 +637,23 @@ void MainWindow::on_popupAddKit_ok()
         delete (this->p_popupAddKit);
         /* refresh the user list by cleaning and loading it again */
         this->GESKIT_refresh_kit_list_from_server(&this->kitList);
+
+        //Refresh display of kits
+        on_GESKIT_pushButton_getkit_clicked();
     }
 }
 
 Kit* MainWindow::GESKIT_get_kit_selected()
 {
     //First get kit selected by user
-    QList<QTableWidgetSelectionRange> items = this->ui->tableWidget_kit->selectedRanges();
+    QList<QTableWidgetSelectionRange> items = this->ui->GESKIT_tableWidget_kit->selectedRanges();
     QTableWidgetSelectionRange  selectedRange = items.first();
     int row = selectedRange.topRow();
     Kit* p_kit = kitListGeskit_view.at(row);
     return p_kit;
 }
 
-void MainWindow::on_pushButton_duplicate_kit_clicked()
+void MainWindow::on_GESKIT_pushButton_duplicate_kit_clicked()
 {
     //First get kit selected by user
     Kit* p_kit = GESKIT_get_kit_selected();
@@ -644,7 +667,7 @@ void MainWindow::on_pushButton_duplicate_kit_clicked()
     QObject::connect(this->p_popupAddKit->getCancelButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_destroyed);
 }
 
-void MainWindow::on_pushButton_modify_kit_clicked()
+void MainWindow::on_GESKIT_pushButton_modify_kit_clicked()
 {
     //First get kit selected by user
     Kit* p_kit = GESKIT_get_kit_selected();
@@ -693,17 +716,17 @@ QDate MainWindow::RESA_get_next_resa_day(QDate start_date)
     return next_friday;
 }
 
-void MainWindow::on_calendarWidget_clicked(const QDate &date)
+void MainWindow::on_RESA_calendarWidget_clicked(const QDate &date)
 {
     if(date.dayOfWeek() == DAY_OF_RESA) // if Day_of_resa
     {
 
-        ui->pushButton_reserver->setEnabled(true);
-        ui->pushButton_getkit_resa->setEnabled(true);
+        ui->RESA_pushButton_reserver->setEnabled(true);
+        ui->RESA_pushButton_getkit_resa->setEnabled(true);
 
 
         //Find out if kits in kit list are already booked
-        g_connect_db.set_kit_booked_status(&this->kitList, this->ui->calendarWidget->selectedDate());
+        g_connect_db.set_kit_booked_status(&this->kitList, this->ui->RESA_calendarWidget->selectedDate());
 
 
         RESA_refresh_kit_list_table();
@@ -713,12 +736,12 @@ void MainWindow::on_calendarWidget_clicked(const QDate &date)
     {
         qInfo()<< "Date de début: Vous devez choisir un vendredi!";
         //Force date to next friday from selected day
-        this->ui->calendarWidget->setSelectedDate(this->RESA_get_next_resa_day(this->ui->calendarWidget->selectedDate()));
-        this->on_calendarWidget_clicked(this->ui->calendarWidget->selectedDate());
+        this->ui->RESA_calendarWidget->setSelectedDate(this->RESA_get_next_resa_day(this->ui->RESA_calendarWidget->selectedDate()));
+        this->on_RESA_calendarWidget_clicked(this->ui->RESA_calendarWidget->selectedDate());
     }
 }
 
-void MainWindow::on_pushButton_getkit_resa_clicked()
+void MainWindow::on_RESA_pushButton_getkit_resa_clicked()
 {
 
 
@@ -730,14 +753,14 @@ void MainWindow::on_pushButton_getkit_resa_clicked()
     this->kitListResa_view.clear();
 
     /* if user enterd a code, then search for Kits with this code */
-    if (ui->lineEdit_findkitbycode_resa->text()!="")
+    if (ui->GESKIT_lineEdit_findkitbycode->text()!="")
     {
-        RESA_get_kits_by_code(&this->kitList,&this->kitListResa_view,ui->lineEdit_findkitbycode_resa->text() );
+        RESA_get_kits_by_code(&this->kitList,&this->kitListResa_view,ui->GESKIT_lineEdit_findkitbycode->text() );
     }
     /* if user enterd a text, then search for Kits with this code */
-    else if (ui->lineEdit_findkitbyname_resa->text()!="")
+    else if (ui->GESKIT_lineEdit_findkitbyname->text()!="")
     {
-        RESA_get_kits_by_name(&this->kitList,&this->kitListResa_view,ui->lineEdit_findkitbyname_resa->text() );
+        RESA_get_kits_by_name(&this->kitList,&this->kitListResa_view,ui->GESKIT_lineEdit_findkitbyname->text() );
     }
     else
     {
@@ -750,7 +773,7 @@ void MainWindow::on_pushButton_getkit_resa_clicked()
 
 
     // Refresh kits in basket to see if none booked them
-    g_connect_db.set_kit_booked_status(&this->kitListResa_view, this->ui->calendarWidget->selectedDate());
+    g_connect_db.set_kit_booked_status(&this->kitListResa_view, this->ui->RESA_calendarWidget->selectedDate());
     MainWindow::RESA_refresh_kit_list_table();
 }
 
@@ -812,10 +835,10 @@ void MainWindow::RESA_refresh_kit_list_table(void)
     // Define brush to display kit in basket
     brush_basket.setColor(Qt::GlobalColor::yellow);
     brush_basket.setStyle(Qt::SolidPattern);
-    this->ui->listWidget_resa->clear();
+    this->ui->RESA_listWidget_resa->clear();
     for(const auto& kit_elem : this->kitListResa_view)
     {
-        QListWidgetItem* p_item = new QListWidgetItem(kit_elem->toString(), this->ui->listWidget_resa);
+        QListWidgetItem* p_item = new QListWidgetItem(kit_elem->toString(), this->ui->RESA_listWidget_resa);
         if(kit_elem->getIs_in_basket())
         {
             p_item->setBackground(brush_basket);
@@ -831,9 +854,9 @@ void MainWindow::RESA_refresh_kit_list_table(void)
     }
 }
 
-void MainWindow::on_listWidget_resa_itemDoubleClicked(QListWidgetItem *item)
+void MainWindow::on_RESA_listWidget_resa_itemDoubleClicked(QListWidgetItem *item)
 {
-    int row = this->ui->listWidget_resa->row(item);
+    int row = this->ui->RESA_listWidget_resa->row(item);
     Kit* p_kit = this->kitListResa_view.at(row);
 
     if (p_kit->getIs_in_basket())
@@ -846,7 +869,7 @@ void MainWindow::on_listWidget_resa_itemDoubleClicked(QListWidgetItem *item)
         this->kitListBasket_view.push_back(p_kit);
     }
     // Refresh kits booked status
-    g_connect_db.set_kit_booked_status(&this->kitListBasket_view, this->ui->calendarWidget->selectedDate());
+    g_connect_db.set_kit_booked_status(&this->kitListBasket_view, this->ui->RESA_calendarWidget->selectedDate());
 
     // Refresh list displays
     RESA_refresh_kit_list_table();
@@ -866,10 +889,10 @@ void MainWindow::RESA_refresh_basket_kit_list_table(void)
     // Define brush to display kit free in kit reservation list
     brush_free.setColor(Qt::GlobalColor::green);
     brush_free.setStyle(Qt::SolidPattern);
-    this->ui->listWidget_panierResa->clear();
+    this->ui->RESA_listWidget_panierResa->clear();
     for(const auto& kit_elem : this->kitListBasket_view)
     {
-        QListWidgetItem* p_item = new QListWidgetItem(kit_elem->toString(), this->ui->listWidget_panierResa);
+        QListWidgetItem* p_item = new QListWidgetItem(kit_elem->toString(), this->ui->RESA_listWidget_panierResa);
         if (kit_elem->getIs_booked())
         {
             p_item->setBackground(brush_booked);
@@ -883,13 +906,13 @@ void MainWindow::RESA_refresh_basket_kit_list_table(void)
 }
 
 
-void MainWindow::on_listWidget_panierResa_itemDoubleClicked(QListWidgetItem *item)
+void MainWindow::on_RESA_listWidget_panierResa_itemDoubleClicked(QListWidgetItem *item)
 {
-    int row = this->ui->listWidget_panierResa->row(item);
+    int row = this->ui->RESA_listWidget_panierResa->row(item);
     Kit* p_kit = this->kitListBasket_view.at(row);
     p_kit->setIs_in_basket(false);
 
-    this->ui->listWidget_panierResa->removeItemWidget(item);//Delete kit from basket view
+    this->ui->RESA_listWidget_panierResa->removeItemWidget(item);//Delete kit from basket view
     this->kitListBasket_view.erase(this->kitListBasket_view.begin()+row);//Delete kit from basket list
 
     RESA_refresh_kit_list_table();
@@ -899,25 +922,25 @@ void MainWindow::on_listWidget_panierResa_itemDoubleClicked(QListWidgetItem *ite
 
 
 
-void MainWindow::on_pushButton_reserver_clicked()
+void MainWindow::on_RESA_pushButton_reserver_clicked()
 {
     int resa_nb = 0;
     uint user_id = 0;
     bool has_errors = false;
     QDate start_date;
-    start_date = this->ui->calendarWidget->selectedDate();
+    start_date = this->ui->RESA_calendarWidget->selectedDate();
 
     g_connect_db.start_resa();// Start of LOCK
 
     // Refresh kits in basket to see if none booked them
-    g_connect_db.set_kit_booked_status(&this->kitListBasket_view, this->ui->calendarWidget->selectedDate());
+    g_connect_db.set_kit_booked_status(&this->kitListBasket_view, this->ui->RESA_calendarWidget->selectedDate());
     RESA_refresh_basket_kit_list_table();
 
     //Retrieve user id
-    has_errors = g_connect_db.get_user_id_by_mail(this->ui->lineEdit_resa_email_user->text(), &user_id);
+    has_errors = g_connect_db.get_user_id_by_mail(this->ui->RESA_lineEdit_resa_email_user->text(), &user_id);
     if (has_errors == true)
     {
-        this->GEN_raise_popup_warning("Impossible de réserver pour l'utilisateur: **" + this->ui->lineEdit_resa_email_user->text()+"**");
+        this->GEN_raise_popup_warning("Impossible de réserver pour l'utilisateur: **" + this->ui->RESA_lineEdit_resa_email_user->text()+"**");
     }
     else
     {
@@ -934,7 +957,7 @@ void MainWindow::on_pushButton_reserver_clicked()
                     kit_elem->setIs_booked(true);
                 }
                 GEN_raise_popup_info("Votre réservation n° **"+QString::number(resa_nb)+"** est bien prise en compte.");
-                this->ui->listWidget_panierResa->clear();
+                this->ui->RESA_listWidget_panierResa->clear();
                 this->kitListBasket_view.clear();
                 RESA_refresh_kit_list_table();
             }
@@ -949,7 +972,7 @@ void MainWindow::on_pushButton_reserver_clicked()
 }
 
 
-void MainWindow::on_pushButton_resa_showResa_clicked()
+void MainWindow::on_RESA_pushButton_resa_showResa_clicked()
 {
     uint user_id = 0;
 
@@ -957,7 +980,7 @@ void MainWindow::on_pushButton_resa_showResa_clicked()
 
      g_utils.clearList(&this->resaList);
     //Retrieve user id
-    has_errors = g_connect_db.get_user_id_by_mail(this->ui->lineEdit_resa_email_user->text(), &user_id);
+    has_errors = g_connect_db.get_user_id_by_mail(this->ui->RESA_lineEdit_resa_email_user->text(), &user_id);
     g_connect_db.select_resa_by_user(&this->resaList, user_id);
     RESA_refresh_current_resa_list_table();
 }
@@ -967,7 +990,7 @@ void MainWindow::RESA_refresh_current_resa_list_table(void)
 {
     int prev_id_resa = 0;
 
-    this->ui->listWidget_resa_currentResa->clear();
+    this->ui->RESA_listWidget_resa_currentResa->clear();
     for(const auto& resa_elem : this->resaList)
     {
         if (resa_elem->getId_resa() == prev_id_resa)
@@ -976,48 +999,59 @@ void MainWindow::RESA_refresh_current_resa_list_table(void)
         }
         else
         {
-            QListWidgetItem* p_item = new QListWidgetItem(resa_elem->toString(), this->ui->listWidget_resa_currentResa);
+            QListWidgetItem* p_item = new QListWidgetItem(resa_elem->toString(), this->ui->RESA_listWidget_resa_currentResa);
             prev_id_resa = resa_elem->getId_resa();
         }
     }
 }
 
 
-
-
-void MainWindow::on_listWidget_resa_currentResa_itemClicked(QListWidgetItem *item)
+int MainWindow::RESA_find_resa_nb_selected(QListWidgetItem *item)
 {
-    QRegularExpression re;
-    QRegularExpressionMatch match;
-    Kit * p_kit;
     int resa_nb = 0;
-    // Find resa nb
+    QRegularExpression re;
     re.setPattern("(\\d*) -");
-
-    //clear kit list
-    this->ui->listWidget_resa_kitsOfResa->clear();
-
-    this->ui->pushButton_suppr_resa->setEnabled(true);
-
+    QRegularExpressionMatch match;
     match = re.match(item->text());
     if (match.hasMatch())
     {
         qInfo()<< "There is a match: " << match.captured(1);
         resa_nb = match.captured(1).toInt();
+    }
+    else
+    {
+        resa_nb = -1;
+    }
+    return resa_nb;
+}
 
+void MainWindow::on_RESA_listWidget_resa_currentResa_itemClicked(QListWidgetItem *item)
+{
+
+    Kit * p_kit;
+    int resa_nb = 0;
+
+    //clear kit list widget
+    this->ui->RESA_listWidget_resa_kitsOfResa->clear();
+    this->ui->RESA_pushButton_suppr_resa->setEnabled(true);
+
+    resa_nb = this->RESA_find_resa_nb_selected(item);
+
+    if (resa_nb != -1)
+    {
         //iter through resa list to find every reservation with resa_nb and get their associated kits
         for(const auto& resa_elem : this->resaList)
         {
             if (resa_elem->getId_resa() == resa_nb)
             {
                 p_kit = GESKIT_find_kit_by_id(resa_elem->getId_kit());
-                QListWidgetItem* p_item = new QListWidgetItem(p_kit->toString(), this->ui->listWidget_resa_kitsOfResa);
+                QListWidgetItem* p_item = new QListWidgetItem(p_kit->toString(), this->ui->RESA_listWidget_resa_kitsOfResa);
             }
         }
     }
 }
 
-void MainWindow::on_pushButton_suppr_resa_clicked()
+void MainWindow::on_RESA_pushButton_suppr_resa_clicked()
 {
     QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Suppression de réservation.",
                                                                tr("Êtes-vous sûr de vouloir supprimer votre réservation ?"),
@@ -1025,13 +1059,26 @@ void MainWindow::on_pushButton_suppr_resa_clicked()
                                                                QMessageBox::Yes);
     if (resBtn != QMessageBox::Yes) {
         // event->ignore();
+
+
     } else {
-        // event->accept();
+
+        //clear kit list widget
+        this->ui->RESA_listWidget_resa_kitsOfResa->clear();
+
+        int resa_nb = 0;
+        resa_nb = this->RESA_find_resa_nb_selected(this->ui->RESA_listWidget_resa_currentResa->currentItem());
+        if (resa_nb != -1)
+        {
+            g_connect_db.delete_resa(resa_nb);
+            this->on_RESA_pushButton_resa_showResa_clicked();
+        }
     }
 }
 
 // ^^^^^^ MAIN WINDOW "Gestion Reservation" ^^^^^^
 //---------------------------------------------------------
+
 
 
 

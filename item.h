@@ -19,11 +19,13 @@ private:
     QString name;
 
     uint forkey;
+    uint quantity;
     // T_etat_item etat;
 
 public:
     explicit Item(QObject *parent = nullptr);
     Item(uint id, const QString &name, uint forkey);
+    Item(uint id, const QString &name, uint forkey, uint quantity);
 
     QString getName() const;
     uint getForkey() const;
@@ -36,6 +38,9 @@ public:
     // QString getEtatStr() const;
     // void setEtatStr(QString etat_str);
     uint getId() const;
+
+    uint getQuantity() const;
+    void setQuantity(uint newQuantity);
 
 signals:
 };

@@ -27,7 +27,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="TAB_ges_user">
        <property name="enabled">
@@ -153,7 +153,7 @@
                 </property>
                 <layout class="QGridLayout" name="gridLayout">
                  <item row="0" column="0">
-                  <widget class="QTableWidget" name="tableWidget_kit">
+                  <widget class="QTableWidget" name="GESKIT_tableWidget_kit">
                    <property name="editTriggers">
                     <set>QAbstractItemView::NoEditTriggers</set>
                    </property>
@@ -178,7 +178,7 @@
                    </property>
                    <layout class="QHBoxLayout" name="horizontalLayout_12">
                     <item>
-                     <widget class="QTextEdit" name="textEdit_descritpionKit">
+                     <widget class="QTextEdit" name="GESKIT_textEdit_descritpionKit">
                       <property name="maximumSize">
                        <size>
                         <width>16777215</width>
@@ -188,6 +188,46 @@
                      </widget>
                     </item>
                    </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="groupBox_3">
+                <property name="title">
+                 <string>Gestion</string>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_6">
+                 <item>
+                  <widget class="QPushButton" name="GESKIT_pushButton_addkit">
+                   <property name="text">
+                    <string>Ajouter un Kit</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="GESKIT_pushButton_duplicate_kit">
+                   <property name="text">
+                    <string>Dupliquer le Kit</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="GESKIT_pushButton_modify_kit">
+                   <property name="text">
+                    <string>Modifier le Kit</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QFrame" name="frame">
+                   <property name="frameShape">
+                    <enum>QFrame::StyledPanel</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
+                   </property>
                   </widget>
                  </item>
                 </layout>
@@ -206,7 +246,7 @@
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_8">
                  <item>
-                  <widget class="QTableWidget" name="tableWidget_item">
+                  <widget class="QTableWidget" name="GESKIT_tableWidget_item">
                    <property name="maximumSize">
                     <size>
                      <width>800</width>
@@ -237,7 +277,7 @@
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_9">
                  <item>
-                  <widget class="QTextEdit" name="textEdit_detailsKit">
+                  <widget class="QTextEdit" name="GESKIT_textEdit_detailsKit">
                    <property name="maximumSize">
                     <size>
                      <width>300</width>
@@ -262,21 +302,21 @@
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
-               <widget class="QPushButton" name="pushButton_getkit">
+               <widget class="QPushButton" name="GESKIT_pushButton_getkit">
                 <property name="text">
                  <string>Rechercher Kit</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_findkitbyname">
+               <widget class="QLineEdit" name="GESKIT_lineEdit_findkitbyname">
                 <property name="placeholderText">
                  <string>Nom</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_findkitbycode">
+               <widget class="QLineEdit" name="GESKIT_lineEdit_findkitbycode">
                 <property name="placeholderText">
                  <string>Code</string>
                 </property>
@@ -299,46 +339,6 @@
                </spacer>
               </item>
              </layout>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBox_3">
-          <property name="title">
-           <string>Gestion</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_6">
-           <item>
-            <widget class="QPushButton" name="pushButton_addkit">
-             <property name="text">
-              <string>Ajouter un Kit</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_duplicate_kit">
-             <property name="text">
-              <string>Dupliquer le Kit</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_modify_kit">
-             <property name="text">
-              <string>Modifier le Kit</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QFrame" name="frame">
-             <property name="frameShape">
-              <enum>QFrame::StyledPanel</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
-             </property>
             </widget>
            </item>
           </layout>
@@ -367,7 +367,7 @@
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_17">
               <item>
-               <widget class="QLineEdit" name="lineEdit_resa_email_user"/>
+               <widget class="QLineEdit" name="RESA_lineEdit_resa_email_user"/>
               </item>
               <item>
                <spacer name="horizontalSpacer_4">
@@ -401,7 +401,7 @@
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_7">
                  <item>
-                  <widget class="QListWidget" name="listWidget_resa"/>
+                  <widget class="QListWidget" name="RESA_listWidget_resa"/>
                  </item>
                 </layout>
                </widget>
@@ -420,7 +420,7 @@
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_6">
                  <item>
-                  <widget class="QListWidget" name="listWidget_panierResa"/>
+                  <widget class="QListWidget" name="RESA_listWidget_panierResa"/>
                  </item>
                 </layout>
                </widget>
@@ -438,21 +438,21 @@
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_9">
               <item>
-               <widget class="QPushButton" name="pushButton_getkit_resa">
+               <widget class="QPushButton" name="RESA_pushButton_getkit_resa">
                 <property name="text">
                  <string>Rechercher Kit</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_findkitbyname_resa">
+               <widget class="QLineEdit" name="RESA_lineEdit_findkitbyname">
                 <property name="placeholderText">
                  <string>Nom</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_findkitbycode_resa">
+               <widget class="QLineEdit" name="RESA_lineEdit_findkitbycode">
                 <property name="placeholderText">
                  <string>Code</string>
                 </property>
@@ -478,7 +478,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton_reserver">
+            <widget class="QPushButton" name="RESA_pushButton_reserver">
              <property name="text">
               <string>Réserver</string>
              </property>
@@ -507,7 +507,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QCalendarWidget" name="calendarWidget"/>
+            <widget class="QCalendarWidget" name="RESA_calendarWidget"/>
            </item>
            <item>
             <widget class="QFrame" name="frame_9">
@@ -525,10 +525,10 @@
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_12">
                  <item>
-                  <widget class="QListWidget" name="listWidget_resa_currentResa"/>
+                  <widget class="QListWidget" name="RESA_listWidget_resa_currentResa"/>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="pushButton_resa_showResa">
+                  <widget class="QPushButton" name="RESA_pushButton_resa_showResa">
                    <property name="text">
                     <string>Afficher Réservations</string>
                    </property>
@@ -544,10 +544,10 @@
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_13">
                  <item>
-                  <widget class="QListWidget" name="listWidget_resa_kitsOfResa"/>
+                  <widget class="QListWidget" name="RESA_listWidget_resa_kitsOfResa"/>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="pushButton_suppr_resa">
+                  <widget class="QPushButton" name="RESA_pushButton_suppr_resa">
                    <property name="font">
                     <font>
                      <bold>true</bold>

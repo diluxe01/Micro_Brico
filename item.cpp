@@ -20,6 +20,16 @@ uint Item::getId() const
     return id;
 }
 
+uint Item::getQuantity() const
+{
+    return quantity;
+}
+
+void Item::setQuantity(uint newQuantity)
+{
+    quantity = newQuantity;
+}
+
 Item::Item(QObject *parent)
     : QObject{parent}
 {}
@@ -87,9 +97,10 @@ uint Item::getForkey() const
 //     }
 // }
 
-Item::Item(uint id, const QString &name, uint forkey) : id(std::move(id)),
-    name(name),
-    forkey(std::move(forkey))
-{
 
-}
+
+Item::Item(uint id, const QString &name, uint forkey, uint quantity) : id(std::move(id)),
+    name(name),
+    forkey(std::move(forkey)),
+    quantity(std::move(quantity))
+{}
