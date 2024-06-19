@@ -11,7 +11,7 @@ Connect_db::Connect_db() {
 
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL", "dbtest");
     db.setHostName("localhost");
-    db.setDatabaseName("dbtest");
+    db.setDatabaseName("db_dev");
     db.setUserName("adrien");
     db.setPassword("adrien");
     bool ok = db.open();

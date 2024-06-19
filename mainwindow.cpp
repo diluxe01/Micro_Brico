@@ -752,19 +752,19 @@ void MainWindow::on_RESA_pushButton_getkit_resa_clicked()
     }
     this->kitListResa_view.clear();
 
-    /* if user enterd a code, then search for Kits with this code */
-    if (ui->GESKIT_lineEdit_findkitbycode->text()!="")
+    /* if user entered a code, then search for Kits with this code */
+    if (ui->RESA_lineEdit_findkitbycode->text()!="")
     {
-        RESA_get_kits_by_code(&this->kitList,&this->kitListResa_view,ui->GESKIT_lineEdit_findkitbycode->text() );
+        RESA_get_kits_by_code(&this->kitList,&this->kitListResa_view,ui->RESA_lineEdit_findkitbycode->text() );
     }
-    /* if user enterd a text, then search for Kits with this code */
-    else if (ui->GESKIT_lineEdit_findkitbyname->text()!="")
+    /* if user entered a text, then search for Kits with this code */
+    else if (ui->RESA_lineEdit_findkitbyname->text()!="")
     {
-        RESA_get_kits_by_name(&this->kitList,&this->kitListResa_view,ui->GESKIT_lineEdit_findkitbyname->text() );
+        RESA_get_kits_by_name(&this->kitList,&this->kitListResa_view,ui->RESA_lineEdit_findkitbyname->text() );
     }
     else
     {
-        /* if user enterd nothing, get every available kits */
+        /* if user entered nothing, get every available kits */
         for(const auto& kit_elem : this->kitList)
         {
             this->kitListResa_view.push_back(kit_elem);
@@ -960,6 +960,7 @@ void MainWindow::on_RESA_pushButton_reserver_clicked()
                 this->ui->RESA_listWidget_panierResa->clear();
                 this->kitListBasket_view.clear();
                 RESA_refresh_kit_list_table();
+                on_RESA_pushButton_resa_showResa_clicked();
             }
         }
         else
@@ -1015,7 +1016,6 @@ int MainWindow::RESA_find_resa_nb_selected(QListWidgetItem *item)
     match = re.match(item->text());
     if (match.hasMatch())
     {
-        qInfo()<< "There is a match: " << match.captured(1);
         resa_nb = match.captured(1).toInt();
     }
     else

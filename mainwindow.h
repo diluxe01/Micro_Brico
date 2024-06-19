@@ -67,7 +67,7 @@ private:
     Ui::MainWindow *ui;
     std::vector<Utilisateur*> userList;
     std::vector<Kit*> kitList; //List of kits only for "Gestion Kits" tab
-    std::vector<Kit*> kitListGeskit_view; //List of kits to be displayed in "RESA_listWidget_resa"
+    std::vector<Kit*> kitListGeskit_view; //List of kits to be displayed in "GESKIT_tableWidget_kit"
     std::vector<Kit*> kitListResa_view; //List of kits to be displayed in "RESA_listWidget_resa"
     std::vector<Kit*> kitListBasket_view; //List of kits to be displayed in "RESA_listWidget_panierResa"
     std::vector<Resa*> resaList; //List of kits to be displayed in "RESA_listWidget_panierResa"

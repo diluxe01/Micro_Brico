@@ -33,3 +33,11 @@ ALTER TABLE resa ADD CONSTRAINT forkey_id_kit FOREIGN KEY (id_kit) REFERENCES ki
 -- changeset adrie:1716202953457-11
 ALTER TABLE resa ADD CONSTRAINT forkey_id_user FOREIGN KEY (id_user) REFERENCES utilisateur (id) ON UPDATE CASCADE ON DELETE SET NULL;
 
+-- changeset adrie:1716202953457-12 comment:Add column to kit ot detect if it is a game or not
+ALTER TABLE kit ADD COLUMN `isgame` TINYINT NULL DEFAULT 0 AFTER `caution`;
+
+-- changeset adrie:1716202953457-13 comment:increase field "nom" size from 60 to 150 in KIT table
+ALTER TABLE kit CHANGE COLUMN `nom` `nom` VARCHAR(150) NULL DEFAULT NULL ;
+
+-- changeset adrie:1716202953457-14 comment:increase field "name" size from 60 to 100 in item table
+ALTER TABLE item CHANGE COLUMN `name` `name` VARCHAR(100) NULL DEFAULT NULL ;
