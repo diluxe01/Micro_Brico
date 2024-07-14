@@ -8,6 +8,7 @@
 #include "kit.h"
 #include "item.h"
 #include "resa.h"
+#include "sortie.h"
 #include "utils.h"
 
 #include <list>
@@ -30,6 +31,8 @@ private:
     void populate_kit_list_from_query(std::vector<Kit *> *kits, QSqlQuery query);
     //-----------Resa-------------------
     void populate_resa_list_from_query(std::vector<Resa *> *i_resa, QSqlQuery query);
+    //-----------sortie-------------------
+    void populate_sortie_list_from_query(std::vector<Sortie *> *i_sortie, QSqlQuery query);
 
 public:
     //-----------General----------------
@@ -44,7 +47,7 @@ public:
     QString get_sha1_from_Qstring(QString mdp);
     QString get_unique_token(void);
     void update_user_token_on_db(void);
-    bool get_user_id_by_mail(QString mail, uint * o_user_id);
+    bool get_user_by_mail(QString i_mail, Utilisateur * o_user);
     //-----------Kit-------------------
     void select_kits_by_code(std::vector<Kit *> *kits, QString code);
     void select_kits_by_name(std::vector<Kit *> *kits, QString code);
@@ -55,6 +58,7 @@ public:
     void select_items_by_kit (Kit * );
     void populate_item_list_from_query(Kit * kit, QSqlQuery query);
     void set_kit_booked_status(std::vector<Kit*> *i_kits, QDate i_date);
+    void set_kit_out_status(std::vector<Kit *> *i_kits, QDate i_date);
     //-----------Resa-------------------
     void select_all_resa(std::vector<Resa *> *i_resa);
     void select_resa_by_user(std::vector<Resa *> *o_resa, uint user_id);
@@ -63,6 +67,9 @@ public:
     void start_resa();
     void end_resa();
     void delete_resa(int i_resa_nb);
+
+    //-----------Sortie-------------------
+    void select_all_sortie(std::vector<Sortie *> *i_sortie);
 
 public slots:
 signals:

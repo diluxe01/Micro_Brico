@@ -46,6 +46,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         money.h money.cpp
         resa.h resa.cpp
         utils.h utils.cpp
+        popups/popupsortirresa.h popups/popupsortirresa.cpp popups/popupsortirresa.ui
+        sortie.h sortie.cpp
+
+
 
 
 

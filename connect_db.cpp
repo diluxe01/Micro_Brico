@@ -174,19 +174,36 @@ bool Connect_db::delete_user(Utilisateur *user_to_delete)
     return true;
 }
 
+
+
+// QSqlQuery query2 = QSqlQuery(this->db);
+// runQuery(query2, "SELECT id, nom, mdp, prenom, email, utinfo, token from utilisateur");
+// while (query2.next())
+// {
+//     QString nom = query2.value("nom").toString();
+//     QString mdp = query2.value("mdp").toString();
+//     QString prenom = query2.value("prenom").toString();
+//     QString email = query2.value("email").toString();
+//     QString utinfo = query2.value("utinfo").toString();
+//     QString token = query2.value("token").toString();
+//     int id = query2.value("id").toInt();
+
+//     Utilisateur * u = new Utilisateur(nom, mdp,prenom, email, utinfo );
+//     u->setId(id);
+//     u->setToken(token);
+//     list->push_back(u);
 ///
 /// \brief Connect_db::get_user_id_by_mail safely gives the user id, given its mail.
-/// \param mail: user booking email
-/// \param o_user_id: pointer where iser id is to be stored
+/// \param i_mail: user booking email
+/// \param o_user: pointer where user is to be stored
 /// \return true if an error occured, false otherwise
 ///
-bool Connect_db::get_user_id_by_mail(QString mail, uint * o_user_id)
+bool Connect_db::get_user_by_mail(QString i_mail, Utilisateur * o_user)
 {
     QSqlQuery query  = QSqlQuery(this->db);
-    uint user_id = 0;
-    QString user_id_str = "";
+
     bool querry_had_errors = false;
-    runQuery(query, "SELECT id from utilisateur where email='"+mail+"'");
+    runQuery(query, "SELECT id, nom, mdp, prenom, utinfo, token from utilisateur where email='"+i_mail+"'");
     if (query.size() == 0)
     {
         querry_had_errors = true;
@@ -195,14 +212,14 @@ bool Connect_db::get_user_id_by_mail(QString mail, uint * o_user_id)
     else
     {   //no errors
         query.first();
-        user_id = query.value("id").toUInt();
-        user_id_str = query.value("id").toString();
-        qDebug() <<  "get_user_id_by_mail: ID of user is: "<<user_id_str;
-        //Set user id to user pointer
-        *o_user_id = user_id;
+        o_user->setNom(query.value("nom").toString());
+        o_user->setMdp(query.value("mdp").toString());
+        o_user->setPrenom(query.value("prenom").toString());
+        o_user->setUtinfo(query.value("utinfo").toString());
+        o_user->setToken(query.value("token").toString());
+        o_user->setId(query.value("id").toInt());
+        o_user->setEmail(i_mail);
     }
-
-
     return querry_had_errors;
 }
 
@@ -534,4 +551,59 @@ void Connect_db::delete_resa(int i_resa_nb)
     QSqlQuery query(this->db);
     runQuery(query, "delete from resa where id_resa = "+ QString::number(i_resa_nb));
 
+}
+
+
+
+
+void  Connect_db::select_all_sortie (std::vector<Sortie *> *i_sortie)
+{
+    QSqlQuery query(this->db);
+    runQuery(query, "SELECT * from sortie");
+
+    populate_sortie_list_from_query(i_sortie, query);
+}
+
+void Connect_db::populate_sortie_list_from_query(std::vector<Sortie *> *i_sortie, QSqlQuery query)
+{
+    QDate qdate;
+    while (query.next())
+    {
+        int id = query.value("id").toInt();
+        QString start_date = query.value("start_date").toString();
+        int id_kit = query.value("id_kit").toInt();
+        int id_user = query.value("id_user").toInt();
+        int id_resa = query.value("id_resa").toInt();
+        int id_sortie = query.value("id_sortie").toInt();
+
+        qdate = QDate::fromString(start_date,"yyyy-MM-dd");
+
+        Sortie * k = new Sortie(id, qdate, id_kit, id_user, id_sortie);
+
+        i_sortie->push_back(k);
+    }
+}
+
+void  Connect_db::set_kit_out_status (std::vector<Kit*> *i_kits, QDate i_date)
+{
+    std::vector<Sortie *> sortie_list;
+    select_all_sortie(&sortie_list);
+    bool is_out = false;
+
+    // Determine if id kit is in sortie table at given date. If so, set "is_out" var to true and break "for" loop.
+    for(const auto& elem_kit : *i_kits)
+    {
+        is_out = false;
+        elem_kit->setIs_out(false);
+        for(const auto& elem_sortie : sortie_list)
+        {
+            if ((elem_kit->getIdKit() == elem_sortie->getId_kit())
+                &&(i_date == elem_sortie->getStart_date()))
+            {
+                is_out = true;
+                break;
+            }
+        }
+        elem_kit->setIs_out(is_out);
+    }
 }

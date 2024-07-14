@@ -41,3 +41,12 @@ ALTER TABLE kit CHANGE COLUMN `nom` `nom` VARCHAR(150) NULL DEFAULT NULL ;
 
 -- changeset adrie:1716202953457-14 comment:increase field "name" size from 60 to 100 in item table
 ALTER TABLE item CHANGE COLUMN `name` `name` VARCHAR(100) NULL DEFAULT NULL ;
+
+-- changeset adrie:1716202953457-15 comment:create sortie table
+CREATE TABLE `db_dev`.`sortie` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `start_date` DATE NOT NULL,
+  `id_user` INT NULL,
+  `id_kit` INT NULL,
+  `id_sortie` INT NULL,
+  PRIMARY KEY (`id`));

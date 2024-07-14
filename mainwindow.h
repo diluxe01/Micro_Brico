@@ -7,6 +7,7 @@
 #include "./popups/login_connect.h"
 #include "./popups/delete_user.h"
 #include "./popups/poppupaddkit.h"
+#include "./popups/popupsortirresa.h"
 #include <list>
 
 #include "resa.h"
@@ -51,6 +52,7 @@ private slots:
     void on_GESKIT_pushButton_modify_kit_clicked();
     void on_GESKIT_pushButton_getkit_clicked();
     void on_GESKIT_tableWidget_kit_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
+    void on_GESKIT_tableWidget_kit_cellDoubleClicked(int row, int column);
 
     //-----------Slots RESA-------------------
     void on_RESA_pushButton_getkit_resa_clicked();
@@ -63,6 +65,18 @@ private slots:
     void on_RESA_pushButton_reserver_clicked();
 
 
+    //-----------Slots SORTIES-------------------
+    void on_SORTIE_pushButton_resa_showResa_clicked();
+
+    void on_SORTIE_listWidget_resa_currentResa_itemClicked(QListWidgetItem *item);
+
+
+    void on_SORTIE_pushButton_sortir_clicked();
+
+    void on_SORTIE_listWidget_resa_kitsOfResa_itemClicked(QListWidgetItem *item);
+
+    void on_SORTIE_popupSortirResa_pushSortir();//Callback called when "Sortir" button is pushed inside popup
+
 private:
     Ui::MainWindow *ui;
     std::vector<Utilisateur*> userList;
@@ -74,8 +88,10 @@ private:
 
     Utilisateur new_user;
     Utilisateur login_user;
+    Utilisateur sortie_user; //User that takes a kit out
     popupAddUsers *p_popupAddUser;
     Login_connect *p_loginConnect;
+    PopupSortirResa *p_popupSortirResa;
     Delete_user *p_popupDeleteUser;
     PoppupAddKit *p_popupAddKit;
     bool isBasketReadyToBook; //Variable remembering if the basket contains an already booked kit
@@ -112,5 +128,9 @@ private:
     QDate RESA_get_next_resa_day(QDate start_date);
     void RESA_refresh_current_resa_list_table();
     int RESA_find_resa_nb_selected(QListWidgetItem *item);
+
+
+    //-----------Sorties-------------------
+    void SORTIE_refresh_current_resa_list_table();
 };
 #endif // MAINWINDOW_H

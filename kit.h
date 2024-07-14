@@ -26,10 +26,11 @@ private:
 
     //RESA related variables
     bool is_booked;
-    bool is_out;
     bool is_in_basket;
     bool is_in_resa_view;
 
+    //SORTIE related variables
+    bool is_out;
 
 public:
     explicit Kit(QObject *parent = nullptr);

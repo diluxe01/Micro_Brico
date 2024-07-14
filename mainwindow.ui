@@ -27,7 +27,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="TAB_ges_user">
        <property name="enabled">
@@ -194,46 +194,6 @@
                </widget>
               </item>
               <item>
-               <widget class="QGroupBox" name="groupBox_3">
-                <property name="title">
-                 <string>Gestion</string>
-                </property>
-                <layout class="QVBoxLayout" name="verticalLayout_6">
-                 <item>
-                  <widget class="QPushButton" name="GESKIT_pushButton_addkit">
-                   <property name="text">
-                    <string>Ajouter un Kit</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="GESKIT_pushButton_duplicate_kit">
-                   <property name="text">
-                    <string>Dupliquer le Kit</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="GESKIT_pushButton_modify_kit">
-                   <property name="text">
-                    <string>Modifier le Kit</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QFrame" name="frame">
-                   <property name="frameShape">
-                    <enum>QFrame::StyledPanel</enum>
-                   </property>
-                   <property name="frameShadow">
-                    <enum>QFrame::Raised</enum>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item>
                <widget class="QGroupBox" name="groupBox_8">
                 <property name="maximumSize">
                  <size>
@@ -338,6 +298,27 @@
                 </property>
                </spacer>
               </item>
+              <item>
+               <widget class="QPushButton" name="GESKIT_pushButton_duplicate_kit">
+                <property name="text">
+                 <string>Dupliquer le Kit</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="GESKIT_pushButton_modify_kit">
+                <property name="text">
+                 <string>Modifier le Kit</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="GESKIT_pushButton_addkit">
+                <property name="text">
+                 <string>Ajouter un Kit</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
            </item>
@@ -367,7 +348,11 @@
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_17">
               <item>
-               <widget class="QLineEdit" name="RESA_lineEdit_resa_email_user"/>
+               <widget class="QLineEdit" name="RESA_lineEdit_resa_email_user">
+                <property name="text">
+                 <string>Email</string>
+                </property>
+               </widget>
               </item>
               <item>
                <spacer name="horizontalSpacer_4">
@@ -570,6 +555,161 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tab_2">
+       <attribute name="title">
+        <string>Gestion Sorties</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string/>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_11">
+           <item>
+            <widget class="QGroupBox" name="groupBox_3">
+             <property name="title">
+              <string>Qui sort l'objet?</string>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_10">
+              <item>
+               <widget class="QFrame" name="frame_6">
+                <property name="frameShape">
+                 <enum>QFrame::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Raised</enum>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_16">
+                 <item>
+                  <widget class="QLineEdit" name="SORTIE_lineEdit_useremail">
+                   <property name="text">
+                    <string>Email</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="SORTIE_pushButton_resa_showResa">
+                   <property name="text">
+                    <string>Afficher Réservations</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>1000</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QFrame" name="frame_11">
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_15">
+              <item>
+               <widget class="QGroupBox" name="groupBox_14">
+                <property name="title">
+                 <string>Vos reservations</string>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_14">
+                 <item>
+                  <widget class="QListWidget" name="SORTIE_listWidget_resa_currentResa">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;bonjour&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="groupBox_15">
+                <property name="title">
+                 <string>Kits associés</string>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_15">
+                 <item>
+                  <widget class="QListWidget" name="SORTIE_listWidget_resa_kitsOfResa"/>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="SORTIE_pushButton_sortir">
+                   <property name="text">
+                    <string>Sortir</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_16">
+             <property name="title">
+              <string>Kits sortis</string>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_13">
+              <item>
+               <widget class="QListWidget" name="SORTIE_listWidget_resa_kitsOfResa_2"/>
+              </item>
+              <item>
+               <widget class="QFrame" name="frame">
+                <property name="frameShape">
+                 <enum>QFrame::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Raised</enum>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_16">
+                 <item>
+                  <widget class="QPushButton" name="pushButton_restituerKit">
+                   <property name="text">
+                    <string>Restituer</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
     <item>
@@ -614,6 +754,7 @@
      <string>Outils</string>
     </property>
     <addaction name="actionAfficher_les_logs"/>
+    <addaction name="separator"/>
    </widget>
    <addaction name="menuLogin"/>
    <addaction name="menuOutils"/>
