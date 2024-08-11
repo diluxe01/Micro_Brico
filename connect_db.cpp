@@ -357,6 +357,7 @@ void  Connect_db::select_items_by_kit (Kit * kit)
 {
     QSqlQuery query(this->db);
     runQuery(query,"SELECT id, name, quantity from item where forkey ='"+QString::number(kit->getIdKit())+"'");
+    g_utils.clearList(&kit->item_list);
     populate_item_list_from_query(kit, query);
 }
 

@@ -67,14 +67,9 @@ private slots:
 
     //-----------Slots SORTIES-------------------
     void on_SORTIE_pushButton_resa_showResa_clicked();
-
     void on_SORTIE_listWidget_resa_currentResa_itemClicked(QListWidgetItem *item);
-
-
-    void on_SORTIE_pushButton_sortir_clicked();
-
+    void on_SORTIE_pushButton_sortir_clicked(); // Function called when "Sortir" Button is called inside main window
     void on_SORTIE_listWidget_resa_kitsOfResa_itemClicked(QListWidgetItem *item);
-
     void on_SORTIE_popupSortirResa_pushSortir();//Callback called when "Sortir" button is pushed inside popup
 
 private:
@@ -83,8 +78,10 @@ private:
     std::vector<Kit*> kitList; //List of kits only for "Gestion Kits" tab
     std::vector<Kit*> kitListGeskit_view; //List of kits to be displayed in "GESKIT_tableWidget_kit"
     std::vector<Kit*> kitListResa_view; //List of kits to be displayed in "RESA_listWidget_resa"
+    std::vector<Kit*> kitListSortie_view; //List of kits to be displayed in "SORTIE_listWidget_resa_kitsOfResa"
     std::vector<Kit*> kitListBasket_view; //List of kits to be displayed in "RESA_listWidget_panierResa"
-    std::vector<Resa*> resaList; //List of kits to be displayed in "RESA_listWidget_panierResa"
+    std::vector<Resa*> resaList;
+    std::vector<Resa*> resaListSortie;
 
     Utilisateur new_user;
     Utilisateur login_user;
@@ -131,6 +128,7 @@ private:
 
 
     //-----------Sorties-------------------
+    Kit *SORTIE_get_kit_selected();
     void SORTIE_refresh_current_resa_list_table();
 };
 #endif // MAINWINDOW_H

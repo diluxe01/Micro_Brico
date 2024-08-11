@@ -5,6 +5,5 @@
 #include "utils.h"
 
 extern  Connect_db g_connect_db;
-extern  Utils g_utils;
 
 #endif // DATAMODEL_H

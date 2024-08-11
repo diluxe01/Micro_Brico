@@ -16,4 +16,6 @@ public:
     void clearList(std::vector<Resa*> *);
 };
 
+extern  Utils g_utils;
+
 #endif // UTILS_H

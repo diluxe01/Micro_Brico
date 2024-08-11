@@ -17,11 +17,10 @@ class Item : public QObject
 private:
     uint id;
     QString name;
-
     uint forkey;
     uint quantity;
-    // T_etat_item etat;
 
+    bool is_verified;
 public:
     explicit Item(QObject *parent = nullptr);
     Item(uint id, const QString &name, uint forkey);
@@ -41,6 +40,9 @@ public:
 
     uint getQuantity() const;
     void setQuantity(uint newQuantity);
+
+    bool getIs_verified() const;
+    void setIs_verified(bool newIs_verified);
 
 signals:
 };

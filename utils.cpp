@@ -1,4 +1,5 @@
 #include "utils.h"
+Utils g_utils;
 
 Utils::Utils() {}
 
