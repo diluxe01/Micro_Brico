@@ -1,6 +1,9 @@
 #include "popupsortirresa.h"
 #include "ui_popupsortirresa.h"
 #include <QMessageBox>
+#include "../connect_db.h"
+#include "../datamodel.h"
+
 PopupSortirResa::PopupSortirResa(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::PopupSortirResa)
@@ -11,6 +14,7 @@ PopupSortirResa::PopupSortirResa(QWidget *parent)
 
 PopupSortirResa::~PopupSortirResa()
 {
+    clean_kit();
     delete ui;
 }
 
@@ -34,6 +38,10 @@ QPushButton * PopupSortirResa::getSortirButton(void)
     return ui->pushButton_sortir;
 }
 
+QPushButton * PopupSortirResa::getAnnulerButton(void)
+{
+    return ui->pushButton_annuler;
+}
 void PopupSortirResa::setUser(Utilisateur *newUser)
 {
     user = newUser;
@@ -44,10 +52,20 @@ void PopupSortirResa::setUser(Utilisateur *newUser)
 bool PopupSortirResa::checkIfOk()
 {
     bool returnValue = true;
-    if (this->ui->lineEdit_mdp->text()!= this->user->getMdp())
+
+    //Convert user mdp to sha1
+    QString mdp_user_sha1 = g_connect_db.get_sha1_from_Qstring(this->ui->lineEdit_mdp->text());
+    if (mdp_user_sha1 != this->user->getMdp())
     {
         GEN_raise_popup_warning("Erreur dans le mot de passe de l'utilisateur.");
         returnValue = false;
+    }
+    // Check if every items have been verified
+    if (this->item_list_dest.size() != p_kit->item_list.size())
+    {
+        GEN_raise_popup_warning("Attention, vous n'avez pas vérifié tous les objets du kit.");
+        returnValue = false;
+
     }
     return returnValue;
 }
@@ -60,6 +78,14 @@ Kit *PopupSortirResa::getP_kit() const
 void PopupSortirResa::setP_kit(Kit *newP_kit)
 {
     p_kit = newP_kit;
+}
+
+void PopupSortirResa::clean_kit(void)
+{
+    for (const auto& elem_item : p_kit->item_list)
+    {
+        elem_item->setIs_verified(false);
+    }
 }
 
 
@@ -174,7 +200,7 @@ void PopupSortirResa::on_listWidget_popupSortie_ItemDest_itemDoubleClicked(QList
     //get selected item from Dest Qlistwidget and delete it
     QListWidgetItem * p_widgetItem = this->ui->listWidget_popupSortie_ItemDest->currentItem();
     this->ui->listWidget_popupSortie_ItemDest->removeItemWidget(p_widgetItem);
-
+    delete (p_widgetItem);
 
     // remove item from dest list
     auto it = std::find(this->item_list_dest.begin(), this->item_list_dest.end(),
@@ -182,6 +208,7 @@ void PopupSortirResa::on_listWidget_popupSortie_ItemDest_itemDoubleClicked(QList
 
     if (it != this->item_list_dest.end()) {
         this->item_list_dest.erase(it);
+        delete (p_itemdest);
     }
 
     //Refresh everybody

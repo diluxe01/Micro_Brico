@@ -50,3 +50,9 @@ CREATE TABLE `db_dev`.`sortie` (
   `id_kit` INT NULL,
   `id_sortie` INT NULL,
   PRIMARY KEY (`id`));
+  
+-- changeset adrie:1716202953457-16 comment:create uid_sortie table
+  CREATE TABLE `db_dev`.`uid_sortie` (
+  `iduid_sortie` INT NOT NULL,
+  PRIMARY KEY (`iduid_sortie`),
+  UNIQUE INDEX `iduid_sortie_UNIQUE` (`iduid_sortie` ASC) VISIBLE);

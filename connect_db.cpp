@@ -90,6 +90,7 @@ void Connect_db::add_kit (Kit *kit)  {
     }
 }
 
+
 void Connect_db::update_kit (Kit *i_kit)  {
     vector<Item*>::iterator it;
     Kit l_db_kit;
@@ -159,6 +160,32 @@ void Connect_db::update_kit (Kit *i_kit)  {
     }
 }
 
+///
+/// \brief Connect_db::update_items_quantity_of_kit
+/// Update the quantity of the items of kit pointed by i_kit, with the quantity of matching items in i_new_items list
+/// \param i_kit: kit where item are to be changed
+/// \param i_new_items: list containing items whith new quantity
+///
+void Connect_db::update_items_quantity_of_kit(Kit * i_kit, std::vector<Item *> i_new_items)  {
+
+    QSqlQuery query  = QSqlQuery(this->db);
+    QString exec_string = "";
+    for(const auto& elem_new_item : i_new_items)
+    {
+        for(const auto& elem_kit_item : i_kit->item_list)
+        {
+            if (elem_new_item->getId() == elem_kit_item->getId())
+            {
+                if (elem_new_item->getQuantity() != elem_kit_item->getQuantity())
+                {
+                    exec_string = "update item set quantity = " +QString::number(elem_new_item->getQuantity())+" where id = " + QString::number(elem_new_item->getId()) ;
+                    runQuery(query, exec_string);
+                }
+            }
+        }
+    }
+}
+
 
 bool Connect_db::delete_user(Utilisateur *user_to_delete)
 {
@@ -175,23 +202,6 @@ bool Connect_db::delete_user(Utilisateur *user_to_delete)
 }
 
 
-
-// QSqlQuery query2 = QSqlQuery(this->db);
-// runQuery(query2, "SELECT id, nom, mdp, prenom, email, utinfo, token from utilisateur");
-// while (query2.next())
-// {
-//     QString nom = query2.value("nom").toString();
-//     QString mdp = query2.value("mdp").toString();
-//     QString prenom = query2.value("prenom").toString();
-//     QString email = query2.value("email").toString();
-//     QString utinfo = query2.value("utinfo").toString();
-//     QString token = query2.value("token").toString();
-//     int id = query2.value("id").toInt();
-
-//     Utilisateur * u = new Utilisateur(nom, mdp,prenom, email, utinfo );
-//     u->setId(id);
-//     u->setToken(token);
-//     list->push_back(u);
 ///
 /// \brief Connect_db::get_user_id_by_mail safely gives the user id, given its mail.
 /// \param i_mail: user booking email
@@ -284,12 +294,8 @@ bool Connect_db::connect_user(void)
     query.exec(query_string);
     query.next();
     mdp_db = query.value("mdp").toString();
-    qDebug() <<  query_string;
-    qDebug() <<  "MDP from DB is: "<<mdp_db;
-
     //Convert user mdp to sha1
     mdp_user_sha1 = get_sha1_from_Qstring(this->active_user->getMdp());
-    qDebug() <<  "MDP from USER is: " << mdp_user_sha1;
 
     if (mdp_db == mdp_user_sha1)
     {
@@ -607,4 +613,36 @@ void  Connect_db::set_kit_out_status (std::vector<Kit*> *i_kits, QDate i_date)
         }
         elem_kit->setIs_out(is_out);
     }
+}
+
+void  Connect_db::start_sortie(void)
+{
+    QSqlQuery query(this->db);
+    runQuery(query, "LOCK TABLES uid_sortie WRITE, sortie WRITE, utilisateur READ, kit READ");
+}
+
+// void  Connect_db::insert_sortie (Kit * i_kit )
+// {
+
+// }
+
+void  Connect_db::end_sortie(void)
+{
+    QSqlQuery query(this->db);
+    runQuery(query, "UNLOCK TABLES");
+}
+
+//Returns next sortie number by incr. the last number inserted.
+// Updates uid_sortie table with incremented number
+uint32_t Connect_db::guess_next_sortie_nb(void)
+{
+    QSqlQuery query(this->db);
+    runQuery(query, "SELECT iduid_sortie from uid_sortie order by iduid_sortie DESC limit 1");
+    query.next();
+
+    int id = query.value("iduid_sortie").toInt();
+    id += 1 ;
+    runQuery(query, "insert into uid_sortie (iduid_sortie) values  ("+QString::number(id)+")");
+
+    return id;
 }

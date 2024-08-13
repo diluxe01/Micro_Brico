@@ -923,6 +923,7 @@ void MainWindow::on_RESA_listWidget_panierResa_itemDoubleClicked(QListWidgetItem
     p_kit->setIs_in_basket(false);
 
     this->ui->RESA_listWidget_panierResa->removeItemWidget(item);//Delete kit from basket view
+    delete(item);
     this->kitListBasket_view.erase(this->kitListBasket_view.begin()+row);//Delete kit from basket list
 
     RESA_refresh_kit_list_table();
@@ -1113,15 +1114,11 @@ void MainWindow::on_SORTIE_listWidget_resa_currentResa_itemClicked(QListWidgetIt
 {
     Kit * p_kit;
     int resa_nb = 0;
-
     //clear kit list widget
     this->ui->SORTIE_listWidget_resa_kitsOfResa->clear();
     this->ui->SORTIE_pushButton_sortir->setEnabled(false); // Disable "sortir" to force user to select a kit
     this->kitListSortie_view.clear();
-
-
     resa_nb = this->RESA_find_resa_nb_selected(item);
-
     if (resa_nb != -1)
     {
         //iter through resa list to find every reservation with resa_nb and get their associated kits
@@ -1185,6 +1182,7 @@ void MainWindow::on_SORTIE_pushButton_sortir_clicked()
     this->p_popupSortirResa->setWindowTitle(SORTIE_get_kit_selected()->getNom());
     this->p_popupSortirResa->show();
     QObject::connect(this->p_popupSortirResa->getSortirButton(), &QPushButton::clicked, this, &MainWindow::on_SORTIE_popupSortirResa_pushSortir);
+    QObject::connect(this->p_popupSortirResa->getAnnulerButton(), &QPushButton::clicked, this, &MainWindow::on_SORTIE_popupSortirResa_pushAnnuler);
 }
 
 void MainWindow::on_SORTIE_listWidget_resa_kitsOfResa_itemClicked(QListWidgetItem *item)
@@ -1203,7 +1201,41 @@ void MainWindow::on_SORTIE_popupSortirResa_pushSortir()
     {
         this->SORTIE_refresh_current_resa_list_table();
 
+        SORTIE_sortir_kit();
+
     }
+}
+
+void MainWindow::SORTIE_sortir_kit()
+{
+    int sortie_nb = 0;
+    Utilisateur l_user;
+    bool has_errors = false;
+    QDate start_date;
+    start_date = this->ui->RESA_calendarWidget->selectedDate();
+    g_connect_db.update_items_quantity_of_kit (this->p_popupSortirResa->getP_kit(), this->p_popupSortirResa->item_list_dest);
+    g_connect_db.start_sortie();// Start of LOCK
+    sortie_nb = g_connect_db.guess_next_sortie_nb();
+
+                //     g_connect_db.add_resa_from_kit(kit_elem, l_user.getId(), start_date, resa_nb );
+                //     kit_elem->setIs_in_basket(false);
+                //     kit_elem->setIs_booked(true);
+
+                // GEN_raise_popup_info("Votre réservation n° **"+QString::number(resa_nb)+"** est bien prise en compte.");
+                // this->ui->RESA_listWidget_panierResa->clear();
+                // this->kitListBasket_view.clear();
+                // RESA_refresh_kit_list_table();
+                // on_RESA_pushButton_resa_showResa_clicked();
+
+    g_connect_db.end_sortie();// End of LOCK
+}
+
+///
+/// \brief MainWindow::on_SORTIE_popupSortirResa_pushAnnuler: : Callback called when "Annuler" button is pushed inside popup
+///
+void MainWindow::on_SORTIE_popupSortirResa_pushAnnuler()
+{
+    delete this->p_popupSortirResa;
 }
 // ^^^^^^ MAIN WINDOW "Gestion SORTIES" ^^^^^^
 //---------------------------------------------------------

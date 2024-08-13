@@ -53,6 +53,7 @@ public:
     void select_kits_by_name(std::vector<Kit *> *kits, QString code);
     void add_kit (Kit *);
     void update_kit (Kit *);
+    void update_items_quantity_of_kit (Kit *, std::vector<Item*> i_new_items);
     void add_item(Item *p_item, QString i_idkit);
     void select_all_kits(std::vector<Kit*> *kits);
     void select_items_by_kit (Kit * );
@@ -70,7 +71,11 @@ public:
 
     //-----------Sortie-------------------
     void select_all_sortie(std::vector<Sortie *> *i_sortie);
+    void insert_sortie(std::vector<Sortie *> *i_sortie);
 
+    void end_sortie();
+    void start_sortie();
+    uint32_t guess_next_sortie_nb();
 public slots:
 signals:
     void log_value_changed(bool is_user_logged);

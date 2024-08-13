@@ -149,6 +149,9 @@
             <height>0</height>
            </size>
           </property>
+          <property name="inputMethodHints">
+           <set>Qt::InputMethodHint::ImhHiddenText|Qt::InputMethodHint::ImhNoAutoUppercase|Qt::InputMethodHint::ImhNoPredictiveText|Qt::InputMethodHint::ImhSensitiveData</set>
+          </property>
          </widget>
         </item>
        </layout>
