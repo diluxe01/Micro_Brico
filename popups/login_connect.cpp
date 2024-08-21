@@ -6,6 +6,7 @@ Login_connect::Login_connect(QWidget *parent)
     , ui(new Ui::login_connect)
 {
     ui->setupUi(this);
+    ui->lineEdit_mail->setFocus();
 }
 
 Login_connect::~Login_connect()

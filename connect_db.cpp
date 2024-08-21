@@ -340,7 +340,7 @@ void Connect_db::update_user_infos_from_db(Utilisateur *login_user)
 void  Connect_db::select_all_users (std::vector<Utilisateur*> *list)
 {
     QSqlQuery query2 = QSqlQuery(this->db);
-    runQuery(query2, "SELECT id, nom, mdp, prenom, email, utinfo, token from utilisateur");
+    runQuery(query2, "SELECT id, nom, mdp, prenom, email, utinfo, token, privilege from utilisateur");
     while (query2.next())
     {
         QString nom = query2.value("nom").toString();
@@ -349,11 +349,23 @@ void  Connect_db::select_all_users (std::vector<Utilisateur*> *list)
         QString email = query2.value("email").toString();
         QString utinfo = query2.value("utinfo").toString();
         QString token = query2.value("token").toString();
+        QString privilege_str = query2.value("privilege").toString();
+
+
         int id = query2.value("id").toInt();
 
         Utilisateur * u = new Utilisateur(nom, mdp,prenom, email, utinfo );
         u->setId(id);
         u->setToken(token);
+        if (privilege_str == "admin")
+        {
+            u->setPrivilege(E_admin);
+        }
+        else
+        {
+            u->setPrivilege(E_basic);
+        }
+
         list->push_back(u);
     }
 }

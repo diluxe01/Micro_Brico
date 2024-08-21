@@ -35,16 +35,15 @@ public slots:
 
 private slots:
     /*Add user popup slots */
-    void on_popupaddUser_destroyed();
-    void on_popupaddUser_ok();
-    void on_getUsers_clicked();
+    //-----------Actions -------------------
     void on_actionNouvel_Utilisateur_triggered();
     void on_actionSe_connecter_triggered();
-    void on_deleteUser_clicked();
     void on_actionSe_d_connecter_triggered();
     void on_actionAfficher_les_logs_triggered();
-    void on_popupAddKit_destroyed();
-    void on_popupAddKit_ok();
+
+    //-----------Slots GESUSER-------------------
+    void on_deleteUser_clicked();
+    void on_GESUSER_pushButton_getuser_clicked();
 
     //-----------Slots GESKIT-------------------
     void on_GESKIT_pushButton_addkit_clicked();
@@ -73,9 +72,11 @@ private slots:
     void on_SORTIE_popupSortirResa_pushSortir();//Callback called when "Sortir" button is pushed inside popup
     void on_SORTIE_popupSortirResa_pushAnnuler();
 
+
 private:
     Ui::MainWindow *ui;
     std::vector<Utilisateur*> userList;
+    std::vector<Utilisateur*> userListView;
     std::vector<Kit*> kitList; //List of kits only for "Gestion Kits" tab
     std::vector<Kit*> kitListGeskit_view; //List of kits to be displayed in "GESKIT_tableWidget_kit"
     std::vector<Kit*> kitListResa_view; //List of kits to be displayed in "RESA_listWidget_resa"
@@ -97,21 +98,34 @@ private:
     void GEN_raise_popup_info(QString msg);
     void GEN_raise_popup_warning(QString msg);
     void closeEvent (QCloseEvent *event);
-    void GESUSER_add_user_to_DB(void);
-    void GESUSER_refresh_user_list_table(void);
     void activateWidgets(bool);
 
+    //-----------popups-------------------
     void on_popupLogin_destroyed();
     void on_popupLogin_ok();
     void on_popupDelete_ok();
     void on_popupDelete_destroyed();
+    void on_popupaddUser_destroyed();
+    void on_popupaddUser_ok();
+    void on_popupAddKit_destroyed();
+    void on_popupAddKit_ok();
+
+    //-----------User-------------------
+    void GESUSER_get_user_by_name(std::vector<Utilisateur *> *from_user, std::vector<Utilisateur *> *to_user, QString name);
+    void GESUSER_get_user_by_utinfo(std::vector<Utilisateur *> *from_user, std::vector<Utilisateur *> *to_user, QString utinfo);
+    void GESUSER_clear_display();
+    void GESUSER_enable_GESUSER_buttons(bool i_enable);
+    Kit* GESUSER_get_user_selected();
+    void GESUSER_refresh_user_list_from_server(std::vector<Utilisateur*> *i_list);
+    void GESUSER_refresh_user_table();
+    void GESUSER_push_back_new_user_on_table(Utilisateur *user, int row);
 
     //-----------Kit-------------------
     void GESKIT_clear_display();
     void GESKIT_enable_geskit_buttons(bool i_enable);
     Kit* GESKIT_get_kit_selected();
     void GESKIT_refresh_kit_list_from_server(std::vector<Kit*> *i_list);
-    void GESKIT_refresh_kit_list_table();
+    void GESKIT_refresh_kit_table();
     void GESKIT_push_back_new_kit_on_table(Kit *kit, int row);
     void GESKIT_refresh_item_list_table(Kit *kit);
     void GESKIT_refresh_descritption(Kit *kit);

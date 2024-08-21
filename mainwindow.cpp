@@ -47,8 +47,22 @@ MainWindow::MainWindow(QWidget *parent)
     qInstallMessageHandler(myMessageOutput);
     connect(logBrowser, &LogBrowser::sendMessage, this, &MainWindow::log_stuffs, Qt::QueuedConnection);
 
-    // Init of Kit display table
     QStringList header_list;
+    // Init of User display table
+    ui->GESUSER_tableWidget_user->setRowCount(0);
+    ui->GESUSER_tableWidget_user->setColumnCount(5);
+    header_list.append("UTINFO");
+    header_list.append("Prénom");
+    header_list.append("Nom");
+    header_list.append("Mail");
+    header_list.append("Privilège");
+    ui->GESUSER_tableWidget_user->setHorizontalHeaderLabels(header_list);
+    ui->GESUSER_tableWidget_user->setColumnWidth(1, 150);
+    ui->GESUSER_tableWidget_user->setColumnWidth(2, 150);
+    ui->GESUSER_tableWidget_user->setColumnWidth(3, 250);
+
+    // Init of Kit display table
+    header_list.clear();
     ui->GESKIT_tableWidget_kit->setRowCount(0);
     ui->GESKIT_tableWidget_kit->setColumnCount(6);
     header_list.append("Code");
@@ -94,16 +108,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent (QCloseEvent *event)
 {
-    // QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Gestion Reservations microBrico",
-    //                                                            tr("Are you sure?\n"),
-    //                                                            QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
-    //                                                            QMessageBox::Yes);
-    // if (resBtn != QMessageBox::Yes) {
-    //     event->ignore();
-    // } else {
-    //     event->accept();
         delete this;
-    // }
 }
 
 void MainWindow::on_actionAfficher_les_logs_triggered()
@@ -152,8 +157,7 @@ void MainWindow::on_popupaddUser_destroyed()
 void MainWindow::on_popupaddUser_ok()
 {
     qDebug() << "OK popup! ;)";
-    this->GESUSER_add_user_to_DB();
-    this->p_popupAddUser->deleteInstance();
+    // this->p_popupAddUser->deleteInstance();
 }
 
 
@@ -218,34 +222,171 @@ void MainWindow::on_actionSe_d_connecter_triggered()
 //---------------------------------------------------------
 // vvvvvv MAIN WINDOW "Gestion Utilisateur" SECTION vvvvvv
 
-void MainWindow::GESUSER_add_user_to_DB(void)
+void MainWindow::GESUSER_get_user_by_name(std::vector<Utilisateur*> *from_user, std::vector<Utilisateur*> *to_user, QString name)
 {
-    g_connect_db.add_user(&this->new_user);
-
-    qDebug() << "MGMT: AddUser to DB;)";
+    for(const auto& user_elem : *from_user)
+    {
+        if (user_elem->getNom().contains(name, Qt::CaseInsensitive))
+        {
+            to_user->push_back(user_elem);
+        }
+    }
 }
-void MainWindow::on_getUsers_clicked()
+
+void MainWindow::GESUSER_get_user_by_utinfo(std::vector<Utilisateur*> *from_user, std::vector<Utilisateur*> *to_user, QString utinfo)
 {
-    /* refresh the user list by cleaning and loading it again */
-    g_utils.clearList(&this->userList);
-
-    g_connect_db.select_all_users(&this->userList);
-    MainWindow::GESUSER_refresh_user_list_table();
+    for(const auto& user_elem : *from_user)
+    {
+        if (user_elem->getUtinfo().contains(utinfo, Qt::CaseInsensitive))
+        {
+            to_user->push_back(user_elem);
+        }
+    }
 }
+
+void MainWindow::on_GESUSER_pushButton_getuser_clicked()
+{
+
+    this->userListView.clear();
+
+    /* if user entered a utinfo, then search for users with this utinfo */
+    if (ui->GESUSER_lineEdit_finduserbyname->text()!="")
+    {
+        GESUSER_get_user_by_utinfo(&this->userList, &this->userListView, ui->GESUSER_lineEdit_finduserbyutinfo->text());
+    }
+    /* if user entered a name, then search for users with this name*/
+    else if (ui->GESUSER_lineEdit_finduserbyutinfo->text()!="")
+    {
+        GESUSER_get_user_by_name(&this->userList, &this->userListView, ui->GESUSER_lineEdit_finduserbyname->text());
+    }
+    else
+    {
+        /* if user entered nothing, get every available kits */
+        for(const auto& elem : this->userList)
+        {
+            this->userListView.push_back(elem);
+        }
+    }
+
+
+    MainWindow::GESUSER_refresh_user_table();
+}
+
 
 void MainWindow::activateWidgets(bool)
 {
 
 }
 
-void MainWindow::GESUSER_refresh_user_list_table(void)
+void MainWindow::GESUSER_refresh_user_table(void)
 {
-    this->ui->listWidget->clear();
-    for(const auto& toto : this->userList)
+    int row = 0;
+
+    for(const auto& user_elem : this->userListView)
     {
-        new QListWidgetItem(toto->ToString(), this->ui->listWidget);
+        row++;
+        GESUSER_push_back_new_user_on_table(user_elem, row);
     }
 }
+
+
+void MainWindow::GESUSER_clear_display()
+{
+    // this->ui->GESKIT_textEdit_descritpionKit->clear();
+    // this->ui->GESKIT_textEdit_detailsKit->clear();
+    // this->ui->GESKIT_tableWidget_item->clearContents();
+    // this->ui->GESKIT_tableWidget_item->setRowCount(0);
+
+    // // Block signal because the clearing of contents when "currentCellChanged" signal is activated causes crash for some reasons
+    // this->ui->GESKIT_tableWidget_kit->blockSignals(true);
+    // this->ui->GESKIT_tableWidget_kit->clearContents();
+    // this->ui->GESKIT_tableWidget_kit->setRowCount(0);
+    // this->ui->GESKIT_tableWidget_kit->blockSignals(false);
+}
+
+void MainWindow::GESUSER_enable_GESUSER_buttons(bool i_enable)
+{
+    // bool l_enable = false;
+    // //Enable buttons only if user is admin
+    // if (this->login_user.getPrivilege() == E_admin)
+    // {
+    //     l_enable = i_enable;
+    //     this->ui->GESKIT_pushButton_addkit->setEnabled(rue); // always enable this one when admin
+    // }
+    // else
+    // {
+    //     l_enable = false;
+    //     this->ui->GESKIT_pushButton_addkit->setEnabled(false); // always enable this one when admin
+    // }
+
+    // this->ui->GESKIT_pushButton_duplicate_kit->setEnabled(l_enable);
+    // this->ui->GESKIT_pushButton_modify_kit->setEnabled(l_enable);
+}
+
+Kit *MainWindow::GESUSER_get_user_selected()
+{
+    // //First get kit selected by user
+    // QList<QTableWidgetSelectionRange> items = this->ui->GESKIT_tableWidget_kit->selectedRanges();
+    // QTableWidgetSelectionRange  selectedRange = items.first();
+    // int row = selectedRange.topRow();
+    // Kit* p_kit = kitListGeskit_view.at(row);
+    // return p_kit;
+}
+
+void MainWindow::GESUSER_refresh_user_list_from_server(std::vector<Utilisateur *> *i_list)
+{
+    /* clean the kit list and delete objects pointed by element of this list */
+    g_utils.clearList(i_list);
+    // clear every depending lists
+    this->userListView.clear();
+
+    //Get every kits on server
+    g_connect_db.select_all_users(i_list);
+}
+
+void MainWindow::GESUSER_push_back_new_user_on_table(Utilisateur *user, int row)
+{
+    uint column_index = 0;
+    ui->GESUSER_tableWidget_user->setRowCount(row);
+    QTableWidgetItem* p_widget_user_utinfo;
+    QTableWidgetItem* p_widget_user_prenom;
+    QTableWidgetItem* p_widget_user_nom;
+    QTableWidgetItem* p_widget_user_mail;
+    QTableWidgetItem* p_widget_user_privilege;
+    QString l_privilege;
+    // set Utinfo
+    p_widget_user_utinfo= new QTableWidgetItem(user->getUtinfo());
+    ui->GESUSER_tableWidget_user->setItem(row-1, column_index, p_widget_user_utinfo);
+    column_index ++;
+    // set Prenom
+    p_widget_user_prenom= new QTableWidgetItem(user->getPrenom());
+    ui->GESUSER_tableWidget_user->setItem(row-1, column_index, p_widget_user_prenom);
+    column_index ++;
+    // set Nom
+    p_widget_user_nom= new QTableWidgetItem(user->getNom());
+    ui->GESUSER_tableWidget_user->setItem(row-1, column_index, p_widget_user_nom);
+    column_index ++;
+    // set Mail
+    p_widget_user_mail= new QTableWidgetItem(user->getEmail());
+    ui->GESUSER_tableWidget_user->setItem(row-1, column_index, p_widget_user_mail);
+    column_index ++;
+
+    // set Privilege
+    if (user->getPrivilege() == E_basic)
+    {
+        l_privilege = "Utilisateur";
+    }
+    else
+    {
+        l_privilege = "Administrateur";
+    }
+    p_widget_user_privilege= new QTableWidgetItem(l_privilege);
+    ui->GESUSER_tableWidget_user->setItem(row-1, column_index, p_widget_user_privilege);
+    column_index ++;
+
+}
+
+
 // ^^^^^^ MAIN WINDOW "Gestion Utilisateur" ^^^^^^
 //---------------------------------------------------------
 
@@ -332,10 +473,10 @@ void MainWindow::on_GESKIT_pushButton_getkit_clicked()
     {
         this->GESKIT_enable_geskit_buttons(false);
     }
-    MainWindow::GESKIT_refresh_kit_list_table();
+    MainWindow::GESKIT_refresh_kit_table();
 }
 
-void MainWindow::GESKIT_refresh_kit_list_table(void)
+void MainWindow::GESKIT_refresh_kit_table(void)
 {
     vector<Kit*>::iterator it;
     int row = 0;
@@ -511,6 +652,8 @@ void MainWindow::on_popupDelete_ok()
 void MainWindow::clean_HMI(void)
 {
     //Clear every table, list and line edit
+    this->ui->GESUSER_lineEdit_finduserbyname->clear();
+    this->ui->GESUSER_lineEdit_finduserbyutinfo->clear();
     this->GESKIT_clear_display();
     this->ui->GESKIT_lineEdit_findkitbycode->clear();
     this->ui->GESKIT_lineEdit_findkitbyname->clear();
@@ -539,7 +682,6 @@ void MainWindow::update_connection_status(bool is_user_logged)
         this->ui->TAB_ges_kits->setEnabled(is_user_logged);
         this->ui->actionSe_connecter->setEnabled(!is_user_logged);
         this->ui->actionSe_d_connecter->setEnabled(is_user_logged);
-        this->ui->listWidget->clear();
 
         this->GESKIT_enable_geskit_buttons(false);
 
@@ -548,8 +690,10 @@ void MainWindow::update_connection_status(bool is_user_logged)
             qInfo() << "Vous êtes maintenant connecté.";
             //Refresh kit list every time a user logs in
             this->GESKIT_refresh_kit_list_from_server(&this->kitList);
+            //Refresh user list every time a user logs in
+            this->GESUSER_refresh_user_list_from_server(&this->userList);
 
-            //Refresh resa lineEdit_resa_email_use with user name and enable it only if user is admin
+            //Refresh resa lineEdit_resa_email_user with user name and enable it only if user is admin
             this->ui->RESA_lineEdit_resa_email_user->setText(this->login_user.getEmail());
             if (this->login_user.getPrivilege() == E_admin)
             {
@@ -634,7 +778,7 @@ void MainWindow::on_popupAddKit_ok()
         g_connect_db.add_kit(p_kit);
         this->p_popupAddKit->close();
         delete (this->p_popupAddKit);
-        /* refresh the user list by cleaning and loading it again */
+        /* refresh the kit list by cleaning and loading it again */
         this->GESKIT_refresh_kit_list_from_server(&this->kitList);
 
         //Refresh display of kits
@@ -645,13 +789,14 @@ void MainWindow::on_popupAddKit_ok()
         g_connect_db.update_kit(p_kit);
         this->p_popupAddKit->close();
         delete (this->p_popupAddKit);
-        /* refresh the user list by cleaning and loading it again */
+        /* refresh the kit list by cleaning and loading it again */
         this->GESKIT_refresh_kit_list_from_server(&this->kitList);
 
         //Refresh display of kits
         on_GESKIT_pushButton_getkit_clicked();
     }
 }
+
 
 Kit* MainWindow::GESKIT_get_kit_selected()
 {

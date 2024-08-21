@@ -8,6 +8,7 @@ popupAddUsers::popupAddUsers(QWidget *parent)
     , ui(new Ui::popupAddUsers)
 {
     ui->setupUi(this);
+    ui->lineEdit_utinfo->setFocus();
 }
 
 popupAddUsers::~popupAddUsers()

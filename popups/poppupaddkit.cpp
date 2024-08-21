@@ -15,6 +15,7 @@ PoppupAddKit::PoppupAddKit(QWidget *parent)
 {
     QStringList header_list;
     ui->setupUi(this);
+    ui->lineEdit_kit_name->setFocus();
     this->kit = new Kit();
 }
 
