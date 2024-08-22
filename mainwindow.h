@@ -121,6 +121,8 @@ private:
     void GESUSER_push_back_new_user_on_table(Utilisateur *user, int row);
 
     //-----------Kit-------------------
+    void GESKIT_get_kits_by_name(std::vector<Kit *> *from_kits, std::vector<Kit *> *to_kits, QString code);
+    void GESKIT_get_kits_by_code(std::vector<Kit *> *from_kits, std::vector<Kit *> *to_kits, QString code);
     void GESKIT_clear_display();
     void GESKIT_enable_geskit_buttons(bool i_enable);
     Kit* GESKIT_get_kit_selected();

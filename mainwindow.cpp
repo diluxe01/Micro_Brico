@@ -393,6 +393,29 @@ void MainWindow::GESUSER_push_back_new_user_on_table(Utilisateur *user, int row)
 //---------------------------------------------------------
 // vvvvvv MAIN WINDOW "Gestion Kits" SECTION vvvvvv
 
+void MainWindow::GESKIT_get_kits_by_code(std::vector<Kit*> *from_kits, std::vector<Kit*> *to_kits, QString code)
+{
+
+    for(const auto& kit_elem : *from_kits)
+    {
+        if (kit_elem->getCode().contains(code, Qt::CaseInsensitive))
+        {
+            to_kits->push_back(kit_elem);
+        }
+    }
+}
+
+void MainWindow::GESKIT_get_kits_by_name(std::vector<Kit*> *from_kits, std::vector<Kit*> *to_kits, QString code)
+{
+    for(const auto& kit_elem : *from_kits)
+    {
+        if (kit_elem->getNom().contains(code, Qt::CaseInsensitive))
+        {
+            to_kits->push_back(kit_elem);
+        }
+    }
+}
+
 ///
 /// \brief MainWindow::GESKIT_clear_display
 /// Clears every tables and textEdit in GESKIT tab
@@ -452,13 +475,13 @@ void MainWindow::on_GESKIT_pushButton_getkit_clicked()
     /* if user enterd a code, then search for Kits with this code */
     if (ui->GESKIT_lineEdit_findkitbycode->text()!="")
     {
-        RESA_get_kits_by_code(&this->kitList,&this->kitListGeskit_view,ui->GESKIT_lineEdit_findkitbycode->text() );
+        GESKIT_get_kits_by_code(&this->kitList,&this->kitListGeskit_view,ui->GESKIT_lineEdit_findkitbycode->text() );
     }
 
     /* if user enterd a text, then search for Kits with this code */
     else if (ui->GESKIT_lineEdit_findkitbyname->text()!="")
     {
-        RESA_get_kits_by_name(&this->kitList,&this->kitListGeskit_view,ui->GESKIT_lineEdit_findkitbyname->text() );
+        GESKIT_get_kits_by_name(&this->kitList,&this->kitListGeskit_view,ui->GESKIT_lineEdit_findkitbyname->text() );
     }
     else
     {        /* if user enterd nothing, get every available kits */
@@ -751,6 +774,7 @@ void MainWindow::log_stuffs(QtMsgType type, const QString &msg)
 void MainWindow::on_GESKIT_pushButton_addkit_clicked()
 {
     this->p_popupAddKit = new (PoppupAddKit);
+    this->p_popupAddKit->setWindowTitle("Ajout d'un nouveau Kit");
     this->p_popupAddKit->show();
     QObject::connect(this->p_popupAddKit->getOkButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_ok);
     QObject::connect(this->p_popupAddKit->getCancelButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_destroyed);
@@ -817,6 +841,7 @@ void MainWindow::on_GESKIT_pushButton_duplicate_kit_clicked()
     //Open popup pre filled with selected kit informations
     this->p_popupAddKit = new (PoppupAddKit);
     this->p_popupAddKit->set_form_from_kit(p_kit);
+    this->p_popupAddKit->setWindowTitle("Duplication du kit : "+ p_kit->getNom());
     this->p_popupAddKit->show();
     QObject::connect(this->p_popupAddKit->getOkButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_ok);
     QObject::connect(this->p_popupAddKit->getCancelButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_destroyed);
@@ -831,6 +856,7 @@ void MainWindow::on_GESKIT_pushButton_modify_kit_clicked()
     //Open popup pre filled with selected kit informations
     this->p_popupAddKit = new (PoppupAddKit);
     this->p_popupAddKit->set_form_from_kit(p_kit);
+    this->p_popupAddKit->setWindowTitle("Modification du kit : "+ p_kit->getNom());
     this->p_popupAddKit->show();
     QObject::connect(this->p_popupAddKit->getOkButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_ok);
     QObject::connect(this->p_popupAddKit->getCancelButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_destroyed);
