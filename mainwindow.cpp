@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     //Init default buttons status
     this->GESKIT_enable_geskit_buttons(false);
-
+    this->GESUSER_enable_GESUSER_buttons(false);
     // Init of the connection status slot
     this->login_user.setIs_logged_on(true);
     update_connection_status(false);
@@ -160,28 +160,14 @@ void MainWindow::on_popupaddUser_ok()
     // this->p_popupAddUser->deleteInstance();
 }
 
-
 void MainWindow::on_actionNouvel_Utilisateur_triggered()
 {
-    this->p_popupAddUser = popupAddUsers::GetInstance();
-    this->p_popupAddUser->setUser(&(this->new_user));
-    // check if a user is connected when creating a new account, and if so, get its privilege
-    if (this->login_user.getIs_logged_on())
-    {
-        this->p_popupAddUser->setCaller_privilege(this->login_user.getPrivilege());
+    GESUSER_add_new_user();
+}
 
-        if (this->login_user.getPrivilege() == E_admin){
-            qDebug() << "ADMIN";
-        }
-        else
-        {
-            qDebug() << "BASIC";
-        }
-
-    }
-    this->p_popupAddUser->show_wrapper();
-    QObject::connect(this->p_popupAddUser->getOkButton(), &QDialogButtonBox::accepted, this, &MainWindow::on_popupaddUser_ok);
-    QObject::connect(this->p_popupAddUser->getOkButton(), &QDialogButtonBox::rejected, this, &MainWindow::on_popupaddUser_destroyed);
+void MainWindow::on_GESUSER_pushButton_add_user_clicked()
+{
+    GESUSER_add_new_user();
 }
 
 // ^^^^^^ POPUP ADD USER SECTION ^^^^^^
@@ -222,6 +208,35 @@ void MainWindow::on_actionSe_d_connecter_triggered()
 //---------------------------------------------------------
 // vvvvvv MAIN WINDOW "Gestion Utilisateur" SECTION vvvvvv
 
+void MainWindow::on_GESUSER_pushButton_getuser_clicked()
+{
+
+    this->userListView.clear();
+
+    /* if user entered a name, then search for users with this name*/
+    if (ui->GESUSER_lineEdit_finduserbyname->text()!="")
+    {
+        GESUSER_get_user_by_name(&this->userList, &this->userListView, ui->GESUSER_lineEdit_finduserbyname->text());
+    }
+    /* if user entered a utinfo, then search for users with this utinfo */
+    else if (ui->GESUSER_lineEdit_finduserbyutinfo->text()!="")
+    {
+        GESUSER_get_user_by_utinfo(&this->userList, &this->userListView, ui->GESUSER_lineEdit_finduserbyutinfo->text());
+    }
+    else
+    {
+        /* if user entered nothing, get every available kits */
+        for(const auto& elem : this->userList)
+        {
+            this->userListView.push_back(elem);
+        }
+    }
+
+
+    MainWindow::GESUSER_refresh_user_table();
+}
+
+
 void MainWindow::GESUSER_get_user_by_name(std::vector<Utilisateur*> *from_user, std::vector<Utilisateur*> *to_user, QString name)
 {
     for(const auto& user_elem : *from_user)
@@ -244,34 +259,22 @@ void MainWindow::GESUSER_get_user_by_utinfo(std::vector<Utilisateur*> *from_user
     }
 }
 
-void MainWindow::on_GESUSER_pushButton_getuser_clicked()
+void MainWindow::GESUSER_add_new_user()
 {
-
-    this->userListView.clear();
-
-    /* if user entered a utinfo, then search for users with this utinfo */
-    if (ui->GESUSER_lineEdit_finduserbyname->text()!="")
+    T_user_privilege l_privilege_of_connected_user = E_basic;
+    this->p_popupAddUser = popupAddUsers::GetInstance();
+    this->p_popupAddUser->setUser(&(this->new_user));
+    // check if a user is connected when creating a new account, and if so, get its privilege
+    if (this->login_user.getIs_logged_on())
     {
-        GESUSER_get_user_by_utinfo(&this->userList, &this->userListView, ui->GESUSER_lineEdit_finduserbyutinfo->text());
+        l_privilege_of_connected_user = this->login_user.getPrivilege();
     }
-    /* if user entered a name, then search for users with this name*/
-    else if (ui->GESUSER_lineEdit_finduserbyutinfo->text()!="")
-    {
-        GESUSER_get_user_by_name(&this->userList, &this->userListView, ui->GESUSER_lineEdit_finduserbyname->text());
-    }
-    else
-    {
-        /* if user entered nothing, get every available kits */
-        for(const auto& elem : this->userList)
-        {
-            this->userListView.push_back(elem);
-        }
-    }
-
-
-    MainWindow::GESUSER_refresh_user_table();
+    this->p_popupAddUser->setCaller_privilege(l_privilege_of_connected_user);
+    this->p_popupAddUser->setWindowTitle("Ajout d'un nouvel utilisateur");
+    this->p_popupAddUser->show_wrapper();
+    QObject::connect(this->p_popupAddUser->getOkButton(), &QDialogButtonBox::accepted, this, &MainWindow::on_popupaddUser_ok);
+    QObject::connect(this->p_popupAddUser->getOkButton(), &QDialogButtonBox::rejected, this, &MainWindow::on_popupaddUser_destroyed);
 }
-
 
 void MainWindow::activateWidgets(bool)
 {
@@ -292,45 +295,26 @@ void MainWindow::GESUSER_refresh_user_table(void)
 
 void MainWindow::GESUSER_clear_display()
 {
-    // this->ui->GESKIT_textEdit_descritpionKit->clear();
-    // this->ui->GESKIT_textEdit_detailsKit->clear();
-    // this->ui->GESKIT_tableWidget_item->clearContents();
-    // this->ui->GESKIT_tableWidget_item->setRowCount(0);
-
-    // // Block signal because the clearing of contents when "currentCellChanged" signal is activated causes crash for some reasons
-    // this->ui->GESKIT_tableWidget_kit->blockSignals(true);
-    // this->ui->GESKIT_tableWidget_kit->clearContents();
-    // this->ui->GESKIT_tableWidget_kit->setRowCount(0);
-    // this->ui->GESKIT_tableWidget_kit->blockSignals(false);
+    // Block signal because the clearing of contents when "currentCellChanged" signal is activated causes crash for some reasons
+    this->ui->GESUSER_tableWidget_user->blockSignals(true);
+    this->ui->GESUSER_tableWidget_user->clearContents();
+    this->ui->GESUSER_tableWidget_user->setRowCount(0);
+    this->ui->GESUSER_tableWidget_user->blockSignals(false);
 }
 
 void MainWindow::GESUSER_enable_GESUSER_buttons(bool i_enable)
 {
-    // bool l_enable = false;
-    // //Enable buttons only if user is admin
-    // if (this->login_user.getPrivilege() == E_admin)
-    // {
-    //     l_enable = i_enable;
-    //     this->ui->GESKIT_pushButton_addkit->setEnabled(rue); // always enable this one when admin
-    // }
-    // else
-    // {
-    //     l_enable = false;
-    //     this->ui->GESKIT_pushButton_addkit->setEnabled(false); // always enable this one when admin
-    // }
-
-    // this->ui->GESKIT_pushButton_duplicate_kit->setEnabled(l_enable);
-    // this->ui->GESKIT_pushButton_modify_kit->setEnabled(l_enable);
+    this->ui->GESUSER_pushbutton_deleteUser->setEnabled(i_enable);
+    this->ui->GESUSER_pushButton_modify_user->setEnabled(i_enable);
 }
 
-Kit *MainWindow::GESUSER_get_user_selected()
+Utilisateur *MainWindow::GESUSER_get_user_selected()
 {
-    // //First get kit selected by user
-    // QList<QTableWidgetSelectionRange> items = this->ui->GESKIT_tableWidget_kit->selectedRanges();
-    // QTableWidgetSelectionRange  selectedRange = items.first();
-    // int row = selectedRange.topRow();
-    // Kit* p_kit = kitListGeskit_view.at(row);
-    // return p_kit;
+    QList<QTableWidgetSelectionRange> items = this->ui->GESUSER_tableWidget_user->selectedRanges();
+    QTableWidgetSelectionRange  selectedRange = items.first();
+    int row = selectedRange.topRow();
+    Utilisateur* p_user = userListView.at(row);
+    return p_user;
 }
 
 void MainWindow::GESUSER_refresh_user_list_from_server(std::vector<Utilisateur *> *i_list)
@@ -503,7 +487,6 @@ void MainWindow::GESKIT_refresh_kit_table(void)
 {
     vector<Kit*>::iterator it;
     int row = 0;
-    // this->GESKIT_clear_display();
 
     for(const auto& kit_elem : this->kitListGeskit_view)
     {
@@ -643,14 +626,15 @@ Kit * MainWindow::GESKIT_find_kit_by_id(uint id)
 //---------------------------------------------------------
 // vvvvvv POPUP DELETE_USER SECTION vvvvvv
 
-void MainWindow::on_deleteUser_clicked()
+
+
+void MainWindow::on_GESUSER_pushbutton_deleteUser_clicked()
 {
     this->p_popupDeleteUser = new (Delete_user);
     this->p_popupDeleteUser->show();
     QObject::connect(this->p_popupDeleteUser->getOkButton(), &QDialogButtonBox::accepted, this, &MainWindow::on_popupDelete_ok);
     QObject::connect(this->p_popupDeleteUser->getOkButton(), &QDialogButtonBox::rejected, this, &MainWindow::on_popupDelete_destroyed);
 }
-
 
 void MainWindow::on_popupDelete_destroyed()
 {
@@ -678,6 +662,7 @@ void MainWindow::clean_HMI(void)
     this->ui->GESUSER_lineEdit_finduserbyname->clear();
     this->ui->GESUSER_lineEdit_finduserbyutinfo->clear();
     this->GESKIT_clear_display();
+    this->GESUSER_clear_display();
     this->ui->GESKIT_lineEdit_findkitbycode->clear();
     this->ui->GESKIT_lineEdit_findkitbyname->clear();
     this->ui->RESA_lineEdit_findkitbycode->clear();
@@ -707,6 +692,8 @@ void MainWindow::update_connection_status(bool is_user_logged)
         this->ui->actionSe_d_connecter->setEnabled(is_user_logged);
 
         this->GESKIT_enable_geskit_buttons(false);
+
+        this->GESUSER_enable_GESUSER_buttons(false);
 
         if (is_user_logged == true)
         {
@@ -1410,4 +1397,5 @@ void MainWindow::on_SORTIE_popupSortirResa_pushAnnuler()
 }
 // ^^^^^^ MAIN WINDOW "Gestion SORTIES" ^^^^^^
 //---------------------------------------------------------
+
 

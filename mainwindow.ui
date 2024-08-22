@@ -39,6 +39,12 @@
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
          <widget class="QGroupBox" name="groupBox_10">
+          <property name="minimumSize">
+           <size>
+            <width>1200</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="title">
            <string>Affichage des utilisateurs</string>
           </property>
@@ -118,8 +124,14 @@
          <widget class="QGroupBox" name="groupBox">
           <property name="minimumSize">
            <size>
-            <width>100</width>
+            <width>0</width>
             <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>16777215</height>
            </size>
           </property>
           <property name="title">
@@ -129,29 +141,47 @@
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_2">
              <item>
-              <widget class="QPushButton" name="deleteUser">
+              <widget class="QPushButton" name="GESUSER_pushbutton_deleteUser">
                <property name="text">
-                <string>Supprimer utilisateur</string>
+                <string>Supprimer Utilisateur</string>
                </property>
               </widget>
              </item>
+             <item>
+              <widget class="QPushButton" name="GESUSER_pushButton_modify_user">
+               <property name="text">
+                <string>Modifier Utilisateur</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="Line" name="line">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="GESUSER_pushButton_add_user">
+               <property name="text">
+                <string>Ajout Utilisateur</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Orientation::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>1000</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
             </layout>
-           </item>
-           <item>
-            <widget class="QFrame" name="frame_2">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>600</height>
-              </size>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::Shape::StyledPanel</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Shadow::Raised</enum>
-             </property>
-            </widget>
            </item>
           </layout>
          </widget>
@@ -625,6 +655,9 @@
                  <item>
                   <widget class="QLineEdit" name="SORTIE_lineEdit_useremail">
                    <property name="text">
+                    <string/>
+                   </property>
+                   <property name="placeholderText">
                     <string>Email</string>
                    </property>
                   </widget>

@@ -44,6 +44,8 @@ private slots:
     //-----------Slots GESUSER-------------------
     void on_deleteUser_clicked();
     void on_GESUSER_pushButton_getuser_clicked();
+    void on_GESUSER_pushButton_add_user_clicked();
+    void on_GESUSER_pushbutton_deleteUser_clicked();
 
     //-----------Slots GESKIT-------------------
     void on_GESKIT_pushButton_addkit_clicked();
@@ -71,6 +73,8 @@ private slots:
     void on_SORTIE_listWidget_resa_kitsOfResa_itemClicked(QListWidgetItem *item);
     void on_SORTIE_popupSortirResa_pushSortir();//Callback called when "Sortir" button is pushed inside popup
     void on_SORTIE_popupSortirResa_pushAnnuler();
+
+
 
 
 private:
@@ -113,6 +117,7 @@ private:
     //-----------User-------------------
     void GESUSER_get_user_by_name(std::vector<Utilisateur *> *from_user, std::vector<Utilisateur *> *to_user, QString name);
     void GESUSER_get_user_by_utinfo(std::vector<Utilisateur *> *from_user, std::vector<Utilisateur *> *to_user, QString utinfo);
+    void GESUSER_add_new_user();
     void GESUSER_clear_display();
     void GESUSER_enable_GESUSER_buttons(bool i_enable);
     Kit* GESUSER_get_user_selected();
