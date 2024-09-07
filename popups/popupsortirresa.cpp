@@ -88,7 +88,6 @@ void PopupSortirResa::clean_kit(void)
     }
 }
 
-
 ///
 /// \brief PopupSortirResa::get_sel_item_from_QlistWidget
 /// \param i_QlistWidget: QlistWidget where user has selected an item
@@ -102,6 +101,22 @@ Item* PopupSortirResa::get_sel_item_from_QlistWidget(QListWidget * i_QlistWidget
     return p_item;
 }
 
+
+void PopupSortirResa::select_next_item_on_QlistWidget(QListWidget * i_QlistWidget, int i_currentRow)
+{
+    int len = i_QlistWidget->count();
+    int row = (i_currentRow + 1) % len;
+    i_QlistWidget->setCurrentRow(row, QItemSelectionModel::Select);
+}
+
+void PopupSortirResa::set_spin_box_qty_from_selected_item()
+{
+    // get selected item from source list
+    Item* p_itemsource = get_sel_item_from_QlistWidget(this->ui->listWidget_popupSortie_ItemSource, p_kit->item_list);
+
+
+    this->ui->spinBox_popupSortie_countItemVerif->setValue(p_itemsource->getQuantity());
+}
 
 Item * PopupSortirResa::get_item_from_id( std::vector<Item*> i_item_list,uint i_id  )
 {
@@ -143,7 +158,9 @@ void PopupSortirResa::refresh_source_item_list(void)
     brush_verified.setColor(Qt::GlobalColor::gray);
     brush_verified.setStyle(Qt::SolidPattern);
 
+    int row = this->ui->listWidget_popupSortie_ItemSource->currentRow();// Get current row before clearing
     this->ui->listWidget_popupSortie_ItemSource->clear();
+
 
     for(const auto& elem_item_new : p_kit->item_list)
     {
@@ -157,6 +174,9 @@ void PopupSortirResa::refresh_source_item_list(void)
             // do nothing
         }
     }
+    // increment selected line in widget
+    select_next_item_on_QlistWidget(this->ui->listWidget_popupSortie_ItemSource, row);
+    set_spin_box_qty_from_selected_item();
 }
 
 void PopupSortirResa::refresh_dest_item_list(void)
@@ -173,7 +193,6 @@ void PopupSortirResa::on_listWidget_popupSortie_ItemSource_itemDoubleClicked(QLi
 {
 
     Item* p_itemsource = get_sel_item_from_QlistWidget(this->ui->listWidget_popupSortie_ItemSource, p_kit->item_list);
-
     if (p_itemsource->getIs_verified())
     {
         //Do nothing if item is already verified
@@ -224,11 +243,7 @@ void PopupSortirResa::on_listWidget_popupSortie_ItemDest_itemDoubleClicked(QList
 ///
 void PopupSortirResa::on_listWidget_popupSortie_ItemSource_itemClicked(QListWidgetItem *item)
 {
-    // get selected item from source list
-    Item* p_itemsource = get_sel_item_from_QlistWidget(this->ui->listWidget_popupSortie_ItemSource, p_kit->item_list);
-
-
-    this->ui->spinBox_popupSortie_countItemVerif->setValue(p_itemsource->getQuantity());
+    set_spin_box_qty_from_selected_item();
 }
 
 void PopupSortirResa::on_pushButton_popupSortie_pushDest_clicked()

@@ -44,6 +44,8 @@ private:
     void GEN_raise_popup_warning(QString msg);
     void push_item_to_dest_list(int new_quantity);
     Item *get_item_from_id(std::vector<Item *> i_item_list, uint i_id);
+    void select_next_item_on_QlistWidget(QListWidget *i_QlistWidget, int i_currentRow);
+    void set_spin_box_qty_from_selected_item (void);
 };
 
 #endif // POPUPSORTIRRESA_H

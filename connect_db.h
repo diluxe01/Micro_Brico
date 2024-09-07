@@ -59,7 +59,6 @@ public:
     void select_items_by_kit (Kit * );
     void populate_item_list_from_query(Kit * kit, QSqlQuery query);
     void set_kit_booked_status(std::vector<Kit*> *i_kits, QDate i_date);
-    void set_kit_out_status(std::vector<Kit *> *i_kits, QDate i_date);
     //-----------Resa-------------------
     void select_all_resa(std::vector<Resa *> *i_resa);
     void select_resa_by_user(std::vector<Resa *> *o_resa, uint user_id);
@@ -70,12 +69,12 @@ public:
     void delete_resa(int i_resa_nb);
 
     //-----------Sortie-------------------
-    void select_all_sortie(std::vector<Sortie *> *i_sortie);
-    void insert_sortie(std::vector<Sortie *> *i_sortie);
-
+    void set_kit_out_status(std::vector<Kit *> *i_kits);
     void end_sortie();
     void start_sortie();
     uint32_t guess_next_sortie_nb();
+    void add_sortie_from_kit(Kit *i_p_kit, uint user_id, QDate i_start_date, int i_sortie_nb);
+    void select_all_sortie(std::vector<Sortie *> *i_sortie);
 public slots:
 signals:
     void log_value_changed(bool is_user_logged);

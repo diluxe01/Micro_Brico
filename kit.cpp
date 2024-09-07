@@ -181,6 +181,16 @@ void Kit::setTo_duplicate(bool newTo_duplicate)
     to_duplicate = newTo_duplicate;
 }
 
+int Kit::getId_user_out() const
+{
+    return id_user_out;
+}
+
+void Kit::setId_user_out(int newId_user_out)
+{
+    id_user_out = newId_user_out;
+}
+
 Kit::Kit(QObject *parent)
     : QObject{parent}
 {}

@@ -592,7 +592,6 @@ void Connect_db::populate_sortie_list_from_query(std::vector<Sortie *> *i_sortie
         QString start_date = query.value("start_date").toString();
         int id_kit = query.value("id_kit").toInt();
         int id_user = query.value("id_user").toInt();
-        int id_resa = query.value("id_resa").toInt();
         int id_sortie = query.value("id_sortie").toInt();
 
         qdate = QDate::fromString(start_date,"yyyy-MM-dd");
@@ -603,12 +602,19 @@ void Connect_db::populate_sortie_list_from_query(std::vector<Sortie *> *i_sortie
     }
 }
 
-void  Connect_db::set_kit_out_status (std::vector<Kit*> *i_kits, QDate i_date)
+///
+/// \brief Connect_db::set_kit_out_status
+///     Set parameters "isOut" of kits in i_kits list to true if given kit is currently out.
+///     Also sets parameter 'id_user_out" of kits to the id of the user currently having the kit out.
+/// \param i_kits
+/// \param i_user
+///
+void  Connect_db::set_kit_out_status (std::vector<Kit*> *i_kits)
 {
     std::vector<Sortie *> sortie_list;
     select_all_sortie(&sortie_list);
     bool is_out = false;
-
+    int id_user_out = 0;
     // Determine if id kit is in sortie table at given date. If so, set "is_out" var to true and break "for" loop.
     for(const auto& elem_kit : *i_kits)
     {
@@ -616,21 +622,22 @@ void  Connect_db::set_kit_out_status (std::vector<Kit*> *i_kits, QDate i_date)
         elem_kit->setIs_out(false);
         for(const auto& elem_sortie : sortie_list)
         {
-            if ((elem_kit->getIdKit() == elem_sortie->getId_kit())
-                &&(i_date == elem_sortie->getStart_date()))
+            if (elem_kit->getIdKit() == elem_sortie->getId_kit())
             {
                 is_out = true;
+                id_user_out = elem_sortie->getId_user();
                 break;
             }
         }
         elem_kit->setIs_out(is_out);
+        elem_kit->setId_user_out(id_user_out);
     }
 }
 
 void  Connect_db::start_sortie(void)
 {
     QSqlQuery query(this->db);
-    runQuery(query, "LOCK TABLES uid_sortie WRITE, sortie WRITE, utilisateur READ, kit READ");
+    runQuery(query, "LOCK TABLES uid_sortie WRITE, sortie WRITE,resa WRITE, utilisateur READ, kit READ");
 }
 
 // void  Connect_db::insert_sortie (Kit * i_kit )
@@ -657,4 +664,19 @@ uint32_t Connect_db::guess_next_sortie_nb(void)
     runQuery(query, "insert into uid_sortie (iduid_sortie) values  ("+QString::number(id)+")");
 
     return id;
+}
+
+
+void Connect_db::add_sortie_from_kit(Kit *i_p_kit, uint user_id, QDate i_start_date, int i_sortie_nb)
+{
+    QSqlQuery query(this->db);
+    QSqlQuery query2(this->db);
+
+    runQuery(query2,"insert into sortie (start_date, id_user, id_kit, id_sortie) values("
+                    "'"+i_start_date.toString("yyyy-MM-dd")+"', "
+                    "'"+QString::number(user_id)+"', "
+                    "'"+QString::number(i_p_kit->getIdKit())+"',"
+                    "'"+QString::number(i_sortie_nb)+"')");
+
+    qInfo()<< "Le Kit " << i_p_kit->getNom() <<" a été sorti avec succès. N° de sortie: " << QString::number(i_sortie_nb) ;
 }

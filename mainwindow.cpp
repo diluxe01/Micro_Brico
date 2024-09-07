@@ -445,7 +445,7 @@ void MainWindow::GESKIT_refresh_kit_list_from_server(std::vector<Kit*> *i_list)
     this->kitListBasket_view.clear();
     this->kitListGeskit_view.clear();
     this->kitListResa_view.clear();
-    this->kitListSortie_view.clear();
+    this->kitListSortie_kitsOfResaView.clear();
 
     this->ui->RESA_listWidget_panierResa->clear();
     this->ui->RESA_listWidget_resa->clear();
@@ -995,7 +995,7 @@ void MainWindow::RESA_refresh_kit_list_table(void)
     QBrush brush_free;
     QBrush brush_basket;
     // Define brush to display kit free in kit reservation list
-    brush_free.setColor(Qt::GlobalColor::green);
+    brush_free.setColor(Qt::GlobalColor::blue);
     brush_free.setStyle(Qt::SolidPattern);
     // Define brush to display kit booked in kit reservation list
     brush_booked.setColor(Qt::GlobalColor::gray);
@@ -1017,7 +1017,7 @@ void MainWindow::RESA_refresh_kit_list_table(void)
         }
         else
         {
-            p_item->setBackground(brush_free);
+            p_item->setForeground(brush_free);
         }
     }
 }
@@ -1055,7 +1055,7 @@ void MainWindow::RESA_refresh_basket_kit_list_table(void)
     brush_booked.setColor(Qt::GlobalColor::gray);
     brush_booked.setStyle(Qt::SolidPattern);
     // Define brush to display kit free in kit reservation list
-    brush_free.setColor(Qt::GlobalColor::green);
+    brush_free.setColor(Qt::GlobalColor::blue);
     brush_free.setStyle(Qt::SolidPattern);
     this->ui->RESA_listWidget_panierResa->clear();
     for(const auto& kit_elem : this->kitListBasket_view)
@@ -1068,7 +1068,7 @@ void MainWindow::RESA_refresh_basket_kit_list_table(void)
         }
         else
         {
-            p_item->setBackground(brush_free);
+            p_item->setForeground(brush_free);
         }
     }
 }
@@ -1257,6 +1257,7 @@ void MainWindow::on_SORTIE_pushButton_resa_showResa_clicked()
     bool has_errors = false;
 
     g_utils.clearList(&this->resaListSortie);
+
     // Populates "sortie_user" object with user informations if email is in database
     if (this->ui->SORTIE_lineEdit_useremail->text() != "")
     {
@@ -1267,27 +1268,83 @@ void MainWindow::on_SORTIE_pushButton_resa_showResa_clicked()
     SORTIE_refresh_current_resa_list_table();
 }
 
-
 void MainWindow::on_SORTIE_listWidget_resa_currentResa_itemClicked(QListWidgetItem *item)
 {
+    //Save last selected resa item
+    item_lastSelectedResa = item;
+
+    // get resa number from item
+    int resa_nb = this->RESA_find_resa_nb_selected(item);
+
+    SORTIE_refresh_kits_of_resa_table(resa_nb);
+
+}
+
+void MainWindow::SORTIE_refresh_kits_of_resa_table(int i_resa_nb)
+{
     Kit * p_kit;
-    int resa_nb = 0;
+    QBrush brush_out_by_sortie_user;
+    QBrush brush_out_by_someone_else;
+    QBrush brush_available;
+
+    brush_out_by_sortie_user.setColor(Qt::GlobalColor::green);
+    brush_out_by_sortie_user.setStyle(Qt::SolidPattern);
+
+    brush_out_by_someone_else.setColor(Qt::GlobalColor::red);
+    brush_out_by_someone_else.setStyle(Qt::SolidPattern);
+
+    brush_available.setColor(Qt::GlobalColor::blue);
+    brush_available.setStyle(Qt::SolidPattern);
+
     //clear kit list widget
     this->ui->SORTIE_listWidget_resa_kitsOfResa->clear();
     this->ui->SORTIE_pushButton_sortir->setEnabled(false); // Disable "sortir" to force user to select a kit
-    this->kitListSortie_view.clear();
-    resa_nb = this->RESA_find_resa_nb_selected(item);
-    if (resa_nb != -1)
+    this->kitListSortie_kitsOfResaView.clear();
+    if (i_resa_nb != -1)
     {
         //iter through resa list to find every reservation with resa_nb and get their associated kits
         for(const auto& resa_elem : this->resaListSortie)
         {
-            if (resa_elem->getId_resa() == resa_nb)
+            if (resa_elem->getId_resa() == i_resa_nb)
             {
-                p_kit = GESKIT_find_kit_by_id(resa_elem->getId_kit());
-                QListWidgetItem* p_item = new QListWidgetItem(p_kit->toString(), this->ui->SORTIE_listWidget_resa_kitsOfResa);
-                this->kitListSortie_view.push_back(p_kit);
+
+                    p_kit = GESKIT_find_kit_by_id(resa_elem->getId_kit());
+                    QListWidgetItem* p_item = new QListWidgetItem(p_kit->toString(), this->ui->SORTIE_listWidget_resa_kitsOfResa);
+                    this->kitListSortie_kitsOfResaView.push_back(p_kit);
             }
+        }
+
+
+        //refresh "isOut" and "id_user_out" parameters of kits inside "kitListSortie_kitsOfResaView"
+        g_connect_db.set_kit_out_status(&this->kitListSortie_kitsOfResaView);
+
+        //Set background color of every items in "SORTIE_listWidget_resa_kitsOfResa"
+        int cnt = 0;
+        QListWidgetItem* p_item2;
+        for(const auto& kit_elem : this->kitListSortie_kitsOfResaView)
+        {
+            // get corresponding item of listWidget
+            p_item2 = this->ui->SORTIE_listWidget_resa_kitsOfResa->item(cnt);
+            // Check if kit is already out
+            if (kit_elem->getIs_out() == true)
+            {
+                //If kit out by "sortie_user" set to green
+                if (kit_elem->getId_user_out() == this->sortie_user.getId())
+                {
+                    p_item2->setBackground(brush_out_by_sortie_user);
+                }
+                //If kit out by anybody else set to red
+                else
+                {
+                    p_item2->setBackground(brush_out_by_someone_else);
+                }
+            }
+            else
+            {
+                //If kit is available, set to blue
+                p_item2->setForeground(brush_available);
+            }
+            cnt++;
         }
     }
 }
@@ -1304,7 +1361,7 @@ Kit* MainWindow::SORTIE_get_kit_selected()
     //First get kit selected by user
     QList<QListWidgetItem*> items = this->ui->SORTIE_listWidget_resa_kitsOfResa->selectedItems();
     int row = this->ui->SORTIE_listWidget_resa_kitsOfResa->row(items.first());
-    Kit* p_kit = kitListSortie_view.at(row);
+    Kit* p_kit = kitListSortie_kitsOfResaView.at(row);
     g_connect_db.select_items_by_kit (p_kit); // get every items of this kit
     return p_kit;
 }
@@ -1333,11 +1390,12 @@ void MainWindow::SORTIE_refresh_current_resa_list_table(void)
 ///
 void MainWindow::on_SORTIE_pushButton_sortir_clicked()
 {
+    Kit * l_kit = SORTIE_get_kit_selected();
     this->p_popupSortirResa = new (PopupSortirResa);
     this->p_popupSortirResa->setUser(&this->sortie_user);
-    this->p_popupSortirResa->setP_kit(SORTIE_get_kit_selected());
+    this->p_popupSortirResa->setP_kit(l_kit);
     this->p_popupSortirResa->refresh_source_item_list();
-    this->p_popupSortirResa->setWindowTitle(SORTIE_get_kit_selected()->getNom());
+    this->p_popupSortirResa->setWindowTitle(l_kit->getNom());
     this->p_popupSortirResa->show();
     QObject::connect(this->p_popupSortirResa->getSortirButton(), &QPushButton::clicked, this, &MainWindow::on_SORTIE_popupSortirResa_pushSortir);
     QObject::connect(this->p_popupSortirResa->getAnnulerButton(), &QPushButton::clicked, this, &MainWindow::on_SORTIE_popupSortirResa_pushAnnuler);
@@ -1346,7 +1404,12 @@ void MainWindow::on_SORTIE_pushButton_sortir_clicked()
 void MainWindow::on_SORTIE_listWidget_resa_kitsOfResa_itemClicked(QListWidgetItem *item)
 {
 
-    this->ui->SORTIE_pushButton_sortir->setEnabled(true);
+    Kit * l_kit = SORTIE_get_kit_selected();
+    //if kit not out, then enable "sortir" button
+    if (l_kit->getIs_out() == false)
+    {
+        this->ui->SORTIE_pushButton_sortir->setEnabled(true);
+    }
 }
 
 ///
@@ -1357,10 +1420,8 @@ void MainWindow::on_SORTIE_popupSortirResa_pushSortir()
 
     if (this->p_popupSortirResa->checkIfOk() == true)
     {
-        this->SORTIE_refresh_current_resa_list_table();
-
         SORTIE_sortir_kit();
-
+        delete(this->p_popupSortirResa);
     }
 }
 
@@ -1370,22 +1431,28 @@ void MainWindow::SORTIE_sortir_kit()
     Utilisateur l_user;
     bool has_errors = false;
     QDate start_date;
-    start_date = this->ui->RESA_calendarWidget->selectedDate();
-    g_connect_db.update_items_quantity_of_kit (this->p_popupSortirResa->getP_kit(), this->p_popupSortirResa->item_list_dest);
-    g_connect_db.start_sortie();// Start of LOCK
+    Kit * p_kit = this->p_popupSortirResa->getP_kit();
+    has_errors = g_connect_db.get_user_by_mail(this->ui->SORTIE_lineEdit_useremail->text(), &l_user);
+    start_date = QDate::currentDate();
+
+    g_connect_db.update_items_quantity_of_kit (p_kit, this->p_popupSortirResa->item_list_dest);
+
+    // Start of LOCK
+    g_connect_db.start_sortie();
     sortie_nb = g_connect_db.guess_next_sortie_nb();
+    g_connect_db.add_sortie_from_kit(p_kit, l_user.getId(), start_date, sortie_nb);
+    // End of LOCK
+    g_connect_db.end_sortie();
 
-                //     g_connect_db.add_resa_from_kit(kit_elem, l_user.getId(), start_date, resa_nb );
-                //     kit_elem->setIs_in_basket(false);
-                //     kit_elem->setIs_booked(true);
 
-                // GEN_raise_popup_info("Votre réservation n° **"+QString::number(resa_nb)+"** est bien prise en compte.");
-                // this->ui->RESA_listWidget_panierResa->clear();
-                // this->kitListBasket_view.clear();
-                // RESA_refresh_kit_list_table();
-                // on_RESA_pushButton_resa_showResa_clicked();
+    p_kit->setIs_out(true);
+    GEN_raise_popup_info("Votre Sortie n° **"+QString::number(sortie_nb)+"** est bien prise en compte.");
 
-    g_connect_db.end_sortie();// End of LOCK
+    // Set item
+    this->ui->SORTIE_listWidget_resa_currentResa->setCurrentItem(this->item_lastSelectedResa);
+    on_SORTIE_listWidget_resa_currentResa_itemClicked(this->item_lastSelectedResa);
+
+
 }
 
 ///

@@ -27,7 +27,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="TAB_ges_user">
        <property name="enabled">
@@ -143,14 +143,14 @@
              <item>
               <widget class="QPushButton" name="GESUSER_pushbutton_deleteUser">
                <property name="text">
-                <string>Supprimer Utilisateur</string>
+                <string>NON IMP :Supprimer Utilisateur</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QPushButton" name="GESUSER_pushButton_modify_user">
                <property name="text">
-                <string>Modifier Utilisateur</string>
+                <string>NON IMP :Modifier Utilisateur</string>
                </property>
               </widget>
              </item>
@@ -706,7 +706,7 @@
                  <item>
                   <widget class="QListWidget" name="SORTIE_listWidget_resa_currentResa">
                    <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <string/>
                    </property>
                   </widget>
                  </item>
@@ -742,7 +742,7 @@
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_13">
               <item>
-               <widget class="QListWidget" name="SORTIE_listWidget_resa_kitsOfResa_2"/>
+               <widget class="QListWidget" name="SORTIE_listWidget_kitsOut"/>
               </item>
               <item>
                <widget class="QFrame" name="frame">

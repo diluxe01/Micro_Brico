@@ -31,6 +31,7 @@ private:
 
     //SORTIE related variables
     bool is_out;
+    int id_user_out;
 
 public:
     explicit Kit(QObject *parent = nullptr);
@@ -81,6 +82,9 @@ public:
     bool getTo_duplicate() const;
 
     void setTo_duplicate(bool newTo_duplicate);
+
+    int getId_user_out() const;
+    void setId_user_out(int newId_user_out);
 
 signals:
 };

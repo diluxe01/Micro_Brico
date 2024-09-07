@@ -42,7 +42,6 @@ private slots:
     void on_actionAfficher_les_logs_triggered();
 
     //-----------Slots GESUSER-------------------
-    void on_deleteUser_clicked();
     void on_GESUSER_pushButton_getuser_clicked();
     void on_GESUSER_pushButton_add_user_clicked();
     void on_GESUSER_pushbutton_deleteUser_clicked();
@@ -65,7 +64,6 @@ private slots:
     void on_RESA_pushButton_suppr_resa_clicked();
     void on_RESA_pushButton_reserver_clicked();
 
-
     //-----------Slots SORTIES-------------------
     void on_SORTIE_pushButton_resa_showResa_clicked();
     void on_SORTIE_listWidget_resa_currentResa_itemClicked(QListWidgetItem *item);
@@ -74,18 +72,16 @@ private slots:
     void on_SORTIE_popupSortirResa_pushSortir();//Callback called when "Sortir" button is pushed inside popup
     void on_SORTIE_popupSortirResa_pushAnnuler();
 
-
-
-
 private:
     Ui::MainWindow *ui;
     std::vector<Utilisateur*> userList;
     std::vector<Utilisateur*> userListView;
-    std::vector<Kit*> kitList; //List of kits only for "Gestion Kits" tab
+    std::vector<Kit*> kitList; //List of kits as a mirror of Kits in DB
     std::vector<Kit*> kitListGeskit_view; //List of kits to be displayed in "GESKIT_tableWidget_kit"
     std::vector<Kit*> kitListResa_view; //List of kits to be displayed in "RESA_listWidget_resa"
-    std::vector<Kit*> kitListSortie_view; //List of kits to be displayed in "SORTIE_listWidget_resa_kitsOfResa"
     std::vector<Kit*> kitListBasket_view; //List of kits to be displayed in "RESA_listWidget_panierResa"
+    std::vector<Kit*> kitListSortie_kitsOfResaView; //List of kits to be displayed in "SORTIE_listWidget_resa_kitsOfResa"
+    std::vector<Kit*> kitListSortie_kitsOutView; //List of kits to be displayed in "SORTIE_listWidget_kitsOut"
     std::vector<Resa*> resaList;
     std::vector<Resa*> resaListSortie;
 
@@ -98,6 +94,7 @@ private:
     Delete_user *p_popupDeleteUser;
     PoppupAddKit *p_popupAddKit;
     bool isBasketReadyToBook; //Variable remembering if the basket contains an already booked kit
+    QListWidgetItem * item_lastSelectedResa;//Variable remembering the last selected resa in sortie view
 
     void GEN_raise_popup_info(QString msg);
     void GEN_raise_popup_warning(QString msg);
@@ -120,7 +117,7 @@ private:
     void GESUSER_add_new_user();
     void GESUSER_clear_display();
     void GESUSER_enable_GESUSER_buttons(bool i_enable);
-    Kit* GESUSER_get_user_selected();
+    Utilisateur* GESUSER_get_user_selected();
     void GESUSER_refresh_user_list_from_server(std::vector<Utilisateur*> *i_list);
     void GESUSER_refresh_user_table();
     void GESUSER_push_back_new_user_on_table(Utilisateur *user, int row);
@@ -153,5 +150,6 @@ private:
     Kit *SORTIE_get_kit_selected();
     void SORTIE_refresh_current_resa_list_table();
     void SORTIE_sortir_kit();
+    void SORTIE_refresh_kits_of_resa_table(int i_resa_nb);
 };
 #endif // MAINWINDOW_H
