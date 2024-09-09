@@ -398,7 +398,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab">
+      <widget class="QWidget" name="TAB_RESA">
        <attribute name="title">
         <string>Gestion Réservation</string>
        </attribute>
@@ -626,7 +626,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_2">
+      <widget class="QWidget" name="TAB_SORTIE">
        <attribute name="title">
         <string>Gestion Sorties</string>
        </attribute>

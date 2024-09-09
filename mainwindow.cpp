@@ -156,8 +156,8 @@ void MainWindow::on_popupaddUser_destroyed()
 
 void MainWindow::on_popupaddUser_ok()
 {
-    qDebug() << "OK popup! ;)";
-    // this->p_popupAddUser->deleteInstance();
+    g_connect_db.add_user(&this->new_user);
+    this->p_popupAddUser->deleteInstance();
 }
 
 void MainWindow::on_actionNouvel_Utilisateur_triggered()
@@ -187,6 +187,8 @@ void MainWindow::on_popupLogin_ok()
     g_connect_db.connect_user();
 
     delete (this->p_loginConnect);
+
+    activateWidgets();
 }
 
 void MainWindow::on_actionSe_connecter_triggered()
@@ -276,9 +278,20 @@ void MainWindow::GESUSER_add_new_user()
     QObject::connect(this->p_popupAddUser->getOkButton(), &QDialogButtonBox::rejected, this, &MainWindow::on_popupaddUser_destroyed);
 }
 
-void MainWindow::activateWidgets(bool)
+void MainWindow::activateWidgets(void)
 {
-
+    bool do_enable = false;
+    if (login_user.getPrivilege() == E_basic)
+    {
+        do_enable = false;
+    }
+    else
+    {
+        do_enable = true;
+    }
+    this->ui->TAB_ges_user->setEnabled(do_enable);
+    this->ui->TAB_ges_kits->setEnabled(do_enable);
+    this->ui->TAB_SORTIE->setEnabled(do_enable);
 }
 
 void MainWindow::GESUSER_refresh_user_table(void)
@@ -617,6 +630,7 @@ Kit * MainWindow::GESKIT_find_kit_by_id(uint id)
         }
     }
 }
+
 
 // ^^^^^^ MAIN WINDOW "Gestion Kits" ^^^^^^
 //---------------------------------------------------------
@@ -1256,16 +1270,35 @@ void MainWindow::on_SORTIE_pushButton_resa_showResa_clicked()
 {
     bool has_errors = false;
 
-    g_utils.clearList(&this->resaListSortie);
+    //Delete every kits in "KitsOfResa" view
+    this->kitListSortie_kitsOfResaView.clear(); //do not delete pointed kits though
+    this->ui->SORTIE_listWidget_resa_kitsOfResa->clear();
+
+    //Delete every resa in "currentResa" view
+    g_utils.clearList(&this->resaListSortie_byUser);
+    this->ui->SORTIE_listWidget_resa_currentResa->clear();
+
+    //Delete every kits in "kitsOut" view
+    g_utils.clearList(&this->sortieList_byUser);
+    this->ui->SORTIE_listWidget_kitsOut->clear();
+
 
     // Populates "sortie_user" object with user informations if email is in database
     if (this->ui->SORTIE_lineEdit_useremail->text() != "")
     {
         has_errors = g_connect_db.get_user_by_mail(this->ui->SORTIE_lineEdit_useremail->text(), &this->sortie_user);
+        if (has_errors == false)
+        {
+            // Updates resa list
+            g_connect_db.select_resa_by_user(&this->resaListSortie_byUser, this->sortie_user.getId());
+            SORTIE_refresh_current_resa_list_table();
+
+            // Updates sortie list
+            g_connect_db.select_sortie_by_user(&this->sortieList_byUser, this->sortie_user.getId());
+            SORTIE_refresh_kitsOut_table();
+        }
     }
-    // Updates resa list
-    g_connect_db.select_resa_by_user(&this->resaListSortie, this->sortie_user.getId());
-    SORTIE_refresh_current_resa_list_table();
+
 }
 
 void MainWindow::on_SORTIE_listWidget_resa_currentResa_itemClicked(QListWidgetItem *item)
@@ -1303,7 +1336,7 @@ void MainWindow::SORTIE_refresh_kits_of_resa_table(int i_resa_nb)
     if (i_resa_nb != -1)
     {
         //iter through resa list to find every reservation with resa_nb and get their associated kits
-        for(const auto& resa_elem : this->resaListSortie)
+        for(const auto& resa_elem : this->resaListSortie_byUser)
         {
             if (resa_elem->getId_resa() == i_resa_nb)
             {
@@ -1349,6 +1382,18 @@ void MainWindow::SORTIE_refresh_kits_of_resa_table(int i_resa_nb)
     }
 }
 
+void MainWindow::SORTIE_refresh_kitsOut_table(void)
+{
+    Kit *p_kit;
+    this->ui->SORTIE_listWidget_kitsOut->clear();
+    for(const auto& sortie_elem : this->sortieList_byUser)
+    {
+        p_kit = GESKIT_find_kit_by_id(sortie_elem->getId_kit());
+        QListWidgetItem* p_item = new QListWidgetItem(QString::number(sortie_elem->getId_sortie())+" - " + p_kit->getNom()+" (code: " +p_kit->getCode() +")" , this->ui->SORTIE_listWidget_kitsOut);
+
+    }
+}
+
 
 ///
 /// \brief MainWindow::SORTIE_get_kit_selected
@@ -1371,7 +1416,7 @@ void MainWindow::SORTIE_refresh_current_resa_list_table(void)
     int prev_id_resa = 0;
 
     this->ui->SORTIE_listWidget_resa_currentResa->clear();
-    for(const auto& resa_elem : this->resaListSortie)
+    for(const auto& resa_elem : this->resaListSortie_byUser)
     {
         if (resa_elem->getId_resa() == prev_id_resa)
         {
@@ -1422,6 +1467,12 @@ void MainWindow::on_SORTIE_popupSortirResa_pushSortir()
     {
         SORTIE_sortir_kit();
         delete(this->p_popupSortirResa);
+
+
+        // Updates sortie list
+        g_utils.clearList(&this->sortieList_byUser);
+        g_connect_db.select_sortie_by_user(&this->sortieList_byUser, this->sortie_user.getId());
+        SORTIE_refresh_kitsOut_table();
     }
 }
 

@@ -11,6 +11,7 @@
 #include <list>
 
 #include "resa.h"
+#include "sortie.h"
 #include <QListWidgetItem>
 #include <QDate>
 
@@ -82,8 +83,9 @@ private:
     std::vector<Kit*> kitListBasket_view; //List of kits to be displayed in "RESA_listWidget_panierResa"
     std::vector<Kit*> kitListSortie_kitsOfResaView; //List of kits to be displayed in "SORTIE_listWidget_resa_kitsOfResa"
     std::vector<Kit*> kitListSortie_kitsOutView; //List of kits to be displayed in "SORTIE_listWidget_kitsOut"
-    std::vector<Resa*> resaList;
-    std::vector<Resa*> resaListSortie;
+    std::vector<Resa*> resaList; //List of reservation only for "RESA" view
+    std::vector<Resa*> resaListSortie_byUser; //List of reservation only for "SORTIE" view
+    std::vector<Sortie*> sortieList_byUser; //List of Sortie associated to the "sortie_user" (only for "SORTIE" view)
 
     Utilisateur new_user;
     Utilisateur login_user;
@@ -94,12 +96,12 @@ private:
     Delete_user *p_popupDeleteUser;
     PoppupAddKit *p_popupAddKit;
     bool isBasketReadyToBook; //Variable remembering if the basket contains an already booked kit
-    QListWidgetItem * item_lastSelectedResa;//Variable remembering the last selected resa in sortie view
+    QListWidgetItem * item_lastSelectedResa;//Variable remembering the last selected resa (only for "SORTIE" view)
 
     void GEN_raise_popup_info(QString msg);
     void GEN_raise_popup_warning(QString msg);
     void closeEvent (QCloseEvent *event);
-    void activateWidgets(bool);
+    void activateWidgets(void);
 
     //-----------popups-------------------
     void on_popupLogin_destroyed();
@@ -151,5 +153,6 @@ private:
     void SORTIE_refresh_current_resa_list_table();
     void SORTIE_sortir_kit();
     void SORTIE_refresh_kits_of_resa_table(int i_resa_nb);
+    void SORTIE_refresh_kitsOut_table();
 };
 #endif // MAINWINDOW_H

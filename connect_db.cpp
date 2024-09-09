@@ -575,6 +575,15 @@ void Connect_db::delete_resa(int i_resa_nb)
 
 
 
+void Connect_db::select_sortie_by_user(std::vector<Sortie *> *o_sortie, uint user_id)
+{
+
+    QSqlQuery query(this->db);
+    runQuery(query, "SELECT * from sortie WHERE id_user="+QString::number(user_id));
+
+    populate_sortie_list_from_query(o_sortie, query);
+}
+
 void  Connect_db::select_all_sortie (std::vector<Sortie *> *i_sortie)
 {
     QSqlQuery query(this->db);

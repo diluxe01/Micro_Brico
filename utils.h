@@ -4,6 +4,7 @@
 #include "kit.h"
 #include "utilisateur.h"
 #include "resa.h"
+#include "sortie.h"
 #include <vector>
 
 class Utils
@@ -14,6 +15,7 @@ public:
     void clearList(std::vector<Kit*> *);
     void clearList(std::vector<Utilisateur*> *);
     void clearList(std::vector<Resa*> *);
+    void clearList(std::vector<Sortie*> *);
 };
 
 extern  Utils g_utils;
