@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Set active user in g_db_connect
     g_connect_db.setActiveUser(&(this->login_user));
-
+    this->setWindowTitle("Micro Brico Resa");
 
     //Init default buttons status
     this->GESKIT_enable_geskit_buttons(false);
@@ -1396,12 +1396,12 @@ void MainWindow::SORTIE_refresh_kitsOut_table(void)
 
 
 ///
-/// \brief MainWindow::SORTIE_get_kit_selected
+/// \brief MainWindow::SORTIE_get_kitOfResa_selected
 ///     Function returning a pointer to the kit selected inside "SORTIE_listWidget_resa_kitsOfResa" widget
 ///     It also populates the item associated to the kit
 /// \return
 ///
-Kit* MainWindow::SORTIE_get_kit_selected()
+Kit* MainWindow::SORTIE_get_kitOfResa_selected()
 {
     //First get kit selected by user
     QList<QListWidgetItem*> items = this->ui->SORTIE_listWidget_resa_kitsOfResa->selectedItems();
@@ -1410,6 +1410,24 @@ Kit* MainWindow::SORTIE_get_kit_selected()
     g_connect_db.select_items_by_kit (p_kit); // get every items of this kit
     return p_kit;
 }
+
+///
+/// \brief MainWindow::SORTIE_get_kitOut_selected
+///     Function returning a pointer to the kit selected inside "SORTIE_listWidget_kitsOut" widget
+///     It also populates the item associated to the kit
+/// \return
+///
+Kit* MainWindow::SORTIE_get_kitOut_selected()
+{
+    //First get kit selected by user
+    QList<QListWidgetItem*> items = this->ui->SORTIE_listWidget_kitsOut->selectedItems();
+    int row = this->ui->SORTIE_listWidget_kitsOut->row(items.first());
+    Sortie* p_sortie = sortieList_byUser.at(row);
+    Kit * p_kit = GESKIT_find_kit_by_id(p_sortie->getId_kit());
+    g_connect_db.select_items_by_kit (p_kit); // get every items of this kit
+    return p_kit;
+}
+
 
 void MainWindow::SORTIE_refresh_current_resa_list_table(void)
 {
@@ -1430,32 +1448,33 @@ void MainWindow::SORTIE_refresh_current_resa_list_table(void)
     }
 }
 
-///
-/// \brief MainWindow::on_SORTIE_pushButton_sortir_clicked: Function called when "Sortir" Button is called inside main window
-///
-void MainWindow::on_SORTIE_pushButton_sortir_clicked()
-{
-    Kit * l_kit = SORTIE_get_kit_selected();
-    this->p_popupSortirResa = new (PopupSortirResa);
-    this->p_popupSortirResa->setUser(&this->sortie_user);
-    this->p_popupSortirResa->setP_kit(l_kit);
-    this->p_popupSortirResa->refresh_source_item_list();
-    this->p_popupSortirResa->setWindowTitle(l_kit->getNom());
-    this->p_popupSortirResa->show();
-    QObject::connect(this->p_popupSortirResa->getSortirButton(), &QPushButton::clicked, this, &MainWindow::on_SORTIE_popupSortirResa_pushSortir);
-    QObject::connect(this->p_popupSortirResa->getAnnulerButton(), &QPushButton::clicked, this, &MainWindow::on_SORTIE_popupSortirResa_pushAnnuler);
-}
-
 void MainWindow::on_SORTIE_listWidget_resa_kitsOfResa_itemClicked(QListWidgetItem *item)
 {
 
-    Kit * l_kit = SORTIE_get_kit_selected();
+    Kit * l_kit = SORTIE_get_kitOfResa_selected();
     //if kit not out, then enable "sortir" button
     if (l_kit->getIs_out() == false)
     {
         this->ui->SORTIE_pushButton_sortir->setEnabled(true);
     }
 }
+///
+/// \brief MainWindow::on_SORTIE_pushButton_sortir_clicked: Function called when "Sortir" Button is called inside main window
+///
+void MainWindow::on_SORTIE_pushButton_sortir_clicked()
+{
+    Kit * l_kit = SORTIE_get_kitOfResa_selected();
+    this->p_popupSortirResa = new (PopupSortirResa);
+    this->p_popupSortirResa->setUser(&this->sortie_user);
+    this->p_popupSortirResa->setP_kit(l_kit);
+    this->p_popupSortirResa->refresh_source_item_list();
+    this->p_popupSortirResa->setWindowTitle(l_kit->getNom());
+    this->p_popupSortirResa->setButtonText("Sortir");
+    this->p_popupSortirResa->show();
+    QObject::connect(this->p_popupSortirResa->getSortirButton(), &QPushButton::clicked, this, &MainWindow::on_SORTIE_popupSortirResa_pushSortir);
+    QObject::connect(this->p_popupSortirResa->getAnnulerButton(), &QPushButton::clicked, this, &MainWindow::on_SORTIE_popupSortirResa_pushAnnuler);
+}
+
 
 ///
 /// \brief MainWindow::on_SORTIE_popupSortirResa_pushSortir : Callback called when "Sortir" button is pushed inside popup
@@ -1507,6 +1526,58 @@ void MainWindow::SORTIE_sortir_kit()
 }
 
 ///
+/// \brief MainWindow::on_pushButton_restituerKit_clicked: Function called when "Restituer" Button is called inside main window
+///
+void MainWindow::on_pushButton_restituerKit_clicked()
+{
+    Kit * l_kit = SORTIE_get_kitOut_selected();
+    this->p_popupSortirResa = new (PopupSortirResa);
+    this->p_popupSortirResa->setUser(&this->sortie_user);
+    this->p_popupSortirResa->setP_kit(l_kit);
+    this->p_popupSortirResa->refresh_source_item_list();
+    this->p_popupSortirResa->setWindowTitle(l_kit->getNom());
+    this->p_popupSortirResa->setButtonText("Restituer");
+    this->p_popupSortirResa->show();
+    QObject::connect(this->p_popupSortirResa->getSortirButton(), &QPushButton::clicked, this, &MainWindow::on_SORTIE_popupSortirResa_pushRestituer);
+    QObject::connect(this->p_popupSortirResa->getAnnulerButton(), &QPushButton::clicked, this, &MainWindow::on_SORTIE_popupSortirResa_pushAnnuler);
+}
+
+///
+/// \brief MainWindow::on_SORTIE_popupSortirResa_pushRestituer : Callback called when "Restituer" button is pushed inside popup
+/////
+void MainWindow::on_SORTIE_popupSortirResa_pushRestituer()
+{
+
+    if (this->p_popupSortirResa->checkIfOk() == true)
+    {
+        SORTIE_restit_kit();
+        delete(this->p_popupSortirResa);
+
+
+        // Updates sortie list
+        g_utils.clearList(&this->sortieList_byUser);
+        g_connect_db.select_sortie_by_user(&this->sortieList_byUser, this->sortie_user.getId());
+        SORTIE_refresh_kitsOut_table();
+    }
+}
+
+
+void MainWindow::SORTIE_restit_kit()
+{
+    Kit * p_kit = this->p_popupSortirResa->getP_kit();
+
+    g_connect_db.update_items_quantity_of_kit (p_kit, this->p_popupSortirResa->item_list_dest);
+
+    //Supprimer la sortie dans la table de reservation
+    g_connect_db.delete_sortie_from_kit(p_kit);
+
+    p_kit->setIs_out(false);
+    GEN_raise_popup_info("Vous avez restitué le kit : "+ p_kit->getNom());
+
+}
+
+
+///
 /// \brief MainWindow::on_SORTIE_popupSortirResa_pushAnnuler: : Callback called when "Annuler" button is pushed inside popup
 ///
 void MainWindow::on_SORTIE_popupSortirResa_pushAnnuler()
@@ -1515,5 +1586,7 @@ void MainWindow::on_SORTIE_popupSortirResa_pushAnnuler()
 }
 // ^^^^^^ MAIN WINDOW "Gestion SORTIES" ^^^^^^
 //---------------------------------------------------------
+
+
 
 

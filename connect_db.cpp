@@ -646,7 +646,7 @@ void  Connect_db::set_kit_out_status (std::vector<Kit*> *i_kits)
 void  Connect_db::start_sortie(void)
 {
     QSqlQuery query(this->db);
-    runQuery(query, "LOCK TABLES uid_sortie WRITE, sortie WRITE,resa WRITE, utilisateur READ, kit READ");
+    runQuery(query, "LOCK TABLES uid_sortie WRITE, sortie WRITE, utilisateur READ, kit READ");
 }
 
 // void  Connect_db::insert_sortie (Kit * i_kit )
@@ -678,7 +678,6 @@ uint32_t Connect_db::guess_next_sortie_nb(void)
 
 void Connect_db::add_sortie_from_kit(Kit *i_p_kit, uint user_id, QDate i_start_date, int i_sortie_nb)
 {
-    QSqlQuery query(this->db);
     QSqlQuery query2(this->db);
 
     runQuery(query2,"insert into sortie (start_date, id_user, id_kit, id_sortie) values("
@@ -688,4 +687,13 @@ void Connect_db::add_sortie_from_kit(Kit *i_p_kit, uint user_id, QDate i_start_d
                     "'"+QString::number(i_sortie_nb)+"')");
 
     qInfo()<< "Le Kit " << i_p_kit->getNom() <<" a été sorti avec succès. N° de sortie: " << QString::number(i_sortie_nb) ;
+}
+
+
+void Connect_db::delete_sortie_from_kit(Kit *i_p_kit)
+{
+    QSqlQuery query(this->db);
+    runQuery(query, "DELETE from sortie where id_kit = "+ QString::number(i_p_kit->getIdKit()));
+
+    qInfo()<< "Le Kit " << i_p_kit->getNom() <<" a été restitué avec succès.";
 }

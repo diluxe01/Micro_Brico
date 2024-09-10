@@ -72,6 +72,8 @@ private slots:
     void on_SORTIE_listWidget_resa_kitsOfResa_itemClicked(QListWidgetItem *item);
     void on_SORTIE_popupSortirResa_pushSortir();//Callback called when "Sortir" button is pushed inside popup
     void on_SORTIE_popupSortirResa_pushAnnuler();
+    void on_SORTIE_popupSortirResa_pushRestituer();//Callback called when "Restituer" button is pushed inside popup
+    void on_pushButton_restituerKit_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -149,10 +151,12 @@ private:
 
 
     //-----------Sorties-------------------
-    Kit *SORTIE_get_kit_selected();
+    Kit *SORTIE_get_kitOfResa_selected();
+    Kit *SORTIE_get_kitOut_selected();
     void SORTIE_refresh_current_resa_list_table();
     void SORTIE_sortir_kit();
     void SORTIE_refresh_kits_of_resa_table(int i_resa_nb);
     void SORTIE_refresh_kitsOut_table();
+    void SORTIE_restit_kit();
 };
 #endif // MAINWINDOW_H

@@ -261,3 +261,9 @@ void PopupSortirResa::on_pushButton_popupSortie_pushDest_clicked()
     }
 }
 
+void PopupSortirResa::setButtonText(const QString &newButtonText)
+{
+    buttonText = newButtonText;
+    this->ui->pushButton_sortir->setText(buttonText);
+}
+

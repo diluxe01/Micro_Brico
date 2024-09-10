@@ -76,6 +76,7 @@ public:
     void add_sortie_from_kit(Kit *i_p_kit, uint user_id, QDate i_start_date, int i_sortie_nb);
     void select_all_sortie(std::vector<Sortie *> *i_sortie);
     void select_sortie_by_user(std::vector<Sortie *> *o_sortie, uint user_id);
+    void delete_sortie_from_kit(Kit *i_p_kit);
 public slots:
 signals:
     void log_value_changed(bool is_user_logged);

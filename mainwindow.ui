@@ -700,7 +700,7 @@
               <item>
                <widget class="QGroupBox" name="groupBox_14">
                 <property name="title">
-                 <string>Vos reservations</string>
+                 <string>Vos réservations</string>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_14">
                  <item>
@@ -742,9 +742,6 @@
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_13">
               <item>
-               <widget class="QListWidget" name="SORTIE_listWidget_kitsOut"/>
-              </item>
-              <item>
                <widget class="QFrame" name="frame">
                 <property name="frameShape">
                  <enum>QFrame::Shape::StyledPanel</enum>
@@ -752,7 +749,10 @@
                 <property name="frameShadow">
                  <enum>QFrame::Shadow::Raised</enum>
                 </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_16">
+                <layout class="QVBoxLayout" name="verticalLayout_17">
+                 <item>
+                  <widget class="QListWidget" name="SORTIE_listWidget_kitsOut"/>
+                 </item>
                  <item>
                   <widget class="QPushButton" name="pushButton_restituerKit">
                    <property name="text">
