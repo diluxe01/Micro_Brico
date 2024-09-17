@@ -32,6 +32,7 @@ public:
     void clean_kit();
     void setButtonText(const QString &newButtonText);
 
+    void closeEvent(QCloseEvent *event);
 private slots:
     void on_listWidget_popupSortie_ItemSource_itemDoubleClicked(QListWidgetItem *item);
     void on_listWidget_popupSortie_ItemDest_itemDoubleClicked(QListWidgetItem *item);
@@ -49,6 +50,8 @@ private:
     Item *get_item_from_id(std::vector<Item *> i_item_list, uint i_id);
     void select_next_item_on_QlistWidget(QListWidget *i_QlistWidget, int i_currentRow);
     void set_spin_box_qty_from_selected_item (void);
+signals:
+    void delete_popup(void);
 };
 
 #endif // POPUPSORTIRRESA_H

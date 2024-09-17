@@ -40,7 +40,7 @@ public:
     Connect_db();
     //-----------User-------------------
     void select_all_users(std::vector<Utilisateur*> *list);
-    void add_user (Utilisateur *user);
+    bool add_user (Utilisateur *user);
     void setActiveUser(Utilisateur * p_user);
     bool delete_user(Utilisateur *user_to_delete);
     bool connect_user();

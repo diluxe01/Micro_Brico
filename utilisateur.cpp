@@ -21,13 +21,14 @@ Utilisateur::Utilisateur( QString nom, QString mdp, QString prenom, QString emai
     this->is_logged_on = false;
 }
 
-void Utilisateur::setUserData( QString nom, QString mdp, QString prenom, QString email, QString utinfo)
+void Utilisateur::setUserData( QString nom, QString mdp, QString prenom, QString email, QString utinfo, T_user_privilege newPrivilege)
 {
     this->nom = nom;
     this->mdp = mdp;
     this->prenom = prenom;
     this->email = email;
     this->utinfo = utinfo;
+    this->privilege = newPrivilege;
 }
 
 QString Utilisateur::getNom(void)

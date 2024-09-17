@@ -15,7 +15,7 @@ public:
     Utilisateur();
     Utilisateur(QString nom, QString mdp, QString prenom, QString email, QString utinfo);
     QString ToString();
-    void setUserData( QString nom, QString mdp, QString prenom, QString email, QString utinfo);
+    void setUserData( QString nom, QString mdp, QString prenom, QString email, QString utinfo, T_user_privilege newPrivilege);
     QString getNom(void);
     QString getMdp(void);
     QString getPrenom() const;

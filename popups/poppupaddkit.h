@@ -24,6 +24,8 @@ public:
     Kit *get_kit_from_form();
     void set_form_from_kit(Kit *);
 
+    void closeEvent(QCloseEvent *event);
+
 private slots:
     void on_pushButton_addobject_clicked();
 
@@ -35,6 +37,8 @@ private:
     Kit * kit;
     void push_back_new_item_on_tabWidget(Item *item);
     void GEN_raise_popup_warning(QString msg);
+signals:
+    void delete_popup(void);
 };
 
 #endif // POPPUPADDKIT_H

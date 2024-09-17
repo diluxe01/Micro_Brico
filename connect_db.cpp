@@ -44,11 +44,26 @@ bool Connect_db::get_querry_errors(QSqlQuery &query)
     return false;
 }
 
-void Connect_db::add_user (Utilisateur *user)  {
+///
+/// \brief Connect_db::add_user
+/// \param user
+/// \return true if an error occured, false otherwise
+///
+bool Connect_db::add_user (Utilisateur *user)  {
     QSqlQuery query  = QSqlQuery(this->db);
-    runQuery(query, "insert into utilisateur "
-               "( nom, mdp, prenom, email, token, utinfo)"
-               " values('"+user->getNom()+"','"+user->getMdp()+"','"+user->getPrenom()+"','"+user->getEmail()+"','"+user->getToken()+"','"+user->getUtinfo()+"')");
+    QString l_privilege;
+    if (user->getPrivilege() == E_admin)
+    {
+        l_privilege = "admin";
+    }
+    else
+    {
+        l_privilege = "user";
+    }
+
+    return runQuery(query, "insert into utilisateur "
+               "( nom, mdp, prenom, email, token, utinfo, privilege)"
+               " values('"+user->getNom()+"','"+user->getMdp()+"','"+user->getPrenom()+"','"+user->getEmail()+"','"+user->getToken()+"','"+user->getUtinfo()+"','"+l_privilege+"')");
 }
 ///
 /// \brief Connect_db::add_item adds item to database,

@@ -56,3 +56,9 @@ CREATE TABLE `db_dev`.`sortie` (
   `iduid_sortie` INT NOT NULL,
   PRIMARY KEY (`iduid_sortie`),
   UNIQUE INDEX `iduid_sortie_UNIQUE` (`iduid_sortie` ASC) VISIBLE);
+
+
+-- changeset adrie:1716202953457-17 comment:set utinfo in utilisateur table to "unique" attribute
+ALTER TABLE `db_dev`.`utilisateur` 
+ADD UNIQUE INDEX `utinfo_UNIQUE` (`utinfo` ASC) VISIBLE;
+;

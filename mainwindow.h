@@ -89,7 +89,6 @@ private:
     std::vector<Resa*> resaListSortie_byUser; //List of reservation only for "SORTIE" view
     std::vector<Sortie*> sortieList_byUser; //List of Sortie associated to the "sortie_user" (only for "SORTIE" view)
 
-    Utilisateur new_user;
     Utilisateur login_user;
     Utilisateur sortie_user; //User that takes a kit out
     popupAddUsers *p_popupAddUser;

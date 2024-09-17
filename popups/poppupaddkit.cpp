@@ -19,6 +19,11 @@ PoppupAddKit::PoppupAddKit(QWidget *parent)
     this->kit = new Kit();
 }
 
+void PoppupAddKit::closeEvent( QCloseEvent* event )
+{
+    emit delete_popup();
+    // event->accept();
+}
 PoppupAddKit::~PoppupAddKit()
 {
     delete ui;

@@ -16,6 +16,8 @@
 
 
 #define DAY_OF_RESA 5
+static QString VERSION = "1.0";
+
 QPointer<LogBrowser> logBrowser;
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
@@ -32,7 +34,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Set active user in g_db_connect
     g_connect_db.setActiveUser(&(this->login_user));
-    this->setWindowTitle("Micro Brico Resa");
+    this->setWindowTitle("Micro Brico Resa (v"+VERSION+")");
 
     //Init default buttons status
     this->GESKIT_enable_geskit_buttons(false);
@@ -151,13 +153,36 @@ void MainWindow::GEN_raise_popup_warning(QString msg)
 void MainWindow::on_popupaddUser_destroyed()
 {
     qDebug() << "destroyed popup! ;)";
-    this->p_popupAddUser->deleteInstance();
+    delete (p_popupAddUser);
+    this->setEnabled(true);
+
+
 }
 
 void MainWindow::on_popupaddUser_ok()
 {
-    g_connect_db.add_user(&this->new_user);
-    this->p_popupAddUser->deleteInstance();
+    Utilisateur *p_user;
+    p_user = this->p_popupAddUser->get_user_from_form();
+
+    if (p_user ==NULL)
+    {
+
+    }
+    else
+    {
+        if (g_connect_db.add_user(p_user) == false)// no errors occured
+        {
+            GEN_raise_popup_info("Nouvel utilisateur '"+p_user->getNom() + "' correctement ajouté!");
+            delete (p_popupAddUser);
+            this->setEnabled(true);
+            this->GESUSER_refresh_user_list_from_server(&this->userList);
+        }
+        else
+        {
+            GEN_raise_popup_info("Une erreur est survenue lors de l'ajout de l'utilisateur.");
+        }
+
+    }
 }
 
 void MainWindow::on_actionNouvel_Utilisateur_triggered()
@@ -264,8 +289,7 @@ void MainWindow::GESUSER_get_user_by_utinfo(std::vector<Utilisateur*> *from_user
 void MainWindow::GESUSER_add_new_user()
 {
     T_user_privilege l_privilege_of_connected_user = E_basic;
-    this->p_popupAddUser = popupAddUsers::GetInstance();
-    this->p_popupAddUser->setUser(&(this->new_user));
+    this->p_popupAddUser = new popupAddUsers;
     // check if a user is connected when creating a new account, and if so, get its privilege
     if (this->login_user.getIs_logged_on())
     {
@@ -274,8 +298,10 @@ void MainWindow::GESUSER_add_new_user()
     this->p_popupAddUser->setCaller_privilege(l_privilege_of_connected_user);
     this->p_popupAddUser->setWindowTitle("Ajout d'un nouvel utilisateur");
     this->p_popupAddUser->show_wrapper();
-    QObject::connect(this->p_popupAddUser->getOkButton(), &QDialogButtonBox::accepted, this, &MainWindow::on_popupaddUser_ok);
-    QObject::connect(this->p_popupAddUser->getOkButton(), &QDialogButtonBox::rejected, this, &MainWindow::on_popupaddUser_destroyed);
+    this->setEnabled(false);
+    QObject::connect(this->p_popupAddUser->getOkButton(), &QPushButton::clicked, this, &MainWindow::on_popupaddUser_ok);
+    QObject::connect(this->p_popupAddUser->getCancelButton(), &QPushButton::clicked, this, &MainWindow::on_popupaddUser_destroyed);
+    QObject::connect(this->p_popupAddUser, &popupAddUsers::delete_popup, this, &MainWindow::on_popupaddUser_destroyed);
 }
 
 void MainWindow::activateWidgets(void)
@@ -777,15 +803,18 @@ void MainWindow::on_GESKIT_pushButton_addkit_clicked()
     this->p_popupAddKit = new (PoppupAddKit);
     this->p_popupAddKit->setWindowTitle("Ajout d'un nouveau Kit");
     this->p_popupAddKit->show();
+    this->setEnabled(false);//disable mainWindow
     QObject::connect(this->p_popupAddKit->getOkButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_ok);
     QObject::connect(this->p_popupAddKit->getCancelButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_destroyed);
+    QObject::connect(this->p_popupAddKit, &PoppupAddKit::delete_popup, this, &MainWindow::on_popupAddKit_destroyed);
 }
 
 
 void MainWindow::on_popupAddKit_destroyed()
 {
-    this->p_popupAddKit->close();
+    // this->p_popupAddKit->close();
     delete (this->p_popupAddKit);
+    this->setEnabled(true);//enable mainWindow
 }
 
 void MainWindow::on_popupAddKit_ok()
@@ -802,6 +831,7 @@ void MainWindow::on_popupAddKit_ok()
     {
         g_connect_db.add_kit(p_kit);
         this->p_popupAddKit->close();
+        this->setEnabled(true);//enable mainWindow
         delete (this->p_popupAddKit);
         /* refresh the kit list by cleaning and loading it again */
         this->GESKIT_refresh_kit_list_from_server(&this->kitList);
@@ -813,6 +843,7 @@ void MainWindow::on_popupAddKit_ok()
     {
         g_connect_db.update_kit(p_kit);
         this->p_popupAddKit->close();
+        this->setEnabled(true);//enable mainWindow
         delete (this->p_popupAddKit);
         /* refresh the kit list by cleaning and loading it again */
         this->GESKIT_refresh_kit_list_from_server(&this->kitList);
@@ -844,8 +875,10 @@ void MainWindow::on_GESKIT_pushButton_duplicate_kit_clicked()
     this->p_popupAddKit->set_form_from_kit(p_kit);
     this->p_popupAddKit->setWindowTitle("Duplication du kit : "+ p_kit->getNom());
     this->p_popupAddKit->show();
+    this->setEnabled(false);//disable mainWindow
     QObject::connect(this->p_popupAddKit->getOkButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_ok);
     QObject::connect(this->p_popupAddKit->getCancelButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_destroyed);
+    QObject::connect(this->p_popupAddKit, &PoppupAddKit::delete_popup, this, &MainWindow::on_popupAddKit_destroyed);
 }
 
 void MainWindow::on_GESKIT_pushButton_modify_kit_clicked()
@@ -859,8 +892,10 @@ void MainWindow::on_GESKIT_pushButton_modify_kit_clicked()
     this->p_popupAddKit->set_form_from_kit(p_kit);
     this->p_popupAddKit->setWindowTitle("Modification du kit : "+ p_kit->getNom());
     this->p_popupAddKit->show();
+    this->setEnabled(false);//disable mainWindow
     QObject::connect(this->p_popupAddKit->getOkButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_ok);
     QObject::connect(this->p_popupAddKit->getCancelButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_destroyed);
+    QObject::connect(this->p_popupAddKit, &PoppupAddKit::delete_popup, this, &MainWindow::on_popupAddKit_destroyed);
 
 }
 
@@ -1457,6 +1492,10 @@ void MainWindow::on_SORTIE_listWidget_resa_kitsOfResa_itemClicked(QListWidgetIte
     {
         this->ui->SORTIE_pushButton_sortir->setEnabled(true);
     }
+    else
+    {
+        this->ui->SORTIE_pushButton_sortir->setEnabled(false);
+    }
 }
 ///
 /// \brief MainWindow::on_SORTIE_pushButton_sortir_clicked: Function called when "Sortir" Button is called inside main window
@@ -1471,8 +1510,10 @@ void MainWindow::on_SORTIE_pushButton_sortir_clicked()
     this->p_popupSortirResa->setWindowTitle(l_kit->getNom());
     this->p_popupSortirResa->setButtonText("Sortir");
     this->p_popupSortirResa->show();
+    this->setEnabled(false);//disable mainWindow
     QObject::connect(this->p_popupSortirResa->getSortirButton(), &QPushButton::clicked, this, &MainWindow::on_SORTIE_popupSortirResa_pushSortir);
     QObject::connect(this->p_popupSortirResa->getAnnulerButton(), &QPushButton::clicked, this, &MainWindow::on_SORTIE_popupSortirResa_pushAnnuler);
+    QObject::connect(this->p_popupSortirResa, &PopupSortirResa::delete_popup, this, &MainWindow::on_SORTIE_popupSortirResa_pushAnnuler);
 }
 
 
@@ -1487,6 +1528,7 @@ void MainWindow::on_SORTIE_popupSortirResa_pushSortir()
         SORTIE_sortir_kit();
         delete(this->p_popupSortirResa);
 
+        this->setEnabled(true);//enable mainWindow
 
         // Updates sortie list
         g_utils.clearList(&this->sortieList_byUser);
@@ -1538,8 +1580,10 @@ void MainWindow::on_pushButton_restituerKit_clicked()
     this->p_popupSortirResa->setWindowTitle(l_kit->getNom());
     this->p_popupSortirResa->setButtonText("Restituer");
     this->p_popupSortirResa->show();
+    this->setEnabled(false);//disable mainWindow
     QObject::connect(this->p_popupSortirResa->getSortirButton(), &QPushButton::clicked, this, &MainWindow::on_SORTIE_popupSortirResa_pushRestituer);
     QObject::connect(this->p_popupSortirResa->getAnnulerButton(), &QPushButton::clicked, this, &MainWindow::on_SORTIE_popupSortirResa_pushAnnuler);
+    QObject::connect(this->p_popupSortirResa, &PopupSortirResa::delete_popup, this, &MainWindow::on_SORTIE_popupSortirResa_pushAnnuler);
 }
 
 ///
@@ -1553,6 +1597,7 @@ void MainWindow::on_SORTIE_popupSortirResa_pushRestituer()
         SORTIE_restit_kit();
         delete(this->p_popupSortirResa);
 
+        this->setEnabled(true);//enable mainWindow
 
         // Updates sortie list
         g_utils.clearList(&this->sortieList_byUser);
@@ -1583,6 +1628,7 @@ void MainWindow::SORTIE_restit_kit()
 void MainWindow::on_SORTIE_popupSortirResa_pushAnnuler()
 {
     delete this->p_popupSortirResa;
+    this->setEnabled(true);//enable mainWindow
 }
 // ^^^^^^ MAIN WINDOW "Gestion SORTIES" ^^^^^^
 //---------------------------------------------------------

@@ -9,7 +9,6 @@ PopupSortirResa::PopupSortirResa(QWidget *parent)
     , ui(new Ui::PopupSortirResa)
 {
     ui->setupUi(this);
-
 }
 
 PopupSortirResa::~PopupSortirResa()
@@ -18,7 +17,11 @@ PopupSortirResa::~PopupSortirResa()
     delete ui;
 }
 
-
+void PopupSortirResa::closeEvent( QCloseEvent* event )
+{
+    emit delete_popup();
+    // event->accept();
+}
 
 void PopupSortirResa::GEN_raise_popup_warning(QString msg)
 {
