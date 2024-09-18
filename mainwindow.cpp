@@ -79,17 +79,19 @@ MainWindow::MainWindow(QWidget *parent)
     // Init of items display table
     header_list.clear();
     ui->GESKIT_tableWidget_item->setRowCount(0);
-    ui->GESKIT_tableWidget_item->setColumnCount(2);
+    ui->GESKIT_tableWidget_item->setColumnCount(3);
     header_list.append("Nom");
-    header_list.append("Quantité");
+    header_list.append("Quantité originale");
+    header_list.append("Quantité actuelle");
     ui->GESKIT_tableWidget_item->setHorizontalHeaderLabels(header_list);
-    ui->GESKIT_tableWidget_item->setColumnWidth(0, 150);
-    ui->GESKIT_tableWidget_item->setColumnWidth(1, 70);
+    ui->GESKIT_tableWidget_item->setColumnWidth(0, 100);
+    ui->GESKIT_tableWidget_item->setColumnWidth(1, 110);
+    ui->GESKIT_tableWidget_item->setColumnWidth(2, 110);
 
 
     // A SUPPRIMER Connection automatique avec l'utilisateur "admin" à chaque démarrage
     this->p_loginConnect = new (Login_connect);
-    this->login_user.setEmail("admin");
+    this->login_user.setUtinfo("admin");
     this->login_user.setMdp("admin");
     this-> on_popupLogin_ok();
 
@@ -146,6 +148,22 @@ void MainWindow::GEN_raise_popup_warning(QString msg)
 
     qDebug() << msg;
 }
+
+int MainWindow::GEN_raise_popup_ask_to_continue(QString msg)
+{
+
+    QMessageBox msgBox;
+    msgBox.setText(msg);
+    msgBox.setTextFormat(Qt::TextFormat::MarkdownText);
+    msgBox.setWindowTitle("Attention");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Cancel);
+    int ret = msgBox.exec();
+
+    qDebug() << msg;
+    return ret;
+}
+
 
 //---------------------------------------------------------
 // vvvvvv POPUP ADD USER SECTION vvvvvv
@@ -640,9 +658,14 @@ void MainWindow::GESKIT_push_back_new_item_on_table(Item* item, int row)
     ui->GESKIT_tableWidget_item->setItem(row-1, column_index, p_widget_item_name);
     column_index++;
 
-    // Set second item of last row (Quantity)
-    QTableWidgetItem* p_widget_item_quantity= new QTableWidgetItem(QString::number(item->getQuantity()));
+    // Set second item of last row (Quantity init)
+    QTableWidgetItem* p_widget_item_quantity= new QTableWidgetItem(QString::number(item->getQuantity_init()));
     ui->GESKIT_tableWidget_item->setItem(row-1, column_index, p_widget_item_quantity);
+    column_index++;
+
+    // Set second item of last row (Quantity current)
+    QTableWidgetItem* p_widget_item_quantity_current= new QTableWidgetItem(QString::number(item->getQuantity_current()));
+    ui->GESKIT_tableWidget_item->setItem(row-1, column_index, p_widget_item_quantity_current);
     column_index++;
 }
 
@@ -707,7 +730,7 @@ void MainWindow::clean_HMI(void)
     this->ui->GESKIT_lineEdit_findkitbyname->clear();
     this->ui->RESA_lineEdit_findkitbycode->clear();
     this->ui->RESA_lineEdit_findkitbyname->clear();
-    this->ui->RESA_lineEdit_resa_email_user->clear();
+    this->ui->RESA_lineEdit_resa_utinfo_user->clear();
     this->ui->RESA_listWidget_panierResa->clear();
     this->ui->RESA_listWidget_resa->clear();
     this->ui->RESA_listWidget_resa_currentResa->clear();
@@ -725,7 +748,7 @@ void MainWindow::update_connection_status(bool is_user_logged)
     if (is_user_logged != this->login_user.getIs_logged_on())
     {
         this->login_user.setIs_logged_on(is_user_logged);
-        this->ui->tabWidget->setEnabled(is_user_logged);
+        this->ui->tabwidget->setEnabled(is_user_logged);
         this->ui->TAB_ges_user->setEnabled(is_user_logged);
         this->ui->TAB_ges_kits->setEnabled(is_user_logged);
         this->ui->actionSe_connecter->setEnabled(!is_user_logged);
@@ -743,15 +766,15 @@ void MainWindow::update_connection_status(bool is_user_logged)
             //Refresh user list every time a user logs in
             this->GESUSER_refresh_user_list_from_server(&this->userList);
 
-            //Refresh resa lineEdit_resa_email_user with user name and enable it only if user is admin
-            this->ui->RESA_lineEdit_resa_email_user->setText(this->login_user.getEmail());
+            //Refresh resa RESA_lineEdit_resa_utinfo_user with user name and enable it only if user is admin
+            this->ui->RESA_lineEdit_resa_utinfo_user->setText(this->login_user.getUtinfo());
             if (this->login_user.getPrivilege() == E_admin)
             {
-                this->ui->RESA_lineEdit_resa_email_user->setEnabled(true);
+                this->ui->RESA_lineEdit_resa_utinfo_user->setEnabled(true);
             }
             else
             {
-                this->ui->RESA_lineEdit_resa_email_user->setEnabled(false);
+                this->ui->RESA_lineEdit_resa_utinfo_user->setEnabled(false);
             }
 
 
@@ -760,9 +783,10 @@ void MainWindow::update_connection_status(bool is_user_logged)
         {
             qInfo() << "Vous êtes maintenant déconnecté.";
             //Clear lineEdit_resa_email_use
-            this->ui->RESA_lineEdit_resa_email_user->setText("");
+            this->ui->RESA_lineEdit_resa_utinfo_user->setText("");
             this->ui->RESA_pushButton_suppr_resa->setEnabled(false);
             this->ui->SORTIE_pushButton_sortir->setEnabled(false);
+            this->ui->SORTIE_pushButton_retirer_kit_from_resa->setEnabled(false);
         }
     }
 }
@@ -830,7 +854,7 @@ void MainWindow::on_popupAddKit_ok()
     else if (p_kit->getTo_duplicate() == true)
     {
         g_connect_db.add_kit(p_kit);
-        this->p_popupAddKit->close();
+        // this->p_popupAddKit->close();
         this->setEnabled(true);//enable mainWindow
         delete (this->p_popupAddKit);
         /* refresh the kit list by cleaning and loading it again */
@@ -842,7 +866,7 @@ void MainWindow::on_popupAddKit_ok()
     else //if (p_kit->getTo_duplicate() == false)
     {
         g_connect_db.update_kit(p_kit);
-        this->p_popupAddKit->close();
+        // this->p_popupAddKit->close();
         this->setEnabled(true);//enable mainWindow
         delete (this->p_popupAddKit);
         /* refresh the kit list by cleaning and loading it again */
@@ -1155,10 +1179,10 @@ void MainWindow::on_RESA_pushButton_reserver_clicked()
     RESA_refresh_basket_kit_list_table();
 
     //Retrieve user id
-    has_errors = g_connect_db.get_user_by_mail(this->ui->RESA_lineEdit_resa_email_user->text(), &l_user);
+    has_errors = g_connect_db.get_user_by_utinfo(this->ui->RESA_lineEdit_resa_utinfo_user->text(), &l_user);
     if (has_errors == true)
     {
-        this->GEN_raise_popup_warning("Impossible de réserver pour l'utilisateur: **" + this->ui->RESA_lineEdit_resa_email_user->text()+"**");
+        this->GEN_raise_popup_warning("Impossible de réserver pour l'utilisateur: **" + this->ui->RESA_lineEdit_resa_utinfo_user->text()+"**");
     }
     else
     {
@@ -1198,8 +1222,8 @@ void MainWindow::on_RESA_pushButton_resa_showResa_clicked()
 
      g_utils.clearList(&this->resaList);
     //Retrieve user id
-    has_errors = g_connect_db.get_user_by_mail(this->ui->RESA_lineEdit_resa_email_user->text(), &l_user);
-    g_connect_db.select_resa_by_user(&this->resaList, l_user.getId());
+    has_errors = g_connect_db.get_user_by_utinfo(this->ui->RESA_lineEdit_resa_utinfo_user->text(), &l_user);
+    g_connect_db.select_active_resa_by_user(&this->resaList, l_user.getId());
     RESA_refresh_current_resa_list_table();
 }
 
@@ -1318,18 +1342,18 @@ void MainWindow::on_SORTIE_pushButton_resa_showResa_clicked()
     this->ui->SORTIE_listWidget_kitsOut->clear();
 
 
-    // Populates "sortie_user" object with user informations if email is in database
-    if (this->ui->SORTIE_lineEdit_useremail->text() != "")
+    // Populates "sortie_user" object with user informations if utinfo is in database
+    if (this->ui->SORTIE_lineEdit_utinfo->text() != "")
     {
-        has_errors = g_connect_db.get_user_by_mail(this->ui->SORTIE_lineEdit_useremail->text(), &this->sortie_user);
+        has_errors = g_connect_db.get_user_by_utinfo(this->ui->SORTIE_lineEdit_utinfo->text(), &this->sortie_user);
         if (has_errors == false)
         {
             // Updates resa list
-            g_connect_db.select_resa_by_user(&this->resaListSortie_byUser, this->sortie_user.getId());
+            g_connect_db.select_active_resa_by_user(&this->resaListSortie_byUser, this->sortie_user.getId());
             SORTIE_refresh_current_resa_list_table();
 
             // Updates sortie list
-            g_connect_db.select_sortie_by_user(&this->sortieList_byUser, this->sortie_user.getId());
+            g_connect_db.select_active_sortie_by_user(&this->sortieList_byUser, this->sortie_user.getId());
             SORTIE_refresh_kitsOut_table();
         }
     }
@@ -1367,6 +1391,7 @@ void MainWindow::SORTIE_refresh_kits_of_resa_table(int i_resa_nb)
     //clear kit list widget
     this->ui->SORTIE_listWidget_resa_kitsOfResa->clear();
     this->ui->SORTIE_pushButton_sortir->setEnabled(false); // Disable "sortir" to force user to select a kit
+    this->ui->SORTIE_pushButton_retirer_kit_from_resa->setEnabled(false); // Disable "retirer_kit_from_resa" to force user to select a kit
     this->kitListSortie_kitsOfResaView.clear();
     if (i_resa_nb != -1)
     {
@@ -1491,10 +1516,12 @@ void MainWindow::on_SORTIE_listWidget_resa_kitsOfResa_itemClicked(QListWidgetIte
     if (l_kit->getIs_out() == false)
     {
         this->ui->SORTIE_pushButton_sortir->setEnabled(true);
+        this->ui->SORTIE_pushButton_retirer_kit_from_resa->setEnabled(true);
     }
     else
     {
         this->ui->SORTIE_pushButton_sortir->setEnabled(false);
+        this->ui->SORTIE_pushButton_retirer_kit_from_resa->setEnabled(false);
     }
 }
 ///
@@ -1532,7 +1559,11 @@ void MainWindow::on_SORTIE_popupSortirResa_pushSortir()
 
         // Updates sortie list
         g_utils.clearList(&this->sortieList_byUser);
-        g_connect_db.select_sortie_by_user(&this->sortieList_byUser, this->sortie_user.getId());
+        g_connect_db.select_active_sortie_by_user(&this->sortieList_byUser, this->sortie_user.getId());
+
+        /* refresh the kit list by cleaning and loading it again */
+        this->GESKIT_refresh_kit_list_from_server(&this->kitList);
+
         SORTIE_refresh_kitsOut_table();
     }
 }
@@ -1544,7 +1575,7 @@ void MainWindow::SORTIE_sortir_kit()
     bool has_errors = false;
     QDate start_date;
     Kit * p_kit = this->p_popupSortirResa->getP_kit();
-    has_errors = g_connect_db.get_user_by_mail(this->ui->SORTIE_lineEdit_useremail->text(), &l_user);
+    has_errors = g_connect_db.get_user_by_utinfo(this->ui->SORTIE_lineEdit_utinfo->text(), &l_user);
     start_date = QDate::currentDate();
 
     g_connect_db.update_items_quantity_of_kit (p_kit, this->p_popupSortirResa->item_list_dest);
@@ -1601,7 +1632,7 @@ void MainWindow::on_SORTIE_popupSortirResa_pushRestituer()
 
         // Updates sortie list
         g_utils.clearList(&this->sortieList_byUser);
-        g_connect_db.select_sortie_by_user(&this->sortieList_byUser, this->sortie_user.getId());
+        g_connect_db.select_active_sortie_by_user(&this->sortieList_byUser, this->sortie_user.getId());
         SORTIE_refresh_kitsOut_table();
     }
 }
@@ -1630,6 +1661,25 @@ void MainWindow::on_SORTIE_popupSortirResa_pushAnnuler()
     delete this->p_popupSortirResa;
     this->setEnabled(true);//enable mainWindow
 }
+
+
+void MainWindow::on_SORTIE_pushButton_retirer_kit_from_resa_clicked()
+{
+    int ret = GEN_raise_popup_ask_to_continue("Voulez-vous vraiment supprimer le Kit de la réservation?");
+    if (ret == QMessageBox::Yes)
+    {
+        Kit * l_kit = SORTIE_get_kitOfResa_selected();
+        g_connect_db.delete_resa_from_kit(l_kit);
+
+        //Refresh resa list from DB
+        on_SORTIE_pushButton_resa_showResa_clicked();
+    }
+    else
+    {
+
+    }
+}
+
 // ^^^^^^ MAIN WINDOW "Gestion SORTIES" ^^^^^^
 //---------------------------------------------------------
 

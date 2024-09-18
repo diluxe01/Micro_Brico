@@ -118,7 +118,7 @@ void PopupSortirResa::set_spin_box_qty_from_selected_item()
     Item* p_itemsource = get_sel_item_from_QlistWidget(this->ui->listWidget_popupSortie_ItemSource, p_kit->item_list);
 
 
-    this->ui->spinBox_popupSortie_countItemVerif->setValue(p_itemsource->getQuantity());
+    this->ui->spinBox_popupSortie_countItemVerif->setValue(p_itemsource->getQuantity_current());
 }
 
 Item * PopupSortirResa::get_item_from_id( std::vector<Item*> i_item_list,uint i_id  )
@@ -140,8 +140,8 @@ void PopupSortirResa::push_item_to_dest_list(int new_quantity)
 {
     Item* p_itemsource = get_sel_item_from_QlistWidget(this->ui->listWidget_popupSortie_ItemSource, p_kit->item_list);
 
-    // Create new item with new quantity (even if it is unchanged)
-    Item* p_item = new Item(p_itemsource->getId(), p_itemsource->getName() , 0, new_quantity);
+    // Create new item with new current quantity (even if it is unchanged)
+    Item* p_item = new Item(p_itemsource->getId(), p_itemsource->getName() , 0 , p_itemsource->getQuantity_init(), new_quantity);
 
     // push this new item to local list
     this->item_list_dest.push_back(p_item);
@@ -167,7 +167,7 @@ void PopupSortirResa::refresh_source_item_list(void)
 
     for(const auto& elem_item_new : p_kit->item_list)
     {
-        QListWidgetItem* p_item = new QListWidgetItem(elem_item_new->getName()+" ("+QString::number(elem_item_new->getQuantity())+")", this->ui->listWidget_popupSortie_ItemSource);
+        QListWidgetItem* p_item = new QListWidgetItem(elem_item_new->getName()+" ("+QString::number(elem_item_new->getQuantity_current())+")", this->ui->listWidget_popupSortie_ItemSource);
         if(elem_item_new->getIs_verified())
         {
             p_item->setBackground(brush_verified);
@@ -188,7 +188,7 @@ void PopupSortirResa::refresh_dest_item_list(void)
     this->ui->listWidget_popupSortie_ItemDest->clear();
     for(const auto& elem_item_new : this->item_list_dest)
     {
-        new QListWidgetItem(elem_item_new->getName()+" ("+QString::number(elem_item_new->getQuantity())+")", this->ui->listWidget_popupSortie_ItemDest);
+        new QListWidgetItem(elem_item_new->getName()+" ("+QString::number(elem_item_new->getQuantity_current())+")", this->ui->listWidget_popupSortie_ItemDest);
     }
 }
 

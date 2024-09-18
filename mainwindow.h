@@ -74,6 +74,7 @@ private slots:
     void on_SORTIE_popupSortirResa_pushAnnuler();
     void on_SORTIE_popupSortirResa_pushRestituer();//Callback called when "Restituer" button is pushed inside popup
     void on_pushButton_restituerKit_clicked();
+    void on_SORTIE_pushButton_retirer_kit_from_resa_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -101,6 +102,7 @@ private:
 
     void GEN_raise_popup_info(QString msg);
     void GEN_raise_popup_warning(QString msg);
+    int GEN_raise_popup_ask_to_continue(QString msg);
     void closeEvent (QCloseEvent *event);
     void activateWidgets(void);
 

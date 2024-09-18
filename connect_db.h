@@ -48,6 +48,7 @@ public:
     QString get_unique_token(void);
     void update_user_token_on_db(void);
     bool get_user_by_mail(QString i_mail, Utilisateur * o_user);
+    bool get_user_by_utinfo(QString i_utinfo, Utilisateur *o_user);
     //-----------Kit-------------------
     void select_kits_by_code(std::vector<Kit *> *kits, QString code);
     void select_kits_by_name(std::vector<Kit *> *kits, QString code);
@@ -60,13 +61,14 @@ public:
     void populate_item_list_from_query(Kit * kit, QSqlQuery query);
     void set_kit_booked_status(std::vector<Kit*> *i_kits, QDate i_date);
     //-----------Resa-------------------
-    void select_all_resa(std::vector<Resa *> *i_resa);
-    void select_resa_by_user(std::vector<Resa *> *o_resa, uint user_id);
+    void select_all_active_resa(std::vector<Resa *> *i_resa);
+    void select_active_resa_by_user(std::vector<Resa *> *o_resa, uint user_id);
     uint32_t guess_next_resa_nb(void);
     void add_resa_from_kit(Kit *i_p_kit, uint user_id, QDate i_start_date, int i_resa_nb);
     void start_resa();
     void end_resa();
     void delete_resa(int i_resa_nb);
+    void delete_resa_from_kit(Kit *i_kit);
 
     //-----------Sortie-------------------
     void set_kit_out_status(std::vector<Kit *> *i_kits);
@@ -74,9 +76,10 @@ public:
     void start_sortie();
     uint32_t guess_next_sortie_nb();
     void add_sortie_from_kit(Kit *i_p_kit, uint user_id, QDate i_start_date, int i_sortie_nb);
-    void select_all_sortie(std::vector<Sortie *> *i_sortie);
-    void select_sortie_by_user(std::vector<Sortie *> *o_sortie, uint user_id);
+    void select_all_active_sortie(std::vector<Sortie *> *i_sortie);
+    void select_active_sortie_by_user(std::vector<Sortie *> *o_sortie, uint user_id);
     void delete_sortie_from_kit(Kit *i_p_kit);
+
 public slots:
 signals:
     void log_value_changed(bool is_user_logged);

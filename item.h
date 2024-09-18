@@ -18,13 +18,14 @@ private:
     uint id;
     QString name;
     uint forkey;
-    uint quantity;
+    uint quantity_init;
+    uint quantity_current;
 
     bool is_verified;
 public:
     explicit Item(QObject *parent = nullptr);
     Item(uint id, const QString &name, uint forkey);
-    Item(uint id, const QString &name, uint forkey, uint quantity);
+    Item(uint id, const QString &name, uint forkey, uint quantity_init, uint quantity_current);
 
     QString getName() const;
     uint getForkey() const;
@@ -38,11 +39,14 @@ public:
     // void setEtatStr(QString etat_str);
     uint getId() const;
 
-    uint getQuantity() const;
-    void setQuantity(uint newQuantity);
-
     bool getIs_verified() const;
     void setIs_verified(bool newIs_verified);
+
+    uint getQuantity_init() const;
+    void setQuantity_init(uint newQuantity_init);
+
+    uint getQuantity_current() const;
+    void setQuantity_current(uint newQuantity_current);
 
 signals:
 };

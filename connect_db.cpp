@@ -73,7 +73,7 @@ bool Connect_db::add_user (Utilisateur *user)  {
 void Connect_db::add_item (Item *p_item, QString i_idkit)  {
 
     QSqlQuery query  = QSqlQuery(this->db);
-    QString exec_string = "insert into item (name, forkey, quantity) values('"+p_item->getName()+"', '"+i_idkit+"', '"+QString::number(p_item->getQuantity())+"')";
+    QString exec_string = "insert into item (name, forkey, quantity, quantity_init) values('"+p_item->getName()+"', '"+i_idkit+"', '"+QString::number(p_item->getQuantity_current())+"', '"+QString::number(p_item->getQuantity_init())+"')";
 
     runQuery(query, exec_string);
 }
@@ -191,9 +191,9 @@ void Connect_db::update_items_quantity_of_kit(Kit * i_kit, std::vector<Item *> i
         {
             if (elem_new_item->getId() == elem_kit_item->getId())
             {
-                if (elem_new_item->getQuantity() != elem_kit_item->getQuantity())
+                if (elem_new_item->getQuantity_current() != elem_kit_item->getQuantity_current())
                 {
-                    exec_string = "update item set quantity = " +QString::number(elem_new_item->getQuantity())+" where id = " + QString::number(elem_new_item->getId()) ;
+                    exec_string = "update item set quantity = " +QString::number(elem_new_item->getQuantity_current())+" where id = " + QString::number(elem_new_item->getId()) ;
                     runQuery(query, exec_string);
                 }
             }
@@ -248,6 +248,37 @@ bool Connect_db::get_user_by_mail(QString i_mail, Utilisateur * o_user)
     return querry_had_errors;
 }
 
+///
+/// \brief Connect_db::get_user_by_utinfo
+/// \param i_mail: user booking email
+/// \param o_user: pointer where user is to be stored
+/// \return true if an error occured, false otherwise
+///
+bool Connect_db::get_user_by_utinfo(QString i_utinfo, Utilisateur * o_user)
+{
+    QSqlQuery query  = QSqlQuery(this->db);
+
+    bool querry_had_errors = false;
+    runQuery(query, "SELECT id, nom, mdp, prenom, email, token from utilisateur where utinfo='"+i_utinfo+"'");
+    if (query.size() == 0)
+    {
+        querry_had_errors = true;
+        qDebug() <<  "get_user_id_by_mail: Une erreur s'est produite, l'utinfo fourni est inconnu.";
+    }
+    else
+    {   //no errors
+        query.first();
+        o_user->setNom(query.value("nom").toString());
+        o_user->setMdp(query.value("mdp").toString());
+        o_user->setPrenom(query.value("prenom").toString());
+        o_user->setUtinfo(query.value("email").toString());
+        o_user->setToken(query.value("token").toString());
+        o_user->setId(query.value("id").toInt());
+        o_user->setEmail(i_utinfo);
+    }
+    return querry_had_errors;
+}
+
 
 QString Connect_db::get_sha1_from_Qstring(QString mdp)
 {
@@ -270,7 +301,7 @@ QString Connect_db::get_unique_token(void)
 
 void Connect_db::update_user_token_on_db(void)
 {
-    QString query_string =  "update utilisateur set token ='"+this->active_user->getToken()+"'where email ='"+this->active_user->getEmail()+"'";
+    QString query_string =  "update utilisateur set token ='"+this->active_user->getToken()+"'where utinfo ='"+this->active_user->getUtinfo()+"'";
     QSqlQuery query(this->db);
     query.exec(query_string);
 }
@@ -281,7 +312,7 @@ bool Connect_db::is_user_connected(void)
     // This function checks if the user given as a parameter is still connected, by comparing its token with the token on the server
     // If not, this functions emits a signal to the appli, to inform that user is disconnected
     QString token_db;
-    QString query_string =  "SELECT token from utilisateur where email ='"+this->active_user->getEmail()+"'";
+    QString query_string =  "SELECT token from utilisateur where utinfo ='"+this->active_user->getUtinfo()+"'";
     QSqlQuery query(this->db);
 
     // If no error in query
@@ -301,7 +332,7 @@ bool Connect_db::is_user_connected(void)
 // Return true if connection succedded
 bool Connect_db::connect_user(void)
 {
-    QString query_string =  "SELECT mdp from utilisateur where email ='"+this->active_user->getEmail()+"'";
+    QString query_string =  "SELECT mdp from utilisateur where utinfo ='"+this->active_user->getUtinfo()+"'";
     QSqlQuery query( this->db);
     QString mdp_db = "";
     QString mdp_user_sha1 = "";
@@ -325,7 +356,7 @@ bool Connect_db::connect_user(void)
     }
     else
     {
-        qInfo() << "Utilisateur non identifié. Mauvais mdp ou email.";
+        qInfo() << "Utilisateur non identifié. Mauvais mdp ou utinfo.";
         returnVal = false;
         // Send connection status change to main appli
         emit log_value_changed(false);
@@ -336,11 +367,11 @@ bool Connect_db::connect_user(void)
 void Connect_db::update_user_infos_from_db(Utilisateur *login_user)
 {
     QSqlQuery query  = QSqlQuery(this->db);
-    runQuery(query, "SELECT id, nom, prenom, utinfo, privilege from utilisateur where email = '"+login_user->getEmail()+"'");
+    runQuery(query, "SELECT id, nom, prenom, email, privilege from utilisateur where utinfo = '"+login_user->getUtinfo()+"'");
     query.first();
     login_user->setNom(query.value("nom").toString());
     login_user->setPrenom(query.value("prenom").toString());
-    login_user->setUtinfo(query.value("utinfo").toString());
+    login_user->setEmail(query.value("email").toString());
     login_user->setId(query.value("id").toInt());
     if (query.value("privilege").toString() == "admin")
     {
@@ -389,7 +420,7 @@ void  Connect_db::select_all_users (std::vector<Utilisateur*> *list)
 void  Connect_db::select_items_by_kit (Kit * kit)
 {
     QSqlQuery query(this->db);
-    runQuery(query,"SELECT id, name, quantity from item where forkey ='"+QString::number(kit->getIdKit())+"'");
+    runQuery(query,"SELECT id, name, quantity, quantity_init from item where forkey ='"+QString::number(kit->getIdKit())+"'");
     g_utils.clearList(&kit->item_list);
     populate_item_list_from_query(kit, query);
 }
@@ -401,11 +432,13 @@ void Connect_db::populate_item_list_from_query(Kit * kit, QSqlQuery query)
         int id = query.value("id").toInt();
         QString name = query.value("name").toString();
         int quantity = query.value("quantity").toInt();
+        int quantity_init = query.value("quantity_init").toInt();
 
         Item * i = new Item();
         i->setid((uint)id);
         i->setName(name);
-        i->setQuantity(quantity);
+        i->setQuantity_current(quantity);
+        i->setQuantity_init(quantity_init);
 
         kit->item_list.push_back(i);
     }
@@ -468,7 +501,7 @@ void Connect_db::populate_kit_list_from_query(std::vector<Kit*> *kits, QSqlQuery
 void  Connect_db::set_kit_booked_status (std::vector<Kit*> *i_kits, QDate i_date)
 {
     std::vector<Resa *> resa_list;
-    select_all_resa(&resa_list);
+    select_all_active_resa(&resa_list);
     bool is_booked = false;
 
     // Determine if id kit is in resa table at given date. If so, set "is_booked" var to true and break "for" loop.
@@ -492,19 +525,25 @@ void  Connect_db::set_kit_booked_status (std::vector<Kit*> *i_kits, QDate i_date
 
 }
 
-void  Connect_db::select_all_resa (std::vector<Resa *> *i_resa)
+void  Connect_db::select_all_active_resa (std::vector<Resa *> *i_resa)
 {
     QSqlQuery query(this->db);
-    runQuery(query, "SELECT * from resa");
+    runQuery(query, "SELECT * from resa where is_active = 1");
 
     populate_resa_list_from_query(i_resa, query);
 }
 
-void Connect_db::select_resa_by_user(std::vector<Resa *> *o_resa, uint user_id)
+///
+/// \brief Connect_db::select_active_resa_by_user
+///     Select only active resa by user
+/// \param o_resa
+/// \param user_id
+///
+void Connect_db::select_active_resa_by_user(std::vector<Resa *> *o_resa, uint user_id)
 {
 
     QSqlQuery query(this->db);
-    runQuery(query, "SELECT * from resa WHERE id_user="+QString::number(user_id));
+    runQuery(query, "SELECT * from resa WHERE id_user="+QString::number(user_id) + " AND is_active = 1");
 
     populate_resa_list_from_query(o_resa, query);
 }
@@ -583,26 +622,36 @@ void  Connect_db::end_resa(void)
 void Connect_db::delete_resa(int i_resa_nb)
 {
     QSqlQuery query(this->db);
-    runQuery(query, "delete from resa where id_resa = "+ QString::number(i_resa_nb));
+
+    runQuery(query, "update resa set is_active = 0 where id_resa = "+ QString::number(i_resa_nb));
+}
+
+void Connect_db::delete_resa_from_kit(Kit * i_kit)
+{
+    QSqlQuery query(this->db);
+
+    runQuery(query, "update resa set is_active = 0 where id_kit = "+ QString::number(i_kit->getIdKit()));
+
+
+    qInfo()<< "Le Kit " << i_kit->getNom() <<" a été retiré de la réservation.";
 
 }
 
 
 
-
-void Connect_db::select_sortie_by_user(std::vector<Sortie *> *o_sortie, uint user_id)
+void Connect_db::select_active_sortie_by_user(std::vector<Sortie *> *o_sortie, uint user_id)
 {
 
     QSqlQuery query(this->db);
-    runQuery(query, "SELECT * from sortie WHERE id_user="+QString::number(user_id));
+    runQuery(query, "SELECT * from sortie WHERE id_user="+QString::number(user_id)+" AND is_active = 1");
 
     populate_sortie_list_from_query(o_sortie, query);
 }
 
-void  Connect_db::select_all_sortie (std::vector<Sortie *> *i_sortie)
+void  Connect_db::select_all_active_sortie (std::vector<Sortie *> *i_sortie)
 {
     QSqlQuery query(this->db);
-    runQuery(query, "SELECT * from sortie");
+    runQuery(query, "SELECT * from sortie where is_active = 1");
 
     populate_sortie_list_from_query(i_sortie, query);
 }
@@ -636,7 +685,7 @@ void Connect_db::populate_sortie_list_from_query(std::vector<Sortie *> *i_sortie
 void  Connect_db::set_kit_out_status (std::vector<Kit*> *i_kits)
 {
     std::vector<Sortie *> sortie_list;
-    select_all_sortie(&sortie_list);
+    select_all_active_sortie(&sortie_list);
     bool is_out = false;
     int id_user_out = 0;
     // Determine if id kit is in sortie table at given date. If so, set "is_out" var to true and break "for" loop.
@@ -664,10 +713,6 @@ void  Connect_db::start_sortie(void)
     runQuery(query, "LOCK TABLES uid_sortie WRITE, sortie WRITE, utilisateur READ, kit READ");
 }
 
-// void  Connect_db::insert_sortie (Kit * i_kit )
-// {
-
-// }
 
 void  Connect_db::end_sortie(void)
 {
@@ -708,7 +753,7 @@ void Connect_db::add_sortie_from_kit(Kit *i_p_kit, uint user_id, QDate i_start_d
 void Connect_db::delete_sortie_from_kit(Kit *i_p_kit)
 {
     QSqlQuery query(this->db);
-    runQuery(query, "DELETE from sortie where id_kit = "+ QString::number(i_p_kit->getIdKit()));
+    runQuery(query, "update sortie set is_active = 0 where id_kit = "+ QString::number(i_p_kit->getIdKit()));
 
     qInfo()<< "Le Kit " << i_p_kit->getNom() <<" a été restitué avec succès.";
 }

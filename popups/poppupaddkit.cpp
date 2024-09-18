@@ -57,13 +57,13 @@ void PoppupAddKit::on_pushButton_addobject_clicked()
 {
 
     QString item_text = ui->lineEdit_new_item->text();
-    int item_qty = ui->spinBox_item_quantity->value();
-    int tmp_int_etat;
+    int item_qty_init = ui->spinBox_item_quantity_init->value();
+    int item_qty_current = ui->spinBox_item_quantity_current->value();
     // If user entered text
     if (item_text!= "")
     {
         //Push_back new item into private item list
-        Item* p_item = new Item(0, item_text, 0, item_qty);
+        Item* p_item = new Item(0, item_text, 0, item_qty_init, item_qty_current);
         this->kit->item_list.push_back(p_item);
 
         //Push_back new item into display tab
@@ -76,7 +76,7 @@ void PoppupAddKit::on_pushButton_addobject_clicked()
 void PoppupAddKit::push_back_new_item_on_tabWidget(Item* p_item)
 {
 
-    QListWidgetItem* p_WidegtItem = new QListWidgetItem(p_item->getName()+ " ("+ QString::number(p_item->getQuantity())+")", this->ui->listWidget_itemBasket);
+    QListWidgetItem* p_WidegtItem = new QListWidgetItem(p_item->getName()+ " (Qté init: "+ QString::number(p_item->getQuantity_init())+")"+ " (Qté courante: "+ QString::number(p_item->getQuantity_current())+")", this->ui->listWidget_itemBasket);
 }
 
 void PoppupAddKit::on_pushButton_deleteitemfromlist_clicked()
@@ -213,10 +213,18 @@ void PoppupAddKit::set_form_from_kit(Kit * p_kit)
     for(const auto& item_elem : p_kit->item_list)
     {
         //Push_back new item into private item list
-        Item* p_item = new Item(item_elem->getId(), item_elem->getName(), 0, item_elem->getQuantity());
+        Item* p_item = new Item(item_elem->getId(), item_elem->getName(), 0,item_elem->getQuantity_init(), item_elem->getQuantity_current());
         this->kit->item_list.push_back(p_item);
         push_back_new_item_on_tabWidget(item_elem);
     }
 }
 
+
+
+void PoppupAddKit::on_spinBox_item_quantity_init_valueChanged(int arg1)
+{
+    // automatically set value of current qty spinbox to init_value
+
+    this->ui->spinBox_item_quantity_current->setValue(arg1);
+}
 

@@ -76,14 +76,9 @@ Utilisateur* popupAddUsers::get_user_from_form(void)
         ok_to_create_user = false;
     }
 
-    if (ui->lineEdit_utinfo->text().size() != 6 )
+    if (ui->lineEdit_utinfo->text().size() < 8 )
     {
-        error_string_list.append("Votre Utinfo ne fait pas la bonne taille.");
-        ok_to_create_user = false;
-    }
-    if (ui->lineEdit_utinfo->text().contains("\w+") == true )
-    {
-        error_string_list.append("Votre Utinfo ne doit pas contenir de lettre.");
+        error_string_list.append("Votre Utinfo ne fait pas la bonne taille. Il devrait contenir 8 ou 10 lettres.");
         ok_to_create_user = false;
     }
     if (ui->lineEdit_utinfo->text().contains("\S+") == true )

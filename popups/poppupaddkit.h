@@ -28,9 +28,8 @@ public:
 
 private slots:
     void on_pushButton_addobject_clicked();
-
     void on_pushButton_deleteitemfromlist_clicked();
-
+    void on_spinBox_item_quantity_init_valueChanged(int arg1);
 
 private:
     Ui::PoppupAddKit *ui;

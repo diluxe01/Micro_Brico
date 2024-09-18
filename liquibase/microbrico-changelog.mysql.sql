@@ -62,3 +62,19 @@ CREATE TABLE `db_dev`.`sortie` (
 ALTER TABLE `db_dev`.`utilisateur` 
 ADD UNIQUE INDEX `utinfo_UNIQUE` (`utinfo` ASC) VISIBLE;
 ;
+
+-- changeset adrie:1716202953457-18 comment:set utinfo to char 10
+ALTER TABLE `db_dev`.`utilisateur` 
+CHANGE COLUMN `utinfo` `utinfo` CHAR(10) NOT NULL ;
+
+-- changeset adrie:1716202953457-19 comment:add quantity_init column to item
+ALTER TABLE `db_dev`.`item` 
+ADD COLUMN `quantity_init` SMALLINT NOT NULL AFTER `quantity`;
+
+-- changeset adrie:1716202953457-20 comment:add is_active column to resa table
+ALTER TABLE `db_dev`.`resa` 
+ADD COLUMN `is_active` TINYINT NULL DEFAULT 1 AFTER `id_resa`;
+
+-- changeset adrie:1716202953457-21 comment:add is_active column to sortie table
+ALTER TABLE `db_dev`.`sortie` 
+ADD COLUMN `is_active` TINYINT NULL DEFAULT 1 AFTER `id_sortie`;

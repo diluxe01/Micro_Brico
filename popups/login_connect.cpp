@@ -6,7 +6,7 @@ Login_connect::Login_connect(QWidget *parent)
     , ui(new Ui::login_connect)
 {
     ui->setupUi(this);
-    ui->lineEdit_mail->setFocus();
+    ui->lineEdit_utinfo->setFocus();
 }
 
 Login_connect::~Login_connect()
@@ -27,7 +27,7 @@ void Login_connect::setUser(Utilisateur *p_user)
 
 void Login_connect::on_buttonBox_clicked(QAbstractButton *button)
 {
-    this->user->setEmail(ui->lineEdit_mail->text());
+    this->user->setUtinfo(ui->lineEdit_utinfo->text());
     this->user->setMdp(ui->lineEdit_mdp->text());
 
 }
