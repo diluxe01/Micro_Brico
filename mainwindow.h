@@ -41,6 +41,7 @@ private slots:
     void on_actionSe_connecter_triggered();
     void on_actionSe_d_connecter_triggered();
     void on_actionAfficher_les_logs_triggered();
+    void on_actionEffacer_les_reservations_pass_es_triggered();
 
     //-----------Slots GESUSER-------------------
     void on_GESUSER_pushButton_getuser_clicked();
@@ -75,6 +76,7 @@ private slots:
     void on_SORTIE_popupSortirResa_pushRestituer();//Callback called when "Restituer" button is pushed inside popup
     void on_pushButton_restituerKit_clicked();
     void on_SORTIE_pushButton_retirer_kit_from_resa_clicked();
+
 
 private:
     Ui::MainWindow *ui;
@@ -149,6 +151,7 @@ private:
     QDate RESA_get_next_resa_day(QDate start_date);
     void RESA_refresh_current_resa_list_table();
     int RESA_find_resa_nb_selected(QListWidgetItem *item);
+    void RESA_deactivate_outdated_resa();
 
 
     //-----------Sorties-------------------

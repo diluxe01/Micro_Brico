@@ -67,8 +67,9 @@ public:
     void add_resa_from_kit(Kit *i_p_kit, uint user_id, QDate i_start_date, int i_resa_nb);
     void start_resa();
     void end_resa();
-    void delete_resa(int i_resa_nb);
-    void delete_resa_from_kit(Kit *i_kit);
+    void deactivate_resa_from_id(int i_resa_nb);
+    void deactivate_resa_from_kit(Kit *i_kit);
+    void deactivate_resa_prior_to_date(QDate i_current_date);
 
     //-----------Sortie-------------------
     void set_kit_out_status(std::vector<Kit *> *i_kits);

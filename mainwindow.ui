@@ -27,7 +27,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="TAB_ges_user">
        <property name="enabled">
@@ -440,39 +440,31 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_7">
            <item>
-            <widget class="QFrame" name="frame_10">
-             <property name="frameShape">
-              <enum>QFrame::Shape::StyledPanel</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Shadow::Raised</enum>
-             </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_17">
-              <item>
-               <widget class="QLineEdit" name="RESA_lineEdit_resa_utinfo_user">
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="placeholderText">
-                 <string>Utinfo</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_4">
-                <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
-            </widget>
+            <layout class="QHBoxLayout" name="horizontalLayout_17">
+             <item>
+              <widget class="QLineEdit" name="RESA_lineEdit_resa_utinfo_user">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="placeholderText">
+                <string>Utinfo</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>500</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
            </item>
            <item>
             <widget class="QFrame" name="frame_5">
@@ -518,53 +510,45 @@
             </widget>
            </item>
            <item>
-            <widget class="QFrame" name="frame_7">
-             <property name="frameShape">
-              <enum>QFrame::Shape::StyledPanel</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Shadow::Raised</enum>
-             </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_9">
-              <item>
-               <widget class="QPushButton" name="RESA_pushButton_getkit_resa">
-                <property name="text">
-                 <string>Rechercher Kit</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLineEdit" name="RESA_lineEdit_findkitbyname">
-                <property name="placeholderText">
-                 <string>Nom</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLineEdit" name="RESA_lineEdit_findkitbycode">
-                <property name="placeholderText">
-                 <string>Code</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_3">
-                <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Policy::Expanding</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>315</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
-            </widget>
+            <layout class="QHBoxLayout" name="horizontalLayout_9">
+             <item>
+              <widget class="QPushButton" name="RESA_pushButton_getkit_resa">
+               <property name="text">
+                <string>Rechercher Kit</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="RESA_lineEdit_findkitbyname">
+               <property name="placeholderText">
+                <string>Nom</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="RESA_lineEdit_findkitbycode">
+               <property name="placeholderText">
+                <string>Code</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Policy::Expanding</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>200</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
            </item>
            <item>
             <widget class="QPushButton" name="RESA_pushButton_reserver">
@@ -599,60 +583,52 @@
             <widget class="QCalendarWidget" name="RESA_calendarWidget"/>
            </item>
            <item>
-            <widget class="QFrame" name="frame_9">
-             <property name="frameShape">
-              <enum>QFrame::Shape::StyledPanel</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Shadow::Raised</enum>
-             </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_14">
-              <item>
-               <widget class="QGroupBox" name="groupBox_12">
-                <property name="title">
-                 <string>Vos reservations</string>
-                </property>
-                <layout class="QVBoxLayout" name="verticalLayout_12">
-                 <item>
-                  <widget class="QListWidget" name="RESA_listWidget_resa_currentResa"/>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="RESA_pushButton_resa_showResa">
-                   <property name="text">
-                    <string>Afficher Réservations</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item>
-               <widget class="QGroupBox" name="groupBox_13">
-                <property name="title">
-                 <string>Kits associés</string>
-                </property>
-                <layout class="QVBoxLayout" name="verticalLayout_13">
-                 <item>
-                  <widget class="QListWidget" name="RESA_listWidget_resa_kitsOfResa"/>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="RESA_pushButton_suppr_resa">
-                   <property name="font">
-                    <font>
-                     <bold>true</bold>
-                     <underline>false</underline>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string>Annuler la réservation</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-             </layout>
-            </widget>
+            <layout class="QHBoxLayout" name="horizontalLayout_14">
+             <item>
+              <widget class="QGroupBox" name="groupBox_12">
+               <property name="title">
+                <string>Vos reservations</string>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_12">
+                <item>
+                 <widget class="QListWidget" name="RESA_listWidget_resa_currentResa"/>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="RESA_pushButton_resa_showResa">
+                  <property name="text">
+                   <string>Afficher Réservations</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="groupBox_13">
+               <property name="title">
+                <string>Kits associés</string>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_13">
+                <item>
+                 <widget class="QListWidget" name="RESA_listWidget_resa_kitsOfResa"/>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="RESA_pushButton_suppr_resa">
+                  <property name="font">
+                   <font>
+                    <bold>true</bold>
+                    <underline>false</underline>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>Annuler la réservation</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </widget>
@@ -743,6 +719,36 @@
                    </property>
                   </widget>
                  </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_20">
+                   <item>
+                    <widget class="QPushButton" name="SORTIE_pushButton_endResa">
+                     <property name="minimumSize">
+                      <size>
+                       <width>100</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string>Terminer Réservation</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_7">
+                     <property name="orientation">
+                      <enum>Qt::Orientation::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </item>
                 </layout>
                </widget>
               </item>
@@ -751,41 +757,33 @@
                 <property name="title">
                  <string>Kits associés</string>
                 </property>
-                <layout class="QVBoxLayout" name="verticalLayout_15">
+                <layout class="QVBoxLayout" name="verticalLayout">
                  <item>
                   <widget class="QListWidget" name="SORTIE_listWidget_resa_kitsOfResa"/>
                  </item>
                  <item>
-                  <widget class="QFrame" name="frame_13">
-                   <property name="frameShape">
-                    <enum>QFrame::Shape::StyledPanel</enum>
-                   </property>
-                   <property name="frameShadow">
-                    <enum>QFrame::Shadow::Raised</enum>
-                   </property>
-                   <layout class="QHBoxLayout" name="horizontalLayout_19">
-                    <item>
-                     <widget class="QPushButton" name="SORTIE_pushButton_sortir">
-                      <property name="font">
-                       <font>
-                        <bold>true</bold>
-                        <underline>true</underline>
-                       </font>
-                      </property>
-                      <property name="text">
-                       <string>Sortir</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="SORTIE_pushButton_retirer_kit_from_resa">
-                      <property name="text">
-                       <string>Retirer kit de la résa</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
+                  <layout class="QHBoxLayout" name="horizontalLayout_19">
+                   <item>
+                    <widget class="QPushButton" name="SORTIE_pushButton_sortir">
+                     <property name="font">
+                      <font>
+                       <bold>true</bold>
+                       <underline>true</underline>
+                      </font>
+                     </property>
+                     <property name="text">
+                      <string>Sortir</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="SORTIE_pushButton_retirer_kit_from_resa">
+                     <property name="text">
+                      <string>Retirer kit de la résa</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
                  </item>
                 </layout>
                </widget>
@@ -896,8 +894,15 @@
     <property name="title">
      <string>Outils</string>
     </property>
+    <widget class="QMenu" name="menuMaintenance">
+     <property name="title">
+      <string>Maintenance</string>
+     </property>
+     <addaction name="actionEffacer_les_reservations_pass_es"/>
+    </widget>
     <addaction name="actionAfficher_les_logs"/>
     <addaction name="separator"/>
+    <addaction name="menuMaintenance"/>
    </widget>
    <addaction name="menuLogin"/>
    <addaction name="menuOutils"/>
@@ -921,6 +926,11 @@
   <action name="actionAfficher_les_logs">
    <property name="text">
     <string>Afficher les logs</string>
+   </property>
+  </action>
+  <action name="actionEffacer_les_reservations_pass_es">
+   <property name="text">
+    <string>Effacer les reservations passées</string>
    </property>
   </action>
  </widget>

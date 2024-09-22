@@ -120,6 +120,11 @@ void MainWindow::on_actionAfficher_les_logs_triggered()
     logBrowser->show();
 }
 
+void MainWindow::on_actionEffacer_les_reservations_pass_es_triggered()
+{
+    RESA_deactivate_outdated_resa();
+}
+
 void MainWindow::GEN_raise_popup_info(QString msg)
 {
 
@@ -1311,12 +1316,25 @@ void MainWindow::on_RESA_pushButton_suppr_resa_clicked()
         resa_nb = this->RESA_find_resa_nb_selected(this->ui->RESA_listWidget_resa_currentResa->currentItem());
         if (resa_nb != -1)
         {
-            g_connect_db.delete_resa(resa_nb);
+            g_connect_db.deactivate_resa_from_id(resa_nb);
             this->on_RESA_pushButton_resa_showResa_clicked();
         }
     }
 }
 
+void MainWindow::RESA_deactivate_outdated_resa(void)
+{
+    int ret = GEN_raise_popup_ask_to_continue("Êtes-vous sûr de vouloir désactiver toutes les réservations passées?");
+    if (ret == QMessageBox::Yes)
+    {
+        g_connect_db.deactivate_resa_prior_to_date(QDate::currentDate());
+        GEN_raise_popup_info("Réservations passées désactivées avec succès.");
+    }
+    else
+    {
+
+    }
+}
 // ^^^^^^ MAIN WINDOW "Gestion Reservation" ^^^^^^
 //---------------------------------------------------------
 
@@ -1669,7 +1687,7 @@ void MainWindow::on_SORTIE_pushButton_retirer_kit_from_resa_clicked()
     if (ret == QMessageBox::Yes)
     {
         Kit * l_kit = SORTIE_get_kitOfResa_selected();
-        g_connect_db.delete_resa_from_kit(l_kit);
+        g_connect_db.deactivate_resa_from_kit(l_kit);
 
         //Refresh resa list from DB
         on_SORTIE_pushButton_resa_showResa_clicked();

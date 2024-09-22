@@ -619,14 +619,22 @@ void  Connect_db::end_resa(void)
     runQuery(query, "UNLOCK TABLES");
 }
 
-void Connect_db::delete_resa(int i_resa_nb)
+
+void Connect_db::deactivate_resa_prior_to_date(QDate i_current_date)
+{
+    QSqlQuery query(this->db);
+
+    runQuery(query, "update resa set is_active = 0 where start_date < '"+i_current_date.toString("yyyy-MM-dd")+"'");
+}
+
+void Connect_db::deactivate_resa_from_id(int i_resa_nb)
 {
     QSqlQuery query(this->db);
 
     runQuery(query, "update resa set is_active = 0 where id_resa = "+ QString::number(i_resa_nb));
 }
 
-void Connect_db::delete_resa_from_kit(Kit * i_kit)
+void Connect_db::deactivate_resa_from_kit(Kit * i_kit)
 {
     QSqlQuery query(this->db);
 
