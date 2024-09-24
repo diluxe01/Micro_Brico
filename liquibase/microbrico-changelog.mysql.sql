@@ -78,3 +78,29 @@ ADD COLUMN `is_active` TINYINT NULL DEFAULT 1 AFTER `id_resa`;
 -- changeset adrie:1716202953457-21 comment:add is_active column to sortie table
 ALTER TABLE `db_dev`.`sortie` 
 ADD COLUMN `is_active` TINYINT NULL DEFAULT 1 AFTER `id_sortie`;
+
+
+-- changeset adrie:1716202953457-22 comment:create log tab
+CREATE TABLE `db_dev`.`log` (
+  `id` INT NOT NULL,
+  `date` DATETIME NULL DEFAULT now(),
+  `text` VARCHAR(10000) NULL,
+  `id_kit` INT NULL,
+  `id_user` INT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `id_user_idx` (`id_user` ASC) VISIBLE,
+  INDEX `id_kit_idx` (`id_kit` ASC) VISIBLE,
+  CONSTRAINT `id_kit`
+    FOREIGN KEY (`id_kit`)
+    REFERENCES `db_dev`.`kit` (`idkit`)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE,
+  CONSTRAINT `id_user`
+    FOREIGN KEY (`id_user`)
+    REFERENCES `db_dev`.`utilisateur` (`id`)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE);
+    
+-- changeset adrie:1716202953457-23 comment:create log tab: correct error
+ALTER TABLE `db_dev`.`log` CHANGE COLUMN `id` `id` INT NOT NULL AUTO_INCREMENT ;
+

@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1507</width>
-    <height>852</height>
+    <width>1446</width>
+    <height>829</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_3">
+   <layout class="QVBoxLayout" name="verticalLayout_18">
     <item>
      <widget class="QTabWidget" name="tabwidget">
       <property name="enabled">
@@ -27,7 +27,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="TAB_ges_user">
        <property name="enabled">
@@ -203,142 +203,123 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_5">
            <item>
-            <widget class="QFrame" name="frame_4">
+            <widget class="QFrame" name="frame_2">
              <property name="frameShape">
               <enum>QFrame::Shape::StyledPanel</enum>
              </property>
              <property name="frameShadow">
               <enum>QFrame::Shadow::Raised</enum>
              </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <layout class="QHBoxLayout" name="horizontalLayout_16">
               <item>
-               <widget class="QGroupBox" name="groupBox_7">
-                <property name="title">
-                 <string>Kits</string>
+               <widget class="QFrame" name="frame_3">
+                <property name="frameShape">
+                 <enum>QFrame::Shape::StyledPanel</enum>
                 </property>
-                <layout class="QGridLayout" name="gridLayout">
-                 <item row="1" column="0">
-                  <widget class="QFrame" name="frame_2">
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>16777215</height>
-                    </size>
+                <property name="frameShadow">
+                 <enum>QFrame::Shadow::Raised</enum>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_4">
+                 <item>
+                  <widget class="QGroupBox" name="groupBox_7">
+                   <property name="title">
+                    <string>Kits</string>
                    </property>
-                   <property name="frameShape">
-                    <enum>QFrame::Shape::StyledPanel</enum>
-                   </property>
-                   <property name="frameShadow">
-                    <enum>QFrame::Shadow::Raised</enum>
-                   </property>
-                   <layout class="QHBoxLayout" name="horizontalLayout_16">
+                   <layout class="QVBoxLayout" name="verticalLayout_3">
                     <item>
-                     <widget class="QGroupBox" name="groupBox_9">
+                     <widget class="QTableWidget" name="GESKIT_tableWidget_kit">
+                      <property name="minimumSize">
+                       <size>
+                        <width>1000</width>
+                        <height>0</height>
+                       </size>
+                      </property>
                       <property name="maximumSize">
                        <size>
                         <width>16777215</width>
                         <height>16777215</height>
                        </size>
                       </property>
-                      <property name="title">
-                       <string>Description</string>
+                      <property name="editTriggers">
+                       <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
                       </property>
-                      <layout class="QHBoxLayout" name="horizontalLayout_12">
-                       <item>
-                        <widget class="QTextEdit" name="GESKIT_textEdit_descritpionKit">
-                         <property name="maximumSize">
-                          <size>
-                           <width>16777215</width>
-                           <height>16777215</height>
-                          </size>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QGroupBox" name="groupBox_8">
-                      <property name="maximumSize">
-                       <size>
-                        <width>500</width>
-                        <height>16777215</height>
-                       </size>
+                      <property name="selectionMode">
+                       <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
                       </property>
-                      <property name="title">
-                       <string>Objets du kit</string>
+                      <property name="selectionBehavior">
+                       <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
                       </property>
-                      <layout class="QVBoxLayout" name="verticalLayout_8">
-                       <item>
-                        <widget class="QTableWidget" name="GESKIT_tableWidget_item">
-                         <property name="maximumSize">
-                          <size>
-                           <width>800</width>
-                           <height>16777215</height>
-                          </size>
-                         </property>
-                         <property name="selectionMode">
-                          <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
-                         </property>
-                         <property name="selectionBehavior">
-                          <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
                      </widget>
                     </item>
                    </layout>
-                  </widget>
-                 </item>
-                 <item row="0" column="0">
-                  <widget class="QTableWidget" name="GESKIT_tableWidget_kit">
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>350</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>2000</height>
-                    </size>
-                   </property>
-                   <property name="editTriggers">
-                    <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
-                   </property>
-                   <property name="selectionMode">
-                    <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
-                   </property>
-                   <property name="selectionBehavior">
-                    <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
-                   </property>
                   </widget>
                  </item>
                 </layout>
                </widget>
               </item>
               <item>
-               <widget class="QGroupBox" name="groupBox_11">
-                <property name="maximumSize">
-                 <size>
-                  <width>250</width>
-                  <height>16777215</height>
-                 </size>
+               <widget class="QFrame" name="frame_4">
+                <property name="frameShape">
+                 <enum>QFrame::Shape::StyledPanel</enum>
                 </property>
-                <property name="title">
-                 <string>Détails du Kit</string>
+                <property name="frameShadow">
+                 <enum>QFrame::Shadow::Raised</enum>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_9">
                  <item>
-                  <widget class="QTextEdit" name="GESKIT_textEdit_detailsKit">
+                  <widget class="QGroupBox" name="groupBox_9">
                    <property name="maximumSize">
                     <size>
-                     <width>300</width>
+                     <width>16777215</width>
                      <height>16777215</height>
                     </size>
                    </property>
+                   <property name="title">
+                    <string>Description</string>
+                   </property>
+                   <layout class="QHBoxLayout" name="horizontalLayout_12">
+                    <item>
+                     <widget class="QTextEdit" name="GESKIT_textEdit_descritpionKit">
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>16777215</height>
+                       </size>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QGroupBox" name="groupBox_8">
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="title">
+                    <string>Objets du kit</string>
+                   </property>
+                   <layout class="QVBoxLayout" name="verticalLayout_8">
+                    <item>
+                     <widget class="QTableWidget" name="GESKIT_tableWidget_item">
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>16777215</height>
+                       </size>
+                      </property>
+                      <property name="selectionMode">
+                       <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+                      </property>
+                      <property name="selectionBehavior">
+                       <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
                   </widget>
                  </item>
                 </layout>
@@ -348,80 +329,72 @@
             </widget>
            </item>
            <item>
-            <widget class="QFrame" name="frame_3">
-             <property name="frameShape">
-              <enum>QFrame::Shape::StyledPanel</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Shadow::Raised</enum>
-             </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_3">
-              <item>
-               <widget class="QPushButton" name="GESKIT_pushButton_getkit">
-                <property name="minimumSize">
-                 <size>
-                  <width>200</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Rechercher Kit</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLineEdit" name="GESKIT_lineEdit_findkitbyname">
-                <property name="placeholderText">
-                 <string>Nom</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLineEdit" name="GESKIT_lineEdit_findkitbycode">
-                <property name="placeholderText">
-                 <string>Code</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer">
-                <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Policy::Maximum</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>400</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QPushButton" name="GESKIT_pushButton_duplicate_kit">
-                <property name="text">
-                 <string>Dupliquer le Kit</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="GESKIT_pushButton_modify_kit">
-                <property name="text">
-                 <string>Modifier le Kit</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="GESKIT_pushButton_addkit">
-                <property name="text">
-                 <string>Ajouter un Kit</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <item>
+              <widget class="QPushButton" name="GESKIT_pushButton_getkit">
+               <property name="minimumSize">
+                <size>
+                 <width>200</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Rechercher Kit</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="GESKIT_lineEdit_findkitbyname">
+               <property name="placeholderText">
+                <string>Nom</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="GESKIT_lineEdit_findkitbycode">
+               <property name="placeholderText">
+                <string>Code</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Policy::Maximum</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>200</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="GESKIT_pushButton_duplicate_kit">
+               <property name="text">
+                <string>Dupliquer le Kit</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="GESKIT_pushButton_modify_kit">
+               <property name="text">
+                <string>Modifier le Kit</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="GESKIT_pushButton_addkit">
+               <property name="text">
+                <string>Ajouter un Kit</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </widget>
@@ -783,6 +756,19 @@
                      </property>
                     </widget>
                    </item>
+                   <item>
+                    <spacer name="horizontalSpacer_8">
+                     <property name="orientation">
+                      <enum>Qt::Orientation::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
                   </layout>
                  </item>
                 </layout>
@@ -805,22 +791,39 @@
                 <property name="frameShadow">
                  <enum>QFrame::Shadow::Raised</enum>
                 </property>
-                <layout class="QVBoxLayout" name="verticalLayout_17">
+                <layout class="QVBoxLayout" name="verticalLayout_15">
                  <item>
                   <widget class="QListWidget" name="SORTIE_listWidget_kitsOut"/>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="pushButton_restituerKit">
-                   <property name="font">
-                    <font>
-                     <bold>true</bold>
-                     <underline>true</underline>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string>Restituer</string>
-                   </property>
-                  </widget>
+                  <layout class="QHBoxLayout" name="horizontalLayout_21">
+                   <item>
+                    <widget class="QPushButton" name="pushButton_restituerKit">
+                     <property name="font">
+                      <font>
+                       <bold>true</bold>
+                       <underline>true</underline>
+                      </font>
+                     </property>
+                     <property name="text">
+                      <string>Restituer</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_9">
+                     <property name="orientation">
+                      <enum>Qt::Orientation::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>500</width>
+                       <height>17</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
                  </item>
                 </layout>
                </widget>
@@ -877,7 +880,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1507</width>
+     <width>1446</width>
      <height>22</height>
     </rect>
    </property>

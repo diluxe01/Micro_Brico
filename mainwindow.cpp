@@ -81,12 +81,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->GESKIT_tableWidget_item->setRowCount(0);
     ui->GESKIT_tableWidget_item->setColumnCount(3);
     header_list.append("Nom");
-    header_list.append("Quantité originale");
-    header_list.append("Quantité actuelle");
+    header_list.append("Qté originale");
+    header_list.append("Qté actuelle");
     ui->GESKIT_tableWidget_item->setHorizontalHeaderLabels(header_list);
     ui->GESKIT_tableWidget_item->setColumnWidth(0, 100);
-    ui->GESKIT_tableWidget_item->setColumnWidth(1, 110);
-    ui->GESKIT_tableWidget_item->setColumnWidth(2, 110);
+    ui->GESKIT_tableWidget_item->setColumnWidth(1, 80);
+    ui->GESKIT_tableWidget_item->setColumnWidth(2, 80);
 
 
     // A SUPPRIMER Connection automatique avec l'utilisateur "admin" à chaque démarrage
@@ -469,7 +469,6 @@ void MainWindow::GESKIT_get_kits_by_name(std::vector<Kit*> *from_kits, std::vect
 void MainWindow::GESKIT_clear_display(void)
 {
     this->ui->GESKIT_textEdit_descritpionKit->clear();
-    this->ui->GESKIT_textEdit_detailsKit->clear();
     this->ui->GESKIT_tableWidget_item->clearContents();
     this->ui->GESKIT_tableWidget_item->setRowCount(0);
 
@@ -508,10 +507,9 @@ void MainWindow::GESKIT_refresh_kit_list_from_server(std::vector<Kit*> *i_list)
     this->kitListGeskit_view.clear();
     this->kitListResa_view.clear();
     this->kitListSortie_kitsOfResaView.clear();
-
     this->ui->RESA_listWidget_panierResa->clear();
     this->ui->RESA_listWidget_resa->clear();
-
+    GESKIT_clear_display();
     //Get every kits on server
     g_connect_db.select_all_kits(i_list);
 }
@@ -600,11 +598,6 @@ void MainWindow::GESKIT_push_back_new_kit_on_table(Kit* kit, int row)
     column_index ++;
 }
 
-
-
-
-
-
 void MainWindow::on_GESKIT_tableWidget_kit_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn)
 {
     if (currentRow != previousRow)
@@ -634,7 +627,6 @@ void MainWindow::on_GESKIT_tableWidget_kit_cellDoubleClicked(int row, int column
 
 void MainWindow::GESKIT_refresh_descritption(Kit* kit)
 {
-    this->ui->GESKIT_textEdit_detailsKit->setText(kit->getTexte_libre());
     this->ui->GESKIT_textEdit_descritpionKit->setText(kit->getDescription());
 }
 /*
@@ -790,6 +782,7 @@ void MainWindow::update_connection_status(bool is_user_logged)
             //Clear lineEdit_resa_email_use
             this->ui->RESA_lineEdit_resa_utinfo_user->setText("");
             this->ui->RESA_pushButton_suppr_resa->setEnabled(false);
+            this->ui->RESA_pushButton_reserver->setEnabled(false);
             this->ui->SORTIE_pushButton_sortir->setEnabled(false);
             this->ui->SORTIE_pushButton_retirer_kit_from_resa->setEnabled(false);
         }
@@ -1148,6 +1141,16 @@ void MainWindow::RESA_refresh_basket_kit_list_table(void)
         {
             p_item->setForeground(brush_free);
         }
+    }
+
+    //Only activate "Reserver" button when basket is no empty and ready to book.
+    if ((isBasketReadyToBook == true) && (this->kitListBasket_view.size() >0))
+    {
+        ui->RESA_pushButton_reserver->setEnabled(true);
+    }
+    else
+    {
+        ui->RESA_pushButton_reserver->setEnabled(false);
     }
 }
 
@@ -1583,6 +1586,10 @@ void MainWindow::on_SORTIE_popupSortirResa_pushSortir()
         this->GESKIT_refresh_kit_list_from_server(&this->kitList);
 
         SORTIE_refresh_kitsOut_table();
+
+        // select RESA and last selected kit by user in GUI
+        this->ui->SORTIE_listWidget_resa_currentResa->setCurrentItem(this->item_lastSelectedResa);
+        on_SORTIE_listWidget_resa_currentResa_itemClicked(this->item_lastSelectedResa);
     }
 }
 
@@ -1608,12 +1615,6 @@ void MainWindow::SORTIE_sortir_kit()
 
     p_kit->setIs_out(true);
     GEN_raise_popup_info("Votre Sortie n° **"+QString::number(sortie_nb)+"** est bien prise en compte.");
-
-    // Set item
-    this->ui->SORTIE_listWidget_resa_currentResa->setCurrentItem(this->item_lastSelectedResa);
-    on_SORTIE_listWidget_resa_currentResa_itemClicked(this->item_lastSelectedResa);
-
-
 }
 
 ///

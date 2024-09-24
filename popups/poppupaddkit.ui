@@ -369,7 +369,11 @@
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_7">
                   <item>
-                   <widget class="QSpinBox" name="spinBox_item_quantity_current"/>
+                   <widget class="QSpinBox" name="spinBox_item_quantity_current">
+                    <property name="value">
+                     <number>1</number>
+                    </property>
+                   </widget>
                   </item>
                  </layout>
                 </widget>
