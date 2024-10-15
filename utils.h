@@ -5,6 +5,7 @@
 #include "utilisateur.h"
 #include "resa.h"
 #include "sortie.h"
+#include "log.h"
 #include <vector>
 
 class Utils
@@ -16,6 +17,7 @@ public:
     void clearList(std::vector<Utilisateur*> *);
     void clearList(std::vector<Resa*> *);
     void clearList(std::vector<Sortie*> *);
+    void clearList(std::vector<Log*> *);
 };
 
 extern  Utils g_utils;

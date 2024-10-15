@@ -20,6 +20,38 @@ Connect_db::Connect_db() {
 
     }
 
+void Connect_db::select_logs_by_kit(std::vector<Log *> *o_log, Kit *i_kit, int i_max_lines)
+{
+    QSqlQuery query  = QSqlQuery(this->db);
+    QString datestr;
+    QDateTime datetime;
+    QString exec_string = "select text, id_user, date from log where id_kit = "+ QString::number(i_kit->getIdKit())+ " order by date desc limit "+QString::number(i_max_lines) ;
+
+    runQuery(query, exec_string);
+    while (query.next())
+    {
+        Log *p_log = new Log;
+        p_log->setId_user((query.value("id_user").toInt()));
+        p_log->setId_kit(i_kit->getIdKit());
+        p_log->setText((query.value("text").toString()));
+        datestr = (query.value("date").toString());
+        qDebug() << datestr;
+        datetime = QDateTime::fromString(datestr,"yyyy-MM-dd");
+
+        o_log->push_back(p_log);
+    }
+
+}
+
+void Connect_db::insert_log_by_user_and_kit(Kit *i_kit, Utilisateur *i_user, QString i_text)
+{
+    QDateTime date = QDateTime::currentDateTime();
+    QSqlQuery query  = QSqlQuery(this->db);
+    QString exec_string = "insert into log (text, id_kit, id_user) values (\""+date.toString()+" :: "+i_text+"\", "+QString::number(i_kit->getIdKit())+", "+QString::number(i_user->getId())+")";
+
+    runQuery(query, exec_string);
+}
+
 bool Connect_db::runQuery(QSqlQuery &query, QString query_string)
 {
     bool querry_had_errors = false;
@@ -271,10 +303,10 @@ bool Connect_db::get_user_by_utinfo(QString i_utinfo, Utilisateur * o_user)
         o_user->setNom(query.value("nom").toString());
         o_user->setMdp(query.value("mdp").toString());
         o_user->setPrenom(query.value("prenom").toString());
-        o_user->setUtinfo(query.value("email").toString());
+        o_user->setEmail(query.value("email").toString());
         o_user->setToken(query.value("token").toString());
         o_user->setId(query.value("id").toInt());
-        o_user->setEmail(i_utinfo);
+        o_user->setUtinfo(i_utinfo);
     }
     return querry_had_errors;
 }
@@ -575,7 +607,7 @@ void Connect_db::populate_resa_list_from_query(std::vector<Resa *> *i_resa, QSql
 void  Connect_db::start_resa(void)
 {
     QSqlQuery query(this->db);
-    runQuery(query, "LOCK TABLES uid_resa WRITE, resa WRITE, utilisateur READ");
+    runQuery(query, "LOCK TABLES uid_resa WRITE, resa WRITE, utilisateur READ, log write");
 }
 
 //Returns next reservation number by incr. the last number inserted.
@@ -718,7 +750,7 @@ void  Connect_db::set_kit_out_status (std::vector<Kit*> *i_kits)
 void  Connect_db::start_sortie(void)
 {
     QSqlQuery query(this->db);
-    runQuery(query, "LOCK TABLES uid_sortie WRITE, sortie WRITE, utilisateur READ, kit READ");
+    runQuery(query, "LOCK TABLES uid_sortie WRITE, sortie WRITE, utilisateur READ, kit READ, log write");
 }
 
 
@@ -764,4 +796,20 @@ void Connect_db::delete_sortie_from_kit(Kit *i_p_kit)
     runQuery(query, "update sortie set is_active = 0 where id_kit = "+ QString::number(i_p_kit->getIdKit()));
 
     qInfo()<< "Le Kit " << i_p_kit->getNom() <<" a été restitué avec succès.";
+}
+
+int Connect_db::select_sortie_nb_from_kit(Kit *i_p_kit)
+{
+    QSqlQuery query(this->db);
+    int id = 0;
+    runQuery(query, "SELECT id_sortie from sortie where id_kit="+QString::number(i_p_kit->getIdKit())+" AND is_active = 1");
+    if (query.next() == false)
+    {
+        id = -1;
+    }
+    else
+    {
+        id = query.value("id_sortie").toInt();
+    }
+    return id;
 }

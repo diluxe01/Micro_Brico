@@ -49,3 +49,13 @@ void Utils::clearList(std::vector<Sortie*> *i_list)
     }
     i_list->clear();
 }
+
+
+void Utils::clearList(std::vector<Log*> *i_list)
+{
+    for(const auto& elem : *i_list)
+    {
+        delete (elem);
+    }
+    i_list->clear();
+}

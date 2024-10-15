@@ -8,6 +8,7 @@
 #include "./popups/delete_user.h"
 #include "./popups/poppupaddkit.h"
 #include "./popups/popupsortirresa.h"
+#include "./logger/log_user_kit_appli.h"
 #include <list>
 
 #include "resa.h"
@@ -53,6 +54,7 @@ private slots:
     void on_GESKIT_pushButton_duplicate_kit_clicked();
     void on_GESKIT_pushButton_modify_kit_clicked();
     void on_GESKIT_pushButton_getkit_clicked();
+    void on_GESKIT_pushButton_logkit_clicked();
     void on_GESKIT_tableWidget_kit_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
     void on_GESKIT_tableWidget_kit_cellDoubleClicked(int row, int column);
 
@@ -78,6 +80,7 @@ private slots:
     void on_SORTIE_pushButton_retirer_kit_from_resa_clicked();
 
 
+
 private:
     Ui::MainWindow *ui;
     std::vector<Utilisateur*> userList;
@@ -99,6 +102,7 @@ private:
     PopupSortirResa *p_popupSortirResa;
     Delete_user *p_popupDeleteUser;
     PoppupAddKit *p_popupAddKit;
+    log_user_kit_appli *p_log_user_kit_appli;
     bool isBasketReadyToBook; //Variable remembering if the basket contains an already booked kit
     QListWidgetItem * item_lastSelectedResa;//Variable remembering the last selected resa (only for "SORTIE" view)
 
@@ -152,7 +156,6 @@ private:
     void RESA_refresh_current_resa_list_table();
     int RESA_find_resa_nb_selected(QListWidgetItem *item);
     void RESA_deactivate_outdated_resa();
-
 
     //-----------Sorties-------------------
     Kit *SORTIE_get_kitOfResa_selected();

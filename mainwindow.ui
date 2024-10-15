@@ -27,7 +27,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="TAB_ges_user">
        <property name="enabled">
@@ -391,6 +391,13 @@
               <widget class="QPushButton" name="GESKIT_pushButton_addkit">
                <property name="text">
                 <string>Ajouter un Kit</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="GESKIT_pushButton_logkit">
+               <property name="text">
+                <string>Afficher Logs</string>
                </property>
               </widget>
              </item>

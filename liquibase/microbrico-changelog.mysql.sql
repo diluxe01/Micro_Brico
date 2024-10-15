@@ -104,3 +104,9 @@ CREATE TABLE `db_dev`.`log` (
 -- changeset adrie:1716202953457-23 comment:create log tab: correct error
 ALTER TABLE `db_dev`.`log` CHANGE COLUMN `id` `id` INT NOT NULL AUTO_INCREMENT ;
 
+
+-- changeset adrie:1716202953457-24 comment: log table set index descend ORDER
+ALTER TABLE `db_dev`.`log` 
+ADD INDEX `index_date` (`date` DESC) VISIBLE;
+;
+

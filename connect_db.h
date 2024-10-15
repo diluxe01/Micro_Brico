@@ -38,6 +38,10 @@ public:
     //-----------General----------------
     QSqlDatabase db;
     Connect_db();
+
+    void select_logs_by_kit(std::vector<Log *> * o_log, Kit * i_kit, int i_max_lines);
+    void insert_log_by_user_and_kit(Kit * i_kit, Utilisateur *i_user, QString text);
+
     //-----------User-------------------
     void select_all_users(std::vector<Utilisateur*> *list);
     bool add_user (Utilisateur *user);
@@ -80,6 +84,7 @@ public:
     void select_all_active_sortie(std::vector<Sortie *> *i_sortie);
     void select_active_sortie_by_user(std::vector<Sortie *> *o_sortie, uint user_id);
     void delete_sortie_from_kit(Kit *i_p_kit);
+    int select_sortie_nb_from_kit(Kit *i_p_kit);
 
 public slots:
 signals:

@@ -48,6 +48,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         utils.h utils.cpp
         popups/popupsortirresa.h popups/popupsortirresa.cpp popups/popupsortirresa.ui
         sortie.h sortie.cpp
+        log.h log.cpp
+        logger/log_user_kit_appli.h logger/log_user_kit_appli.cpp logger/log_user_kit_appli.ui
 
 
 

@@ -678,6 +678,23 @@ Kit * MainWindow::GESKIT_find_kit_by_id(uint id)
 }
 
 
+void MainWindow::on_GESKIT_pushButton_logkit_clicked()
+{
+    //First get kit selected by user
+    Kit* p_kit = GESKIT_get_kit_selected();
+
+
+    this->p_log_user_kit_appli = new (log_user_kit_appli);
+    this->p_log_user_kit_appli->setKit(p_kit);
+    this->p_log_user_kit_appli->setWindowTitle("Logs du kit: "+p_kit->getNom());
+    this->p_log_user_kit_appli->update_logs_from_kit(100);
+    this->p_log_user_kit_appli->show();
+
+}
+
+
+
+
 // ^^^^^^ MAIN WINDOW "Gestion Kits" ^^^^^^
 //---------------------------------------------------------
 
@@ -1203,6 +1220,7 @@ void MainWindow::on_RESA_pushButton_reserver_clicked()
                 for(const auto& kit_elem : this->kitListBasket_view)
                 {
                     g_connect_db.add_resa_from_kit(kit_elem, l_user.getId(), start_date, resa_nb );
+                    g_connect_db.insert_log_by_user_and_kit(kit_elem,&l_user,"L'utilisateur '"+l_user.getUtinfo()+"' a réservé le kit '"+kit_elem->getNom()+"' (code: "+kit_elem->getCode()+") pour la date: '"+start_date.toString()+"'");
                     kit_elem->setIs_in_basket(false);
                     kit_elem->setIs_booked(true);
                 }
@@ -1609,6 +1627,7 @@ void MainWindow::SORTIE_sortir_kit()
     g_connect_db.start_sortie();
     sortie_nb = g_connect_db.guess_next_sortie_nb();
     g_connect_db.add_sortie_from_kit(p_kit, l_user.getId(), start_date, sortie_nb);
+    g_connect_db.insert_log_by_user_and_kit(p_kit,&l_user,"L'utilisateur '"+l_user.getUtinfo()+"' a sorti le kit '"+p_kit->getNom()+"' (code: "+p_kit->getCode()+", n° de sortie: "+QString::number(sortie_nb)+")");
     // End of LOCK
     g_connect_db.end_sortie();
 
@@ -1660,14 +1679,17 @@ void MainWindow::on_SORTIE_popupSortirResa_pushRestituer()
 void MainWindow::SORTIE_restit_kit()
 {
     Kit * p_kit = this->p_popupSortirResa->getP_kit();
+    Utilisateur l_user;
+    g_connect_db.get_user_by_utinfo(this->ui->SORTIE_lineEdit_utinfo->text(), &l_user);
 
     g_connect_db.update_items_quantity_of_kit (p_kit, this->p_popupSortirResa->item_list_dest);
 
     //Supprimer la sortie dans la table de reservation
+    int sortie_number = g_connect_db.select_sortie_nb_from_kit(p_kit); // get sortie_nb for logs before deactivating sortie
     g_connect_db.delete_sortie_from_kit(p_kit);
-
     p_kit->setIs_out(false);
     GEN_raise_popup_info("Vous avez restitué le kit : "+ p_kit->getNom());
+    g_connect_db.insert_log_by_user_and_kit(p_kit,&l_user,"L'utilisateur '"+l_user.getUtinfo()+"' a restitué le kit '"+p_kit->getNom()+"' (code: "+p_kit->getCode()+", n° de sortie: "+QString::number(sortie_number)+")");
 
 }
 
@@ -1701,7 +1723,4 @@ void MainWindow::on_SORTIE_pushButton_retirer_kit_from_resa_clicked()
 
 // ^^^^^^ MAIN WINDOW "Gestion SORTIES" ^^^^^^
 //---------------------------------------------------------
-
-
-
 
