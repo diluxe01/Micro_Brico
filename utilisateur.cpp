@@ -10,6 +10,7 @@ Utilisateur::Utilisateur(void ) {
     this->token = "token";
     this->utinfo = "utinfo";
     this->is_logged_on = false;
+    this->create_type = E_new;
 }
 Utilisateur::Utilisateur( QString nom, QString mdp, QString prenom, QString email, QString utinfo)
 {
@@ -19,12 +20,12 @@ Utilisateur::Utilisateur( QString nom, QString mdp, QString prenom, QString emai
     this->email = email;
     this->utinfo = utinfo;
     this->is_logged_on = false;
+    this->create_type = E_new;
 }
 
-void Utilisateur::setUserData( QString nom, QString mdp, QString prenom, QString email, QString utinfo, T_user_privilege newPrivilege)
+void Utilisateur::setUserData( QString nom,  QString prenom, QString email, QString utinfo, T_user_privilege newPrivilege)
 {
     this->nom = nom;
-    this->mdp = mdp;
     this->prenom = prenom;
     this->email = email;
     this->utinfo = utinfo;
@@ -120,6 +121,17 @@ int Utilisateur::getId() const
 {
     return id;
 }
+
+T_modify_or_new Utilisateur::getCreate_type() const
+{
+    return create_type;
+}
+
+void Utilisateur::setCreate_type(T_modify_or_new newCreate_type)
+{
+    create_type = newCreate_type;
+}
+
 
 QString Utilisateur::ToString() {
 

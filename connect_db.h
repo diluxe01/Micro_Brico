@@ -14,6 +14,7 @@
 #include <list>
 #include <iterator>
 
+
 class Connect_db : public QObject
 {
     Q_OBJECT
@@ -45,6 +46,7 @@ public:
     //-----------User-------------------
     void select_all_users(std::vector<Utilisateur*> *list);
     bool add_user (Utilisateur *user);
+    bool update_user(Utilisateur *i_user);
     void setActiveUser(Utilisateur * p_user);
     bool delete_user(Utilisateur *user_to_delete);
     bool connect_user();
@@ -58,7 +60,7 @@ public:
     void select_kits_by_name(std::vector<Kit *> *kits, QString code);
     void add_kit (Kit *);
     void update_kit (Kit *);
-    void update_items_quantity_of_kit (Kit *, std::vector<Item*> i_new_items);
+    QString update_items_quantity_of_kit (Kit *, std::vector<Item*> i_new_items);
     void add_item(Item *p_item, QString i_idkit);
     void select_all_kits(std::vector<Kit*> *kits);
     void select_items_by_kit (Kit * );

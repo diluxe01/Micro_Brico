@@ -23,6 +23,7 @@ public:
 
     void closeEvent(QCloseEvent *event);
     Utilisateur* get_user_from_form(void);
+    void set_form_from_user(Utilisateur * p_user);
 
     QPushButton *getOkButton();
     QPushButton *getCancelButton();

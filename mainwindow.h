@@ -48,6 +48,8 @@ private slots:
     void on_GESUSER_pushButton_getuser_clicked();
     void on_GESUSER_pushButton_add_user_clicked();
     void on_GESUSER_pushbutton_deleteUser_clicked();
+    void on_GESUSER_pushButton_modify_user_clicked();
+    void on_GESUSER_tableWidget_user_cellClicked(int row, int column);
 
     //-----------Slots GESKIT-------------------
     void on_GESKIT_pushButton_addkit_clicked();
@@ -80,6 +82,8 @@ private slots:
     void on_SORTIE_pushButton_retirer_kit_from_resa_clicked();
 
 
+
+    void on_GESUSER_tableWidget_user_cellDoubleClicked(int row, int column);
 
 private:
     Ui::MainWindow *ui;
@@ -126,6 +130,7 @@ private:
     void GESUSER_get_user_by_name(std::vector<Utilisateur *> *from_user, std::vector<Utilisateur *> *to_user, QString name);
     void GESUSER_get_user_by_utinfo(std::vector<Utilisateur *> *from_user, std::vector<Utilisateur *> *to_user, QString utinfo);
     void GESUSER_add_new_user();
+    void GESUSER_edit_user();
     void GESUSER_clear_display();
     void GESUSER_enable_GESUSER_buttons(bool i_enable);
     Utilisateur* GESUSER_get_user_selected();

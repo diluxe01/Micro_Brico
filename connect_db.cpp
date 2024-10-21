@@ -98,6 +98,37 @@ bool Connect_db::add_user (Utilisateur *user)  {
                " values('"+user->getNom()+"','"+user->getMdp()+"','"+user->getPrenom()+"','"+user->getEmail()+"','"+user->getToken()+"','"+user->getUtinfo()+"','"+l_privilege+"')");
 }
 ///
+/// \brief Connect_db::update_user
+/// \param i_user
+/// \return true if an error occured, false otherwise
+///
+bool Connect_db::update_user (Utilisateur *i_user)  {
+    QSqlQuery query  = QSqlQuery(this->db);
+    QString l_privilege;
+    if (i_user->getPrivilege() == E_admin)
+    {
+        l_privilege = "admin";
+    }
+    else
+    {
+        l_privilege = "user";
+    }
+
+
+    QString exec_string = "update utilisateur set  nom = \"%1\" ,  mdp = \"%2\", prenom = \"%3\",  email = \"%4\", utinfo = \"%5\",privilege = \"%6\" where id = %7";
+
+    exec_string = exec_string .arg(i_user->getNom())
+                              .arg(i_user->getMdp())
+                              .arg(i_user->getPrenom())
+                              .arg(i_user->getEmail())
+                              .arg(i_user->getUtinfo())
+                              .arg(l_privilege)
+                              .arg(i_user->getId());
+
+    return runQuery(query, exec_string);
+}
+
+///
 /// \brief Connect_db::add_item adds item to database,
 /// \param p_item: pointer to item to add to db
 /// \param i_idkit: idkit (foreign key of item) associated to added item
@@ -212,17 +243,20 @@ void Connect_db::update_kit (Kit *i_kit)  {
 /// Update the quantity of the items of kit pointed by i_kit, with the quantity of matching items in i_new_items list
 /// \param i_kit: kit where item are to be changed
 /// \param i_new_items: list containing items whith new quantity
+/// \return Returns the string of new quantity by items for logs
 ///
-void Connect_db::update_items_quantity_of_kit(Kit * i_kit, std::vector<Item *> i_new_items)  {
+QString Connect_db::update_items_quantity_of_kit(Kit * i_kit, std::vector<Item *> i_new_items)  {
 
     QSqlQuery query  = QSqlQuery(this->db);
     QString exec_string = "";
+    QString log_str = "Nouvelle quantité de chaque items du kit '"+i_kit->getNom()+"'--> ";
     for(const auto& elem_new_item : i_new_items)
     {
         for(const auto& elem_kit_item : i_kit->item_list)
         {
             if (elem_new_item->getId() == elem_kit_item->getId())
             {
+                log_str = log_str + elem_new_item->getName()+ " ("+QString::number(elem_new_item->getQuantity_current())+"), ";
                 if (elem_new_item->getQuantity_current() != elem_kit_item->getQuantity_current())
                 {
                     exec_string = "update item set quantity = " +QString::number(elem_new_item->getQuantity_current())+" where id = " + QString::number(elem_new_item->getId()) ;
@@ -231,6 +265,7 @@ void Connect_db::update_items_quantity_of_kit(Kit * i_kit, std::vector<Item *> i
             }
         }
     }
+    return log_str;
 }
 
 

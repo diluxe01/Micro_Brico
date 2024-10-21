@@ -187,23 +187,43 @@ void MainWindow::on_popupaddUser_ok()
     Utilisateur *p_user;
     p_user = this->p_popupAddUser->get_user_from_form();
 
-    if (p_user ==NULL)
+    if (p_user == NULL)
     {
 
     }
     else
     {
-        if (g_connect_db.add_user(p_user) == false)// no errors occured
+        if (p_user->getCreate_type() == E_modify) // modify user in database
         {
-            GEN_raise_popup_info("Nouvel utilisateur '"+p_user->getNom() + "' correctement ajouté!");
-            delete (p_popupAddUser);
-            this->setEnabled(true);
-            this->GESUSER_refresh_user_list_from_server(&this->userList);
+            if (g_connect_db.update_user(p_user) == false)// no errors occured
+            {
+                GEN_raise_popup_info("L'utilisateur '"+p_user->getNom() + "' correctement modifié!");
+                delete (p_popupAddUser);
+                this->setEnabled(true);
+            }
+            else
+            {
+                GEN_raise_popup_info("Une erreur est survenue lors de la modification de l'utilisteur.");
+            }
+
         }
-        else
+        else // insert new user in database
         {
-            GEN_raise_popup_info("Une erreur est survenue lors de l'ajout de l'utilisateur.");
+            if (g_connect_db.add_user(p_user) == false)// no errors occured
+            {
+                GEN_raise_popup_info("Nouvel utilisateur '"+p_user->getNom() + "' correctement ajouté!");
+                delete (p_popupAddUser);
+                this->setEnabled(true);
+            }
+            else
+            {
+                GEN_raise_popup_info("Une erreur est survenue lors de l'ajout de l'utilisateur.");
+            }
+
         }
+
+        this->GESUSER_refresh_user_list_from_server(&this->userList);
+        on_GESUSER_pushButton_getuser_clicked();
 
     }
 }
@@ -216,6 +236,22 @@ void MainWindow::on_actionNouvel_Utilisateur_triggered()
 void MainWindow::on_GESUSER_pushButton_add_user_clicked()
 {
     GESUSER_add_new_user();
+}
+
+void MainWindow::on_GESUSER_pushButton_modify_user_clicked()
+{
+    GESUSER_edit_user();
+}
+
+void MainWindow::on_GESUSER_tableWidget_user_cellDoubleClicked(int row, int column)
+{
+    GESUSER_edit_user();
+}
+
+
+void MainWindow::on_GESUSER_tableWidget_user_cellClicked(int row, int column)
+{
+    GESUSER_enable_GESUSER_buttons(true);
 }
 
 // ^^^^^^ POPUP ADD USER SECTION ^^^^^^
@@ -283,6 +319,7 @@ void MainWindow::on_GESUSER_pushButton_getuser_clicked()
     }
 
 
+    GESUSER_enable_GESUSER_buttons(false);
     MainWindow::GESUSER_refresh_user_table();
 }
 
@@ -320,6 +357,27 @@ void MainWindow::GESUSER_add_new_user()
     }
     this->p_popupAddUser->setCaller_privilege(l_privilege_of_connected_user);
     this->p_popupAddUser->setWindowTitle("Ajout d'un nouvel utilisateur");
+    this->p_popupAddUser->show_wrapper();
+    this->setEnabled(false);
+    QObject::connect(this->p_popupAddUser->getOkButton(), &QPushButton::clicked, this, &MainWindow::on_popupaddUser_ok);
+    QObject::connect(this->p_popupAddUser->getCancelButton(), &QPushButton::clicked, this, &MainWindow::on_popupaddUser_destroyed);
+    QObject::connect(this->p_popupAddUser, &popupAddUsers::delete_popup, this, &MainWindow::on_popupaddUser_destroyed);
+}
+
+void MainWindow::GESUSER_edit_user()
+{
+    T_user_privilege l_privilege_of_connected_user = E_basic;
+    Utilisateur* p_user = GESUSER_get_user_selected();
+    this->p_popupAddUser = new popupAddUsers;
+    // check if a user is connected when creating a new account, and if so, get its privilege
+    if (this->login_user.getIs_logged_on())
+    {
+        l_privilege_of_connected_user = this->login_user.getPrivilege();
+    }
+    this->p_popupAddUser->setCaller_privilege(l_privilege_of_connected_user);
+    this->p_popupAddUser->setWindowTitle("Modification de l'utilisateur: ");
+    p_user->setCreate_type(E_modify);
+    this->p_popupAddUser->set_form_from_user(p_user);
     this->p_popupAddUser->show_wrapper();
     this->setEnabled(false);
     QObject::connect(this->p_popupAddUser->getOkButton(), &QPushButton::clicked, this, &MainWindow::on_popupaddUser_ok);
@@ -727,6 +785,9 @@ void MainWindow::on_popupDelete_ok()
 
     delete (this->p_popupDeleteUser);
 }
+
+
+
 // ^^^^^^ POPUP DELETE_USER SECTION ^^^^^^
 //---------------------------------------------------------
 
@@ -770,7 +831,6 @@ void MainWindow::update_connection_status(bool is_user_logged)
 
         this->GESKIT_enable_geskit_buttons(false);
 
-        this->GESUSER_enable_GESUSER_buttons(false);
 
         if (is_user_logged == true)
         {
@@ -1621,13 +1681,14 @@ void MainWindow::SORTIE_sortir_kit()
     has_errors = g_connect_db.get_user_by_utinfo(this->ui->SORTIE_lineEdit_utinfo->text(), &l_user);
     start_date = QDate::currentDate();
 
-    g_connect_db.update_items_quantity_of_kit (p_kit, this->p_popupSortirResa->item_list_dest);
+    QString log_str = g_connect_db.update_items_quantity_of_kit (p_kit, this->p_popupSortirResa->item_list_dest);
 
     // Start of LOCK
     g_connect_db.start_sortie();
     sortie_nb = g_connect_db.guess_next_sortie_nb();
     g_connect_db.add_sortie_from_kit(p_kit, l_user.getId(), start_date, sortie_nb);
     g_connect_db.insert_log_by_user_and_kit(p_kit,&l_user,"L'utilisateur '"+l_user.getUtinfo()+"' a sorti le kit '"+p_kit->getNom()+"' (code: "+p_kit->getCode()+", n° de sortie: "+QString::number(sortie_nb)+")");
+    g_connect_db.insert_log_by_user_and_kit(p_kit,&l_user,log_str);
     // End of LOCK
     g_connect_db.end_sortie();
 
@@ -1682,14 +1743,15 @@ void MainWindow::SORTIE_restit_kit()
     Utilisateur l_user;
     g_connect_db.get_user_by_utinfo(this->ui->SORTIE_lineEdit_utinfo->text(), &l_user);
 
-    g_connect_db.update_items_quantity_of_kit (p_kit, this->p_popupSortirResa->item_list_dest);
+    int sortie_number = g_connect_db.select_sortie_nb_from_kit(p_kit); // get sortie_nb for logs before deactivating sortie
+    g_connect_db.insert_log_by_user_and_kit(p_kit,&l_user,"L'utilisateur '"+l_user.getUtinfo()+"' a restitué le kit '"+p_kit->getNom()+"' (code: "+p_kit->getCode()+", n° de sortie: "+QString::number(sortie_number)+")");
+    QString log_str = g_connect_db.update_items_quantity_of_kit (p_kit, this->p_popupSortirResa->item_list_dest);
+    g_connect_db.insert_log_by_user_and_kit(p_kit,&l_user,log_str);
 
     //Supprimer la sortie dans la table de reservation
-    int sortie_number = g_connect_db.select_sortie_nb_from_kit(p_kit); // get sortie_nb for logs before deactivating sortie
     g_connect_db.delete_sortie_from_kit(p_kit);
     p_kit->setIs_out(false);
     GEN_raise_popup_info("Vous avez restitué le kit : "+ p_kit->getNom());
-    g_connect_db.insert_log_by_user_and_kit(p_kit,&l_user,"L'utilisateur '"+l_user.getUtinfo()+"' a restitué le kit '"+p_kit->getNom()+"' (code: "+p_kit->getCode()+", n° de sortie: "+QString::number(sortie_number)+")");
 
 }
 
@@ -1723,4 +1785,7 @@ void MainWindow::on_SORTIE_pushButton_retirer_kit_from_resa_clicked()
 
 // ^^^^^^ MAIN WINDOW "Gestion SORTIES" ^^^^^^
 //---------------------------------------------------------
+
+
+
 

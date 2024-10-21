@@ -7,6 +7,9 @@
 #include "sortie.h"
 #include "log.h"
 #include <vector>
+using namespace std;
+
+
 
 class Utils
 {

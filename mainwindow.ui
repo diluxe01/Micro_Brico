@@ -27,7 +27,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="TAB_ges_user">
        <property name="enabled">
@@ -150,7 +150,7 @@
              <item>
               <widget class="QPushButton" name="GESUSER_pushButton_modify_user">
                <property name="text">
-                <string>NON IMP :Modifier Utilisateur</string>
+                <string>Modifier Utilisateur</string>
                </property>
               </widget>
              </item>
