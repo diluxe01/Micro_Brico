@@ -346,6 +346,32 @@ bool Connect_db::get_user_by_utinfo(QString i_utinfo, Utilisateur * o_user)
     return querry_had_errors;
 }
 
+bool Connect_db::get_user_by_id(int id, Utilisateur *o_user)
+{
+    QSqlQuery query  = QSqlQuery(this->db);
+
+    bool querry_had_errors = false;
+    runQuery(query, "SELECT utinfo, nom, mdp, prenom, email, token from utilisateur where id="+QString::number(id)+"");
+    if (query.size() == 0)
+    {
+        querry_had_errors = true;
+        qDebug() <<  "get_user_by_id: Une erreur s'est produite, l'id fournie est inconnu.";
+    }
+    else
+    {   //no errors
+        query.first();
+        o_user->setNom(query.value("nom").toString());
+        o_user->setMdp(query.value("mdp").toString());
+        o_user->setPrenom(query.value("prenom").toString());
+        o_user->setUtinfo(query.value("utinfo").toString());
+        o_user->setEmail(query.value("email").toString());
+        o_user->setToken(query.value("token").toString());
+        o_user->setId(id);
+    }
+    return querry_had_errors;
+
+}
+
 
 QString Connect_db::get_sha1_from_Qstring(QString mdp)
 {

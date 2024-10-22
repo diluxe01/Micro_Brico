@@ -55,6 +55,7 @@ public:
     void update_user_token_on_db(void);
     bool get_user_by_mail(QString i_mail, Utilisateur * o_user);
     bool get_user_by_utinfo(QString i_utinfo, Utilisateur *o_user);
+    bool get_user_by_id(int id, Utilisateur *o_user);
     //-----------Kit-------------------
     void select_kits_by_code(std::vector<Kit *> *kits, QString code);
     void select_kits_by_name(std::vector<Kit *> *kits, QString code);

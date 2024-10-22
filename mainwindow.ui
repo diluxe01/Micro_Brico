@@ -27,7 +27,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="TAB_ges_user">
        <property name="enabled">
@@ -710,7 +710,7 @@
                       </size>
                      </property>
                      <property name="text">
-                      <string>Terminer Réservation</string>
+                      <string>NOT IMPLEM :Terminer Réservation</string>
                      </property>
                     </widget>
                    </item>

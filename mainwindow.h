@@ -50,6 +50,7 @@ private slots:
     void on_GESUSER_pushbutton_deleteUser_clicked();
     void on_GESUSER_pushButton_modify_user_clicked();
     void on_GESUSER_tableWidget_user_cellClicked(int row, int column);
+    void on_GESUSER_tableWidget_user_cellDoubleClicked(int row, int column);
 
     //-----------Slots GESKIT-------------------
     void on_GESKIT_pushButton_addkit_clicked();
@@ -80,10 +81,7 @@ private slots:
     void on_SORTIE_popupSortirResa_pushRestituer();//Callback called when "Restituer" button is pushed inside popup
     void on_pushButton_restituerKit_clicked();
     void on_SORTIE_pushButton_retirer_kit_from_resa_clicked();
-
-
-
-    void on_GESUSER_tableWidget_user_cellDoubleClicked(int row, int column);
+    void on_SORTIE_pushButton_endResa_clicked();
 
 private:
     Ui::MainWindow *ui;

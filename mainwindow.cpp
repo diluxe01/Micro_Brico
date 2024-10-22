@@ -89,11 +89,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->GESKIT_tableWidget_item->setColumnWidth(2, 80);
 
 
-    // A SUPPRIMER Connection automatique avec l'utilisateur "admin" à chaque démarrage
-    this->p_loginConnect = new (Login_connect);
-    this->login_user.setUtinfo("admin");
-    this->login_user.setMdp("admin");
-    this-> on_popupLogin_ok();
 
     // Init date Edit in resa tab to current date
     QDate maxDate;
@@ -101,6 +96,16 @@ MainWindow::MainWindow(QWidget *parent)
     this->ui->RESA_calendarWidget->setDateRange(QDate::currentDate(), maxDate);
     this->ui->RESA_calendarWidget->setSelectedDate(this->RESA_get_next_resa_day(QDate::currentDate())); // Set Selected date to next friday
     this->on_RESA_calendarWidget_clicked(this->RESA_get_next_resa_day(QDate::currentDate()));
+
+    // Disable menu items that should not be activable if no user is connected
+    this->ui->actionEffacer_les_reservations_pass_es->setEnabled(false);
+
+
+    // A SUPPRIMER Connection automatique avec l'utilisateur "admin" à chaque démarrage
+    this->p_loginConnect = new (Login_connect);
+    this->login_user.setUtinfo("admin");
+    this->login_user.setMdp("admin");
+    this-> on_popupLogin_ok();
 }
 
 MainWindow::~MainWindow()
@@ -828,7 +833,6 @@ void MainWindow::update_connection_status(bool is_user_logged)
         this->ui->TAB_ges_kits->setEnabled(is_user_logged);
         this->ui->actionSe_connecter->setEnabled(!is_user_logged);
         this->ui->actionSe_d_connecter->setEnabled(is_user_logged);
-
         this->GESKIT_enable_geskit_buttons(false);
 
 
@@ -845,10 +849,12 @@ void MainWindow::update_connection_status(bool is_user_logged)
             if (this->login_user.getPrivilege() == E_admin)
             {
                 this->ui->RESA_lineEdit_resa_utinfo_user->setEnabled(true);
+                this->ui->actionEffacer_les_reservations_pass_es->setEnabled(true);
             }
             else
             {
                 this->ui->RESA_lineEdit_resa_utinfo_user->setEnabled(false);
+                this->ui->actionEffacer_les_reservations_pass_es->setEnabled(false);
             }
 
 
@@ -1517,6 +1523,7 @@ void MainWindow::SORTIE_refresh_kits_of_resa_table(int i_resa_nb)
         {
             // get corresponding item of listWidget
             p_item2 = this->ui->SORTIE_listWidget_resa_kitsOfResa->item(cnt);
+
             // Check if kit is already out
             if (kit_elem->getIs_out() == true)
             {
@@ -1529,6 +1536,13 @@ void MainWindow::SORTIE_refresh_kits_of_resa_table(int i_resa_nb)
                 else
                 {
                     p_item2->setBackground(brush_out_by_someone_else);
+                    //If item is out by another user, add user UTINFO to text
+                    Utilisateur user;
+                    if (g_connect_db.get_user_by_id(kit_elem->getId_user_out(), &user) == false)
+                    {
+                        QString text = p_item2->text();
+                        p_item2->setText(text + " (sorti par '" + user.getUtinfo() + "', email: '"+user.getEmail()+"')");
+                    }
                 }
             }
             else
@@ -1783,9 +1797,15 @@ void MainWindow::on_SORTIE_pushButton_retirer_kit_from_resa_clicked()
     }
 }
 
+
+
+
+void MainWindow::on_SORTIE_pushButton_endResa_clicked()
+{
+
+}
 // ^^^^^^ MAIN WINDOW "Gestion SORTIES" ^^^^^^
 //---------------------------------------------------------
-
 
 
 
