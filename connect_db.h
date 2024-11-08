@@ -43,6 +43,8 @@ public:
     void select_logs_by_kit(std::vector<Log *> * o_log, Kit * i_kit, int i_max_lines);
     void insert_log_by_user_and_kit(Kit * i_kit, Utilisateur *i_user, QString text);
 
+    void set_db(void);
+
     //-----------User-------------------
     void select_all_users(std::vector<Utilisateur*> *list);
     bool add_user (Utilisateur *user);

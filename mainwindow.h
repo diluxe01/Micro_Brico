@@ -148,7 +148,7 @@ private:
     void GESKIT_refresh_item_list_table(Kit *kit);
     void GESKIT_refresh_descritption(Kit *kit);
     void GESKIT_push_back_new_item_on_table(Item *item, int row);
-    Kit* GESKIT_find_kit_by_id(uint id);
+    Kit* GESKIT_find_kit_by_id(int id);
 
     //-----------Resa-------------------
     void RESA_refresh_kit_list_table();

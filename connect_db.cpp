@@ -7,18 +7,15 @@
 #include <QSqlError>
 #include <QDateTime>
 
-Connect_db::Connect_db() {
+Connect_db::Connect_db()
+{
 
-    QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL", "dbtest");
-    db.setHostName("localhost");
-    db.setDatabaseName("db_dev");
-    db.setUserName("adrien");
-    db.setPassword("adrien");
-    bool ok = db.open();
+}
 
-    this->db = db;
-
-    }
+void Connect_db::set_db(void)
+{
+    this->db = QSqlDatabase::database("dbtest");
+}
 
 void Connect_db::select_logs_by_kit(std::vector<Log *> *o_log, Kit *i_kit, int i_max_lines)
 {
@@ -415,10 +412,14 @@ bool Connect_db::is_user_connected(void)
 
     if (token_db != this->active_user->getToken())
     {
-        qDebug() <<  "token_db: "<<token_db;
-        qDebug() <<  "login_user->getToken(): "<<this->active_user->getToken();
+        // qDebug() <<  "token_db: "<<token_db;
+        // qDebug() <<  "login_user->getToken(): "<<this->active_user->getToken();
         emit log_value_changed(false);
         return false;
+    }
+    else
+    {
+        return true;
     }
 }
 
@@ -515,7 +516,7 @@ void  Connect_db::select_items_by_kit (Kit * kit)
     QSqlQuery query(this->db);
     runQuery(query,"SELECT id, name, quantity, quantity_init from item where forkey ='"+QString::number(kit->getIdKit())+"'");
     g_utils.clearList(&kit->item_list);
-    populate_item_list_from_query(kit, query);
+    populate_item_list_from_query(kit, std::move(query));
 }
 
 void Connect_db::populate_item_list_from_query(Kit * kit, QSqlQuery query)
@@ -542,21 +543,21 @@ void  Connect_db::select_all_kits (std::vector<Kit *> *kits)
     QSqlQuery query(this->db);
     runQuery(query, "SELECT idkit, nom, description, date_achat, prix_achat, texte_libre, en_panne, code_kit, caution from kit");
 
-    populate_kit_list_from_query(kits, query);
+    populate_kit_list_from_query(kits, std::move(query));
 }
 
 void  Connect_db::select_kits_by_code (std::vector<Kit*> *kits, QString code)
 {
     QSqlQuery query(this->db);
     runQuery(query, "SELECT idkit, nom, description, date_achat, prix_achat, texte_libre, en_panne, code_kit, caution from kit where code_kit REGEXP '"+code+"'");
-    populate_kit_list_from_query(kits, query);
+    populate_kit_list_from_query(kits, std::move(query));
 }
 
 void  Connect_db::select_kits_by_name (std::vector<Kit*> *kits, QString code)
 {
     QSqlQuery query(this->db);
     runQuery(query, "SELECT idkit, nom, description, date_achat, prix_achat, texte_libre, en_panne, code_kit, caution from kit where nom REGEXP '"+code+"'");
-    populate_kit_list_from_query(kits, query);
+    populate_kit_list_from_query(kits, std::move(query));
 }
 
 
@@ -623,7 +624,7 @@ void  Connect_db::select_all_active_resa (std::vector<Resa *> *i_resa)
     QSqlQuery query(this->db);
     runQuery(query, "SELECT * from resa where is_active = 1");
 
-    populate_resa_list_from_query(i_resa, query);
+    populate_resa_list_from_query(i_resa, std::move(query));
 }
 
 ///
@@ -638,7 +639,7 @@ void Connect_db::select_active_resa_by_user(std::vector<Resa *> *o_resa, uint us
     QSqlQuery query(this->db);
     runQuery(query, "SELECT * from resa WHERE id_user="+QString::number(user_id) + " AND is_active = 1");
 
-    populate_resa_list_from_query(o_resa, query);
+    populate_resa_list_from_query(o_resa, std::move(query));
 }
 
 void Connect_db::populate_resa_list_from_query(std::vector<Resa *> *i_resa, QSqlQuery query)
@@ -746,7 +747,7 @@ void Connect_db::select_active_sortie_by_user(std::vector<Sortie *> *o_sortie, u
     QSqlQuery query(this->db);
     runQuery(query, "SELECT * from sortie WHERE id_user="+QString::number(user_id)+" AND is_active = 1");
 
-    populate_sortie_list_from_query(o_sortie, query);
+    populate_sortie_list_from_query(o_sortie, std::move(query));
 }
 
 void  Connect_db::select_all_active_sortie (std::vector<Sortie *> *i_sortie)
@@ -754,7 +755,7 @@ void  Connect_db::select_all_active_sortie (std::vector<Sortie *> *i_sortie)
     QSqlQuery query(this->db);
     runQuery(query, "SELECT * from sortie where is_active = 1");
 
-    populate_sortie_list_from_query(i_sortie, query);
+    populate_sortie_list_from_query(i_sortie, std::move(query));
 }
 
 void Connect_db::populate_sortie_list_from_query(std::vector<Sortie *> *i_sortie, QSqlQuery query)

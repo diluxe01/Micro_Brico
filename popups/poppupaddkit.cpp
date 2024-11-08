@@ -76,7 +76,7 @@ void PoppupAddKit::on_pushButton_addobject_clicked()
 void PoppupAddKit::push_back_new_item_on_tabWidget(Item* p_item)
 {
 
-    QListWidgetItem* p_WidegtItem = new QListWidgetItem(p_item->getName()+ " (Qté init: "+ QString::number(p_item->getQuantity_init())+")"+ " (Qté courante: "+ QString::number(p_item->getQuantity_current())+")", this->ui->listWidget_itemBasket);
+    new QListWidgetItem(p_item->getName()+ " (Qté init: "+ QString::number(p_item->getQuantity_init())+")"+ " (Qté courante: "+ QString::number(p_item->getQuantity_current())+")", this->ui->listWidget_itemBasket);
 }
 
 void PoppupAddKit::on_pushButton_deleteitemfromlist_clicked()

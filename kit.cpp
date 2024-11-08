@@ -51,12 +51,12 @@ Money Kit::getCaution() const
     return caution;
 }
 
-uint Kit::getIdKit() const
+int Kit::getIdKit() const
 {
     return idkit;
 }
 
-void Kit::setIdkit(uint newIdkit)
+void Kit::setIdkit(int newIdkit)
 {
     idkit = newIdkit;
 }
@@ -196,7 +196,7 @@ Kit::Kit(QObject *parent)
 {}
 
 
-Kit::Kit(uint idkit, const QString &nom, const QString &description, const QString &date_achat, const QString &prix_achat, const QString &texte_libre, const bool en_panne, const QString &code, const QString &caution)
+Kit::Kit(int idkit, const QString &nom, const QString &description, const QString &date_achat, const QString &prix_achat, const QString &texte_libre, const bool en_panne, const QString &code, const QString &caution)
 {
     this->setIdkit(idkit);
     this->setNom(nom);

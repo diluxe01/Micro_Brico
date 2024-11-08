@@ -32,6 +32,15 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL", "dbtest");
+
+    db.setHostName("localhost");
+    db.setDatabaseName("db_dev");
+    db.setUserName("adrien");
+    db.setPassword("adrien");
+    db.open();
+    g_connect_db.set_db();
+
     // Set active user in g_db_connect
     g_connect_db.setActiveUser(&(this->login_user));
     this->setWindowTitle("Micro Brico Resa (v"+VERSION+")");
@@ -396,6 +405,7 @@ void MainWindow::activateWidgets(void)
     if (login_user.getPrivilege() == E_basic)
     {
         do_enable = false;
+        this->ui->tabwidget->setCurrentIndex(2);//By default, when user connects, open on the reservation page
     }
     else
     {
@@ -729,7 +739,7 @@ void MainWindow::GESKIT_push_back_new_item_on_table(Item* item, int row)
     column_index++;
 }
 
-Kit * MainWindow::GESKIT_find_kit_by_id(uint id)
+Kit * MainWindow::GESKIT_find_kit_by_id(int id)
 {
     for(const auto& kit_elem : this->kitList)
     {
@@ -738,6 +748,7 @@ Kit * MainWindow::GESKIT_find_kit_by_id(uint id)
             return kit_elem;
         }
     }
+    return nullptr;
 }
 
 
@@ -878,6 +889,7 @@ void MainWindow::log_stuffs(QtMsgType type, const QString &msg)
     QDateTime date ;
     QString date_str = date.currentDateTime().toString();
     switch (type) {
+    default:
     case QtInfoMsg:
         this->ui->textEditLogs->append(date_str +" : "+ msg);
         break;
@@ -893,6 +905,11 @@ void MainWindow::log_stuffs(QtMsgType type, const QString &msg)
     case QtFatalMsg:
         this->ui->textEditLogs->append(date_str +tr(" : — FATAL: %1").arg(msg));
         break;
+
+    case QtDebugMsg:
+        // this->ui->textEditLogs->append(date_str +tr(" : — DEBUG: %1").arg(msg));
+        break;
+
     }
 }
 
@@ -1048,7 +1065,10 @@ void MainWindow::on_RESA_calendarWidget_clicked(const QDate &date)
 
 
         //Find out if kits in kit list are already booked
-        g_connect_db.set_kit_booked_status(&this->kitList, this->ui->RESA_calendarWidget->selectedDate());
+        if (this->kitList.size() > 0)
+        {
+            g_connect_db.set_kit_booked_status(&this->kitList, this->ui->RESA_calendarWidget->selectedDate());
+        }
 
 
         RESA_refresh_kit_list_table();
@@ -1144,7 +1164,6 @@ void MainWindow::RESA_get_kits_by_code(std::vector<Kit*> *from_kits, std::vector
 void MainWindow::RESA_refresh_kit_list_table(void)
 {
     vector<Kit*>::iterator it;
-    int row = 0;
     QBrush brush_booked;
     QBrush brush_free;
     QBrush brush_basket;
@@ -1315,8 +1334,12 @@ void MainWindow::on_RESA_pushButton_resa_showResa_clicked()
      g_utils.clearList(&this->resaList);
     //Retrieve user id
     has_errors = g_connect_db.get_user_by_utinfo(this->ui->RESA_lineEdit_resa_utinfo_user->text(), &l_user);
-    g_connect_db.select_active_resa_by_user(&this->resaList, l_user.getId());
-    RESA_refresh_current_resa_list_table();
+    if (has_errors != true)
+    {
+        g_connect_db.select_active_resa_by_user(&this->resaList, l_user.getId());
+        RESA_refresh_current_resa_list_table();
+
+    }
 }
 
 
@@ -1333,7 +1356,7 @@ void MainWindow::RESA_refresh_current_resa_list_table(void)
         }
         else
         {
-            QListWidgetItem* p_item = new QListWidgetItem(resa_elem->toString(), this->ui->RESA_listWidget_resa_currentResa);
+            new QListWidgetItem(resa_elem->toString(), this->ui->RESA_listWidget_resa_currentResa);
             prev_id_resa = resa_elem->getId_resa();
         }
     }
@@ -1378,7 +1401,7 @@ void MainWindow::on_RESA_listWidget_resa_currentResa_itemClicked(QListWidgetItem
             if (resa_elem->getId_resa() == resa_nb)
             {
                 p_kit = GESKIT_find_kit_by_id(resa_elem->getId_kit());
-                QListWidgetItem* p_item = new QListWidgetItem(p_kit->toString(), this->ui->RESA_listWidget_resa_kitsOfResa);
+                new QListWidgetItem(p_kit->toString(), this->ui->RESA_listWidget_resa_kitsOfResa);
             }
         }
     }
@@ -1507,7 +1530,7 @@ void MainWindow::SORTIE_refresh_kits_of_resa_table(int i_resa_nb)
             {
 
                     p_kit = GESKIT_find_kit_by_id(resa_elem->getId_kit());
-                    QListWidgetItem* p_item = new QListWidgetItem(p_kit->toString(), this->ui->SORTIE_listWidget_resa_kitsOfResa);
+                    new QListWidgetItem(p_kit->toString(), this->ui->SORTIE_listWidget_resa_kitsOfResa);
                     this->kitListSortie_kitsOfResaView.push_back(p_kit);
             }
         }
@@ -1562,7 +1585,7 @@ void MainWindow::SORTIE_refresh_kitsOut_table(void)
     for(const auto& sortie_elem : this->sortieList_byUser)
     {
         p_kit = GESKIT_find_kit_by_id(sortie_elem->getId_kit());
-        QListWidgetItem* p_item = new QListWidgetItem(QString::number(sortie_elem->getId_sortie())+" - " + p_kit->getNom()+" (code: " +p_kit->getCode() +")" , this->ui->SORTIE_listWidget_kitsOut);
+        new QListWidgetItem(QString::number(sortie_elem->getId_sortie())+" - " + p_kit->getNom()+" (code: " +p_kit->getCode() +")" , this->ui->SORTIE_listWidget_kitsOut);
 
     }
 }
@@ -1615,7 +1638,7 @@ void MainWindow::SORTIE_refresh_current_resa_list_table(void)
         }
         else
         {
-            QListWidgetItem* p_item = new QListWidgetItem(resa_elem->toString(), this->ui->SORTIE_listWidget_resa_currentResa);
+            new QListWidgetItem(resa_elem->toString(), this->ui->SORTIE_listWidget_resa_currentResa);
             prev_id_resa = resa_elem->getId_resa();
         }
     }
@@ -1693,22 +1716,26 @@ void MainWindow::SORTIE_sortir_kit()
     QDate start_date;
     Kit * p_kit = this->p_popupSortirResa->getP_kit();
     has_errors = g_connect_db.get_user_by_utinfo(this->ui->SORTIE_lineEdit_utinfo->text(), &l_user);
-    start_date = QDate::currentDate();
+    if (has_errors != true)
+    {
+        start_date = QDate::currentDate();
 
-    QString log_str = g_connect_db.update_items_quantity_of_kit (p_kit, this->p_popupSortirResa->item_list_dest);
+        QString log_str = g_connect_db.update_items_quantity_of_kit (p_kit, this->p_popupSortirResa->item_list_dest);
 
-    // Start of LOCK
-    g_connect_db.start_sortie();
-    sortie_nb = g_connect_db.guess_next_sortie_nb();
-    g_connect_db.add_sortie_from_kit(p_kit, l_user.getId(), start_date, sortie_nb);
-    g_connect_db.insert_log_by_user_and_kit(p_kit,&l_user,"L'utilisateur '"+l_user.getUtinfo()+"' a sorti le kit '"+p_kit->getNom()+"' (code: "+p_kit->getCode()+", n° de sortie: "+QString::number(sortie_nb)+")");
-    g_connect_db.insert_log_by_user_and_kit(p_kit,&l_user,log_str);
-    // End of LOCK
-    g_connect_db.end_sortie();
+        // Start of LOCK
+        g_connect_db.start_sortie();
+        sortie_nb = g_connect_db.guess_next_sortie_nb();
+        g_connect_db.add_sortie_from_kit(p_kit, l_user.getId(), start_date, sortie_nb);
+        g_connect_db.insert_log_by_user_and_kit(p_kit,&l_user,"L'utilisateur '"+l_user.getUtinfo()+"' a sorti le kit '"+p_kit->getNom()+"' (code: "+p_kit->getCode()+", n° de sortie: "+QString::number(sortie_nb)+")");
+        g_connect_db.insert_log_by_user_and_kit(p_kit,&l_user,log_str);
+        // End of LOCK
+        g_connect_db.end_sortie();
 
+        p_kit->setIs_out(true);
+        GEN_raise_popup_info("Votre Sortie n° **"+QString::number(sortie_nb)+"** est bien prise en compte.");
 
-    p_kit->setIs_out(true);
-    GEN_raise_popup_info("Votre Sortie n° **"+QString::number(sortie_nb)+"** est bien prise en compte.");
+    }
+
 }
 
 ///

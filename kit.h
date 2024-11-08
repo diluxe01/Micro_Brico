@@ -11,7 +11,7 @@ class Kit : public QObject
 {
     Q_OBJECT
 private:
-    uint idkit;
+    int idkit;
     QString nom;
     QString description;
     QDate date_achat;
@@ -35,7 +35,7 @@ private:
 
 public:
     explicit Kit(QObject *parent = nullptr);
-    Kit(uint idkit, const QString &nom, const QString &description, const QString &date_achat, const QString &prix_achat, const QString &texte_libre, const bool en_panne, const QString &code, const QString &caution);
+    Kit(int idkit, const QString &nom, const QString &description, const QString &date_achat, const QString &prix_achat, const QString &texte_libre, const bool en_panne, const QString &code, const QString &caution);
 
     std::vector<Item*> item_list;
 
@@ -47,9 +47,9 @@ public:
     bool getEn_panne() const;
     QString getCode() const;
     Money getCaution() const;
-    uint getIdKit() const;
+    int getIdKit() const;
 
-    void setIdkit(uint newIdkit);
+    void setIdkit(int newIdkit);
     void setNom(const QString &newNom);
     void setDescription(const QString &newDescription);
     void setDate_achat(const QDate &newDate_achat);

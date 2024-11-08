@@ -17,12 +17,12 @@ LogBrowser::~LogBrowser()
 {
     delete browserDialog;
 }
-LogBrowser::show()
+void LogBrowser::show()
 {
     browserDialog->show();
 }
 
-LogBrowser::close()
+void LogBrowser::close()
 {
     browserDialog->close();
 }
