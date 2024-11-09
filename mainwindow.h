@@ -15,6 +15,7 @@
 #include "sortie.h"
 #include <QListWidgetItem>
 #include <QDate>
+#include <QLabel>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -38,11 +39,22 @@ public slots:
 private slots:
     /*Add user popup slots */
     //-----------Actions -------------------
+    // actions générales
     void on_actionNouvel_Utilisateur_triggered();
     void on_actionSe_connecter_triggered();
     void on_actionSe_d_connecter_triggered();
-    void on_actionAfficher_les_logs_triggered();
     void on_actionEffacer_les_reservations_pass_es_triggered();
+    void on_actionAfficher_les_logs_appli_triggered();
+    // actions pour GESKIT
+    void on_actionafficher_les_logs_kit_triggered();
+    void on_actiondupliquer_kit_triggered();
+    void on_actionmodifier_kit_triggered();
+    void on_actionajouter_nouveau_kit_triggered();
+    // actions pour GESUSER
+    void on_actionAfficher_logs_utilisateur_triggered();
+    void on_actionAjouter_utilisateur_triggered();
+    void on_actionModifier_l_utilisateur_triggered();
+
 
     //-----------Slots GESUSER-------------------
     void on_GESUSER_pushButton_getuser_clicked();
@@ -83,6 +95,8 @@ private slots:
     void on_SORTIE_pushButton_retirer_kit_from_resa_clicked();
     void on_SORTIE_pushButton_endResa_clicked();
 
+
+
 private:
     Ui::MainWindow *ui;
     std::vector<Utilisateur*> userList;
@@ -107,12 +121,16 @@ private:
     log_user_kit_appli *p_log_user_kit_appli;
     bool isBasketReadyToBook; //Variable remembering if the basket contains an already booked kit
     QListWidgetItem * item_lastSelectedResa;//Variable remembering the last selected resa (only for "SORTIE" view)
+    QLabel * p_status_bar_label;
 
     void GEN_raise_popup_info(QString msg);
     void GEN_raise_popup_warning(QString msg);
     int GEN_raise_popup_ask_to_continue(QString msg);
     void closeEvent (QCloseEvent *event);
     void activateWidgets(void);
+
+    //-----------Context menu-------------------
+    void contextMenuEvent(QContextMenuEvent *event);
 
     //-----------popups-------------------
     void on_popupLogin_destroyed();
@@ -135,6 +153,7 @@ private:
     void GESUSER_refresh_user_list_from_server(std::vector<Utilisateur*> *i_list);
     void GESUSER_refresh_user_table();
     void GESUSER_push_back_new_user_on_table(Utilisateur *user, int row);
+    void GESUSER_display_user_logs();
 
     //-----------Kit-------------------
     void GESKIT_get_kits_by_name(std::vector<Kit *> *from_kits, std::vector<Kit *> *to_kits, QString code);
@@ -149,6 +168,10 @@ private:
     void GESKIT_refresh_descritption(Kit *kit);
     void GESKIT_push_back_new_item_on_table(Item *item, int row);
     Kit* GESKIT_find_kit_by_id(int id);
+    void GESKIT_display_kit_logs();
+    void GESKIT_duplicate_kit();
+    void GESKIT_modify_kit();
+    void GESKIT_add_kit();
 
     //-----------Resa-------------------
     void RESA_refresh_kit_list_table();

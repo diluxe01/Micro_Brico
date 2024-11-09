@@ -45,6 +45,10 @@ MainWindow::MainWindow(QWidget *parent)
     g_connect_db.setActiveUser(&(this->login_user));
     this->setWindowTitle("Micro Brico Resa (v"+VERSION+")");
 
+    //Gestion de la bar de status
+    this->p_status_bar_label = new QLabel;
+    this->statusBar()->addPermanentWidget(this->p_status_bar_label);
+
     //Init default buttons status
     this->GESKIT_enable_geskit_buttons(false);
     this->GESUSER_enable_GESUSER_buttons(false);
@@ -115,6 +119,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->login_user.setUtinfo("admin");
     this->login_user.setMdp("admin");
     this-> on_popupLogin_ok();
+
 }
 
 MainWindow::~MainWindow()
@@ -129,7 +134,7 @@ void MainWindow::closeEvent (QCloseEvent *event)
         delete this;
 }
 
-void MainWindow::on_actionAfficher_les_logs_triggered()
+void MainWindow::on_actionAfficher_les_logs_appli_triggered()
 {
     logBrowser->show();
 }
@@ -138,6 +143,80 @@ void MainWindow::on_actionEffacer_les_reservations_pass_es_triggered()
 {
     RESA_deactivate_outdated_resa();
 }
+
+void MainWindow::on_actionafficher_les_logs_kit_triggered()
+{
+    GESKIT_display_kit_logs();
+}
+
+void MainWindow::on_actiondupliquer_kit_triggered()
+{
+    GESKIT_duplicate_kit();
+}
+
+void MainWindow::on_actionmodifier_kit_triggered()
+{
+    GESKIT_modify_kit();
+}
+
+void MainWindow::on_actionajouter_nouveau_kit_triggered()
+{
+    GESKIT_add_kit();
+}
+
+
+// actions pour GESUSER
+void MainWindow::on_actionAfficher_logs_utilisateur_triggered()
+{
+    GESUSER_display_user_logs();
+}
+
+void MainWindow::on_actionAjouter_utilisateur_triggered()
+{
+    GESUSER_add_new_user();
+}
+
+void MainWindow::on_actionModifier_l_utilisateur_triggered()
+{
+    GESUSER_edit_user();
+}
+
+void MainWindow::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu menu(this);
+
+    //Context menu for GESKIT table widget only
+    if (this->focusWidget() == this->ui->GESKIT_tableWidget_kit)
+    {
+        menu.addAction(this->ui->actionafficher_les_logs_kit);
+        menu.addSeparator();
+        menu.addAction(this->ui->actiondupliquer_kit);
+        menu.addSeparator();
+        menu.addAction(this->ui->actionmodifier_kit);
+        menu.addSeparator();
+        menu.addAction(this->ui->actionajouter_nouveau_kit);
+        if (this->GESKIT_get_kit_selected() == nullptr)// Only activate menu if a kit has been selected
+        {
+            menu.setEnabled(false);
+        }
+        menu.exec(event->globalPos());
+    }
+    //Context menu for GESUSER table widget only
+    else if (this->focusWidget() == this->ui->GESUSER_tableWidget_user)
+    {
+        menu.addAction(this->ui->actionAfficher_logs_utilisateur);
+        menu.addSeparator();
+        menu.addAction(this->ui->actionNouvel_Utilisateur);
+        menu.addSeparator();
+        menu.addAction(this->ui->actionModifier_l_utilisateur);
+        if (this->GESUSER_get_user_selected() == nullptr) // Only activate menu if a user has been selected
+        {
+            menu.setEnabled(false);
+        }
+        menu.exec(event->globalPos());
+    }
+}
+
 
 void MainWindow::GEN_raise_popup_info(QString msg)
 {
@@ -282,11 +361,16 @@ void MainWindow::on_popupLogin_destroyed()
 void MainWindow::on_popupLogin_ok()
 {
     qDebug() << "OK popup! ;)";
-    g_connect_db.connect_user();
+    if (g_connect_db.connect_user() == true)
+    {
+        delete (this->p_loginConnect);
+        activateWidgets();
+    }
+    else
+    {
+        this->GEN_raise_popup_warning("Attention, UTINFO ou mot de passe incorrectes.");
+    }
 
-    delete (this->p_loginConnect);
-
-    activateWidgets();
 }
 
 void MainWindow::on_actionSe_connecter_triggered()
@@ -414,6 +498,7 @@ void MainWindow::activateWidgets(void)
     this->ui->TAB_ges_user->setEnabled(do_enable);
     this->ui->TAB_ges_kits->setEnabled(do_enable);
     this->ui->TAB_SORTIE->setEnabled(do_enable);
+
 }
 
 void MainWindow::GESUSER_refresh_user_table(void)
@@ -446,10 +531,15 @@ void MainWindow::GESUSER_enable_GESUSER_buttons(bool i_enable)
 Utilisateur *MainWindow::GESUSER_get_user_selected()
 {
     QList<QTableWidgetSelectionRange> items = this->ui->GESUSER_tableWidget_user->selectedRanges();
-    QTableWidgetSelectionRange  selectedRange = items.first();
-    int row = selectedRange.topRow();
-    Utilisateur* p_user = userListView.at(row);
-    return p_user;
+    if (items.size() != 0)
+    {
+        QTableWidgetSelectionRange  selectedRange = items.first();
+        int row = selectedRange.topRow();
+        Utilisateur* p_user = userListView.at(row);
+        return p_user;
+    }
+    return nullptr;
+
 }
 
 void MainWindow::GESUSER_refresh_user_list_from_server(std::vector<Utilisateur *> *i_list)
@@ -503,6 +593,20 @@ void MainWindow::GESUSER_push_back_new_user_on_table(Utilisateur *user, int row)
     ui->GESUSER_tableWidget_user->setItem(row-1, column_index, p_widget_user_privilege);
     column_index ++;
 
+}
+
+void MainWindow::GESUSER_display_user_logs()
+{
+    //First get user selected
+    Utilisateur* p_user = GESUSER_get_user_selected();
+    if (p_user != nullptr)
+    {
+        this->p_log_user_kit_appli = new (log_user_kit_appli);
+        this->p_log_user_kit_appli->setUser(p_user);
+        this->p_log_user_kit_appli->setWindowTitle("Logs de l'utilisateur: "+p_user->getUtinfo());
+        this->p_log_user_kit_appli->update_logs_from_user(100);
+        this->p_log_user_kit_appli->show();
+    }
 }
 
 
@@ -754,18 +858,22 @@ Kit * MainWindow::GESKIT_find_kit_by_id(int id)
 
 void MainWindow::on_GESKIT_pushButton_logkit_clicked()
 {
-    //First get kit selected by user
-    Kit* p_kit = GESKIT_get_kit_selected();
-
-
-    this->p_log_user_kit_appli = new (log_user_kit_appli);
-    this->p_log_user_kit_appli->setKit(p_kit);
-    this->p_log_user_kit_appli->setWindowTitle("Logs du kit: "+p_kit->getNom());
-    this->p_log_user_kit_appli->update_logs_from_kit(100);
-    this->p_log_user_kit_appli->show();
-
+    GESKIT_display_kit_logs();
 }
 
+void MainWindow::GESKIT_display_kit_logs()
+{
+    //First get kit selected by user
+    Kit* p_kit = GESKIT_get_kit_selected();
+    if (p_kit != nullptr)
+    {
+        this->p_log_user_kit_appli = new (log_user_kit_appli);
+        this->p_log_user_kit_appli->setKit(p_kit);
+        this->p_log_user_kit_appli->setWindowTitle("Logs du kit: "+p_kit->getNom());
+        this->p_log_user_kit_appli->update_logs_from_kit(100);
+        this->p_log_user_kit_appli->show();
+    }
+}
 
 
 
@@ -850,6 +958,9 @@ void MainWindow::update_connection_status(bool is_user_logged)
         if (is_user_logged == true)
         {
             qInfo() << "Vous êtes maintenant connecté.";
+
+            this->p_status_bar_label->setText("Connecté en tant que: "+ this->login_user.getUtinfo());
+
             //Refresh kit list every time a user logs in
             this->GESKIT_refresh_kit_list_from_server(&this->kitList);
             //Refresh user list every time a user logs in
@@ -873,6 +984,7 @@ void MainWindow::update_connection_status(bool is_user_logged)
         else
         {
             qInfo() << "Vous êtes maintenant déconnecté.";
+            this->p_status_bar_label->setText("Déconnecté");
             //Clear lineEdit_resa_email_use
             this->ui->RESA_lineEdit_resa_utinfo_user->setText("");
             this->ui->RESA_pushButton_suppr_resa->setEnabled(false);
@@ -922,6 +1034,12 @@ void MainWindow::log_stuffs(QtMsgType type, const QString &msg)
 
 void MainWindow::on_GESKIT_pushButton_addkit_clicked()
 {
+    GESKIT_add_kit();
+}
+
+
+void MainWindow::GESKIT_add_kit()
+{
     this->p_popupAddKit = new (PoppupAddKit);
     this->p_popupAddKit->setWindowTitle("Ajout d'un nouveau Kit");
     this->p_popupAddKit->show();
@@ -930,7 +1048,6 @@ void MainWindow::on_GESKIT_pushButton_addkit_clicked()
     QObject::connect(this->p_popupAddKit->getCancelButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_destroyed);
     QObject::connect(this->p_popupAddKit, &PoppupAddKit::delete_popup, this, &MainWindow::on_popupAddKit_destroyed);
 }
-
 
 void MainWindow::on_popupAddKit_destroyed()
 {
@@ -979,46 +1096,68 @@ void MainWindow::on_popupAddKit_ok()
 Kit* MainWindow::GESKIT_get_kit_selected()
 {
     //First get kit selected by user
+
     QList<QTableWidgetSelectionRange> items = this->ui->GESKIT_tableWidget_kit->selectedRanges();
-    QTableWidgetSelectionRange  selectedRange = items.first();
-    int row = selectedRange.topRow();
-    Kit* p_kit = kitListGeskit_view.at(row);
-    return p_kit;
+    if (items.size() !=0)
+    {
+        QTableWidgetSelectionRange  selectedRange = items.first();
+        int row = selectedRange.topRow();
+        Kit* p_kit = kitListGeskit_view.at(row);
+        return p_kit;
+
+    }
+    return nullptr;
 }
 
 void MainWindow::on_GESKIT_pushButton_duplicate_kit_clicked()
 {
+    GESKIT_duplicate_kit();
+}
+
+void MainWindow::GESKIT_duplicate_kit()
+{
     //First get kit selected by user
     Kit* p_kit = GESKIT_get_kit_selected();
-    p_kit->setTo_duplicate(true);
+    if (p_kit !=nullptr)
+    {
+        p_kit->setTo_duplicate(true);
 
-    //Open popup pre filled with selected kit informations
-    this->p_popupAddKit = new (PoppupAddKit);
-    this->p_popupAddKit->set_form_from_kit(p_kit);
-    this->p_popupAddKit->setWindowTitle("Duplication du kit : "+ p_kit->getNom());
-    this->p_popupAddKit->show();
-    this->setEnabled(false);//disable mainWindow
-    QObject::connect(this->p_popupAddKit->getOkButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_ok);
-    QObject::connect(this->p_popupAddKit->getCancelButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_destroyed);
-    QObject::connect(this->p_popupAddKit, &PoppupAddKit::delete_popup, this, &MainWindow::on_popupAddKit_destroyed);
+        //Open popup pre filled with selected kit informations
+        this->p_popupAddKit = new (PoppupAddKit);
+        this->p_popupAddKit->set_form_from_kit(p_kit);
+        this->p_popupAddKit->setWindowTitle("Duplication du kit : "+ p_kit->getNom());
+        this->p_popupAddKit->show();
+        this->setEnabled(false);//disable mainWindow
+        QObject::connect(this->p_popupAddKit->getOkButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_ok);
+        QObject::connect(this->p_popupAddKit->getCancelButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_destroyed);
+        QObject::connect(this->p_popupAddKit, &PoppupAddKit::delete_popup, this, &MainWindow::on_popupAddKit_destroyed);
+
+    }
 }
 
 void MainWindow::on_GESKIT_pushButton_modify_kit_clicked()
 {
+    GESKIT_modify_kit();
+}
+
+void MainWindow::GESKIT_modify_kit()
+{
     //First get kit selected by user
     Kit* p_kit = GESKIT_get_kit_selected();
-    p_kit->setTo_duplicate(false);
+    if (p_kit !=nullptr)
+    {
+        p_kit->setTo_duplicate(false);
 
-    //Open popup pre filled with selected kit informations
-    this->p_popupAddKit = new (PoppupAddKit);
-    this->p_popupAddKit->set_form_from_kit(p_kit);
-    this->p_popupAddKit->setWindowTitle("Modification du kit : "+ p_kit->getNom());
-    this->p_popupAddKit->show();
-    this->setEnabled(false);//disable mainWindow
-    QObject::connect(this->p_popupAddKit->getOkButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_ok);
-    QObject::connect(this->p_popupAddKit->getCancelButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_destroyed);
-    QObject::connect(this->p_popupAddKit, &PoppupAddKit::delete_popup, this, &MainWindow::on_popupAddKit_destroyed);
-
+        //Open popup pre filled with selected kit informations
+        this->p_popupAddKit = new (PoppupAddKit);
+        this->p_popupAddKit->set_form_from_kit(p_kit);
+        this->p_popupAddKit->setWindowTitle("Modification du kit : "+ p_kit->getNom());
+        this->p_popupAddKit->show();
+        this->setEnabled(false);//disable mainWindow
+        QObject::connect(this->p_popupAddKit->getOkButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_ok);
+        QObject::connect(this->p_popupAddKit->getCancelButton(), &QPushButton::clicked, this, &MainWindow::on_popupAddKit_destroyed);
+        QObject::connect(this->p_popupAddKit, &PoppupAddKit::delete_popup, this, &MainWindow::on_popupAddKit_destroyed);
+    }
 }
 
 // ^^^^^^ POPUP Add_kit SECTION ^^^^^^
@@ -1302,10 +1441,11 @@ void MainWindow::on_RESA_pushButton_reserver_clicked()
             if (this->kitListBasket_view.empty() == false)
             {
                 resa_nb = g_connect_db.guess_next_resa_nb();
+                g_connect_db.insert_log_by_user_and_kit(nullptr,&l_user,"L'utilisateur '"+l_user.getUtinfo()+"' a effectué la reservation numéro: " + QString::number(resa_nb));
                 for(const auto& kit_elem : this->kitListBasket_view)
                 {
                     g_connect_db.add_resa_from_kit(kit_elem, l_user.getId(), start_date, resa_nb );
-                    g_connect_db.insert_log_by_user_and_kit(kit_elem,&l_user,"L'utilisateur '"+l_user.getUtinfo()+"' a réservé le kit '"+kit_elem->getNom()+"' (code: "+kit_elem->getCode()+") pour la date: '"+start_date.toString()+"'");
+                    g_connect_db.insert_log_by_user_and_kit(kit_elem,&l_user,"-----> Dans la réservation n°" + QString::number(resa_nb) + ", l'utilisateur '"+l_user.getUtinfo()+"' a réservé le kit '"+kit_elem->getNom()+"' (code: "+kit_elem->getCode()+") pour la date: '"+start_date.toString()+"'");
                     kit_elem->setIs_in_basket(false);
                     kit_elem->setIs_booked(true);
                 }
@@ -1409,6 +1549,9 @@ void MainWindow::on_RESA_listWidget_resa_currentResa_itemClicked(QListWidgetItem
 
 void MainWindow::on_RESA_pushButton_suppr_resa_clicked()
 {
+
+    Utilisateur l_user;
+    bool has_errors = false;
     QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Suppression de réservation.",
                                                                tr("Êtes-vous sûr de vouloir supprimer votre réservation ?"),
                                                                QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
@@ -1419,6 +1562,9 @@ void MainWindow::on_RESA_pushButton_suppr_resa_clicked()
 
     } else {
 
+        //Retrieve user id
+        has_errors = g_connect_db.get_user_by_utinfo(this->ui->RESA_lineEdit_resa_utinfo_user->text(), &l_user);
+
         //clear kit list widget
         this->ui->RESA_listWidget_resa_kitsOfResa->clear();
 
@@ -1428,6 +1574,8 @@ void MainWindow::on_RESA_pushButton_suppr_resa_clicked()
         {
             g_connect_db.deactivate_resa_from_id(resa_nb);
             this->on_RESA_pushButton_resa_showResa_clicked();
+
+            g_connect_db.insert_log_by_user_and_kit(nullptr,&l_user,"L'utilisateur '"+l_user.getUtinfo()+"' a annulé la reservation portant le numéro: "+QString::number(resa_nb));
         }
     }
 }
@@ -1833,6 +1981,10 @@ void MainWindow::on_SORTIE_pushButton_endResa_clicked()
 }
 // ^^^^^^ MAIN WINDOW "Gestion SORTIES" ^^^^^^
 //---------------------------------------------------------
+
+
+
+
 
 
 

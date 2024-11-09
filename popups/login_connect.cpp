@@ -21,7 +21,6 @@ QDialogButtonBox* Login_connect::getOkButton(void)
 
 void Login_connect::setUser(Utilisateur *p_user)
 {
-
     this->user = p_user;
 }
 
@@ -29,12 +28,7 @@ void Login_connect::on_buttonBox_clicked(QAbstractButton *button)
 {
     this->user->setUtinfo(ui->lineEdit_utinfo->text());
     this->user->setMdp(ui->lineEdit_mdp->text());
-
 }
 
 
-void Login_connect::on_buttonBox_accepted()
-{
-
-}
 

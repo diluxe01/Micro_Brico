@@ -27,7 +27,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="TAB_ges_user">
        <property name="enabled">
@@ -462,17 +462,32 @@
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_7">
                  <item>
-                  <widget class="QListWidget" name="RESA_listWidget_resa"/>
+                  <widget class="QListWidget" name="RESA_listWidget_resa">
+                   <property name="toolTip">
+                    <string>Double cliquer pour mettre dans le panier</string>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>
               </item>
               <item>
-               <widget class="QLabel" name="label_2">
-                <property name="text">
-                 <string>&gt;&gt;&gt;</string>
-                </property>
-               </widget>
+               <layout class="QVBoxLayout" name="verticalLayout_17">
+                <item>
+                 <widget class="QLabel" name="label">
+                  <property name="text">
+                   <string>&gt;&gt;&gt;</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_2">
+                  <property name="text">
+                   <string>&lt;&lt;&lt;</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
               <item>
                <widget class="QGroupBox" name="groupBox_6">
@@ -481,7 +496,11 @@
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_6">
                  <item>
-                  <widget class="QListWidget" name="RESA_listWidget_panierResa"/>
+                  <widget class="QListWidget" name="RESA_listWidget_panierResa">
+                   <property name="toolTip">
+                    <string>Double cliquer pour retirer du panier</string>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>
@@ -530,13 +549,6 @@
              </item>
             </layout>
            </item>
-           <item>
-            <widget class="QPushButton" name="RESA_pushButton_reserver">
-             <property name="text">
-              <string>Réserver</string>
-             </property>
-            </widget>
-           </item>
           </layout>
          </widget>
         </item>
@@ -561,6 +573,13 @@
            </item>
            <item>
             <widget class="QCalendarWidget" name="RESA_calendarWidget"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="RESA_pushButton_reserver">
+             <property name="text">
+              <string>Réserver</string>
+             </property>
+            </widget>
            </item>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_14">
@@ -910,7 +929,7 @@
      </property>
      <addaction name="actionEffacer_les_reservations_pass_es"/>
     </widget>
-    <addaction name="actionAfficher_les_logs"/>
+    <addaction name="actionAfficher_les_logs_appli"/>
     <addaction name="separator"/>
     <addaction name="menuMaintenance"/>
    </widget>
@@ -919,28 +938,144 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionNouvel_Utilisateur">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::ContactNew"/>
+   </property>
    <property name="text">
     <string>Nouvel Utilisateur</string>
    </property>
   </action>
   <action name="actionSe_connecter">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::WindowNew"/>
+   </property>
    <property name="text">
     <string>Se connecter</string>
    </property>
   </action>
   <action name="actionSe_d_connecter">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::SystemLogOut"/>
+   </property>
    <property name="text">
     <string>Se déconnecter</string>
    </property>
   </action>
-  <action name="actionAfficher_les_logs">
+  <action name="actionAfficher_les_logs_appli">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::DocumentPageSetup"/>
+   </property>
    <property name="text">
     <string>Afficher les logs</string>
    </property>
+   <property name="toolTip">
+    <string>Afficher les logs de l'application</string>
+   </property>
   </action>
   <action name="actionEffacer_les_reservations_pass_es">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::EditClear"/>
+   </property>
    <property name="text">
     <string>Effacer les reservations passées</string>
+   </property>
+  </action>
+  <action name="actionafficher_les_logs_kit">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::DocumentPageSetup"/>
+   </property>
+   <property name="text">
+    <string>Afficher logs du kit</string>
+   </property>
+   <property name="toolTip">
+    <string>Afficher les logs du kit selectionné</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actiondupliquer_kit">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::EditCopy"/>
+   </property>
+   <property name="text">
+    <string>Dupliquer le kit</string>
+   </property>
+   <property name="toolTip">
+    <string>Dupliquer le kit selectionné</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionmodifier_kit">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::MailMessageNew"/>
+   </property>
+   <property name="text">
+    <string>Modifier le kit</string>
+   </property>
+   <property name="toolTip">
+    <string>Modifier le kit selectionné</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionajouter_nouveau_kit">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::ListAdd"/>
+   </property>
+   <property name="text">
+    <string>Ajouter un kit</string>
+   </property>
+   <property name="toolTip">
+    <string>Ajouter un nouveau kit</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionAfficher_logs_utilisateur">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::DocumentPageSetup"/>
+   </property>
+   <property name="text">
+    <string>Afficher logs utilisateur</string>
+   </property>
+   <property name="toolTip">
+    <string>Afficher les logs de l'utilisateur selectionné</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionAjouter_utilisateur">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::ListAdd"/>
+   </property>
+   <property name="text">
+    <string>Ajouter utilisateur</string>
+   </property>
+   <property name="toolTip">
+    <string>Ajouter un nouvel utilisateur</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionModifier_l_utilisateur">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::MailMessageNew"/>
+   </property>
+   <property name="text">
+    <string>Modifier l'utilisateur</string>
+   </property>
+   <property name="toolTip">
+    <string>Modifier l'utilisateur sélectionné</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
  </widget>

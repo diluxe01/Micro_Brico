@@ -23,15 +23,23 @@ void log_user_kit_appli::setUser(Utilisateur *newUser)
     user = newUser;
 }
 
-void log_user_kit_appli::update_logs_from_user(int i_max_lines)
-{
-
-}
 
 void log_user_kit_appli::update_logs_from_kit(int i_max_lines)
 {
     g_utils.clearList(&this->log_list);
     g_connect_db.select_logs_by_kit(&this->log_list, kit,i_max_lines);
+
+    for(const auto& elem : this->log_list)
+    {
+        this->ui->textEdit->insertPlainText(elem->getText());
+        this->ui->textEdit->insertPlainText("\n");
+    }
+}
+
+void log_user_kit_appli::update_logs_from_user(int i_max_lines)
+{
+    g_utils.clearList(&this->log_list);
+    g_connect_db.select_logs_by_user(&this->log_list, user,i_max_lines);
 
     for(const auto& elem : this->log_list)
     {
