@@ -51,7 +51,7 @@ LogBrowserDialog::~LogBrowserDialog()
 void LogBrowserDialog::outputMessage(QtMsgType type, const QString &msg)
 {
     QDateTime date ;
-    QString date_str = date.currentDateTime().toString();
+    QString date_str = date.currentDateTime().toString("ddd d MMM yyyy hh:mm:ss");
     switch (type) {
     case QtDebugMsg:
     case QtInfoMsg:

@@ -576,6 +576,12 @@
            </item>
            <item>
             <widget class="QPushButton" name="RESA_pushButton_reserver">
+             <property name="font">
+              <font>
+               <bold>true</bold>
+               <underline>true</underline>
+              </font>
+             </property>
              <property name="text">
               <string>Réserver</string>
              </property>

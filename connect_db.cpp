@@ -22,7 +22,7 @@ void Connect_db::select_logs_by_kit(std::vector<Log *> *o_log, Kit *i_kit, int i
     QSqlQuery query  = QSqlQuery(this->db);
     QString datestr;
     QDateTime datetime;
-    QString exec_string = "select text, id_user, date from log where id_kit = "+ QString::number(i_kit->getIdKit())+ " order by date desc limit "+QString::number(i_max_lines) ;
+    QString exec_string = "select text, id_user, date from log where id_kit = "+ QString::number(i_kit->getIdKit())+ " order by date limit "+QString::number(i_max_lines) ;
 
     runQuery(query, exec_string);
     while (query.next())
@@ -34,7 +34,7 @@ void Connect_db::select_logs_by_kit(std::vector<Log *> *o_log, Kit *i_kit, int i
         datestr = (query.value("date").toString());
         qDebug() << datestr;
         datetime = QDateTime::fromString(datestr,"yyyy-MM-dd");
-
+        p_log->setDate(datetime);
         o_log->push_back(p_log);
     }
 
@@ -45,7 +45,7 @@ void Connect_db::select_logs_by_user(std::vector<Log *> *o_log, Utilisateur *i_u
     QSqlQuery query  = QSqlQuery(this->db);
     QString datestr;
     QDateTime datetime;
-    QString exec_string = "select text, id_kit, date from log where id_user = "+ QString::number(i_user->getId())+ " order by date desc limit "+QString::number(i_max_lines) ;
+    QString exec_string = "select text, id_kit, date from log where id_user = "+ QString::number(i_user->getId())+ " order by date limit "+QString::number(i_max_lines) ;
 
     runQuery(query, exec_string);
     while (query.next())
@@ -57,7 +57,7 @@ void Connect_db::select_logs_by_user(std::vector<Log *> *o_log, Utilisateur *i_u
         datestr = (query.value("date").toString());
         qDebug() << datestr;
         datetime = QDateTime::fromString(datestr,"yyyy-MM-dd");
-
+        p_log->setDate(datetime);
         o_log->push_back(p_log);
     }
 
@@ -74,17 +74,17 @@ void Connect_db::insert_log_by_user_and_kit(Kit *i_kit, Utilisateur *i_user, QSt
     {
         id_kit = QString::number(i_kit->getIdKit());
         id_user = QString::number(i_user->getId());
-        exec_string = "insert into log (text, id_kit, id_user) values (\""+date.toString()+" :: "+i_text+"\", "+id_kit+", "+id_user+")";
+        exec_string = "insert into log (text, id_kit, id_user) values (\""+date.toString("ddd d MMM yyyy hh:mm:ss")+" :: "+i_text+"\", "+id_kit+", "+id_user+")";
     }
     else if (i_kit == nullptr && i_user != nullptr )
     {
         id_user = QString::number(i_user->getId());
-        exec_string = "insert into log (text, id_user) values (\""+date.toString()+" :: "+i_text+"\", "+id_user+")";
+        exec_string = "insert into log (text, id_user) values (\""+date.toString("ddd d MMM yyyy hh:mm:ss")+" :: "+i_text+"\", "+id_user+")";
     }
     else if (i_kit != nullptr && i_user == nullptr )
     {
         id_kit = QString::number(i_kit->getIdKit());
-        exec_string = "insert into log (text, id_kit) values (\""+date.toString()+" :: "+i_text+"\", "+id_kit+")";
+        exec_string = "insert into log (text, id_kit) values (\""+date.toString("ddd d MMM yyyy hh:mm:ss")+" :: "+i_text+"\", "+id_kit+")";
     }
     else
     {
@@ -291,7 +291,7 @@ QString Connect_db::update_items_quantity_of_kit(Kit * i_kit, std::vector<Item *
 
     QSqlQuery query  = QSqlQuery(this->db);
     QString exec_string = "";
-    QString log_str = "Nouvelle quantité de chaque items du kit '"+i_kit->getNom()+"'--> ";
+    QString log_str = "-----> Nouvelle quantité de chaque items du kit '"+i_kit->getNom()+"'--> ";
     for(const auto& elem_new_item : i_new_items)
     {
         for(const auto& elem_kit_item : i_kit->item_list)

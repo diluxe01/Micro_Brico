@@ -971,14 +971,34 @@ void MainWindow::update_connection_status(bool is_user_logged)
             if (this->login_user.getPrivilege() == E_admin)
             {
                 this->ui->RESA_lineEdit_resa_utinfo_user->setEnabled(true);
+
+                // Enable some actions only for admins
                 this->ui->actionEffacer_les_reservations_pass_es->setEnabled(true);
+                this->ui->actionAfficher_les_logs_appli->setEnabled(true);
+                this->ui->actionafficher_les_logs_kit->setEnabled(true);
+                this->ui->actionAfficher_logs_utilisateur->setEnabled(true);
+                this->ui->actionajouter_nouveau_kit->setEnabled(true);
+                this->ui->actiondupliquer_kit->setEnabled(true);
+                this->ui->actionmodifier_kit->setEnabled(true);
+                this->ui->actionModifier_l_utilisateur->setEnabled(true);
             }
             else
             {
                 this->ui->RESA_lineEdit_resa_utinfo_user->setEnabled(false);
-                this->ui->actionEffacer_les_reservations_pass_es->setEnabled(false);
-            }
 
+                // Disable actions for user
+                this->ui->actionEffacer_les_reservations_pass_es->setEnabled(false);
+                this->ui->actionAfficher_les_logs_appli->setEnabled(false);
+                this->ui->actionafficher_les_logs_kit->setEnabled(false);
+                this->ui->actionAfficher_logs_utilisateur->setEnabled(false);
+                this->ui->actionajouter_nouveau_kit->setEnabled(false);
+                this->ui->actiondupliquer_kit->setEnabled(false);
+                this->ui->actionmodifier_kit->setEnabled(false);
+                this->ui->actionModifier_l_utilisateur->setEnabled(false);
+            }
+            // Display every kits on resa view for a more user friendly approach. He can filter after if he wants
+            this->on_RESA_pushButton_getkit_resa_clicked();
+            this->on_RESA_pushButton_resa_showResa_clicked();
 
         }
         else
@@ -991,6 +1011,17 @@ void MainWindow::update_connection_status(bool is_user_logged)
             this->ui->RESA_pushButton_reserver->setEnabled(false);
             this->ui->SORTIE_pushButton_sortir->setEnabled(false);
             this->ui->SORTIE_pushButton_retirer_kit_from_resa->setEnabled(false);
+
+
+            // Disable some actions when disconected
+            this->ui->actionEffacer_les_reservations_pass_es->setEnabled(false);
+            this->ui->actionAfficher_les_logs_appli->setEnabled(false);
+            this->ui->actionafficher_les_logs_kit->setEnabled(false);
+            this->ui->actionAfficher_logs_utilisateur->setEnabled(false);
+            this->ui->actionajouter_nouveau_kit->setEnabled(false);
+            this->ui->actiondupliquer_kit->setEnabled(false);
+            this->ui->actionmodifier_kit->setEnabled(false);
+            this->ui->actionModifier_l_utilisateur->setEnabled(false);
         }
     }
 }
@@ -999,7 +1030,7 @@ void MainWindow::update_connection_status(bool is_user_logged)
 void MainWindow::log_stuffs(QtMsgType type, const QString &msg)
 {
     QDateTime date ;
-    QString date_str = date.currentDateTime().toString();
+    QString date_str = date.currentDateTime().toString("ddd d MMM yyyy hh:mm:ss");
     switch (type) {
     default:
     case QtInfoMsg:
@@ -1445,7 +1476,7 @@ void MainWindow::on_RESA_pushButton_reserver_clicked()
                 for(const auto& kit_elem : this->kitListBasket_view)
                 {
                     g_connect_db.add_resa_from_kit(kit_elem, l_user.getId(), start_date, resa_nb );
-                    g_connect_db.insert_log_by_user_and_kit(kit_elem,&l_user,"-----> Dans la réservation n°" + QString::number(resa_nb) + ", l'utilisateur '"+l_user.getUtinfo()+"' a réservé le kit '"+kit_elem->getNom()+"' (code: "+kit_elem->getCode()+") pour la date: '"+start_date.toString()+"'");
+                    g_connect_db.insert_log_by_user_and_kit(kit_elem,&l_user,"-----> Dans la réservation n°" + QString::number(resa_nb) + ", l'utilisateur '"+l_user.getUtinfo()+"' a réservé le kit '"+kit_elem->getNom()+"' (code: "+kit_elem->getCode()+") pour la date: '"+start_date.toString("ddd d MMM yyyy")+"'");
                     kit_elem->setIs_in_basket(false);
                     kit_elem->setIs_booked(true);
                 }
@@ -1794,7 +1825,6 @@ void MainWindow::SORTIE_refresh_current_resa_list_table(void)
 
 void MainWindow::on_SORTIE_listWidget_resa_kitsOfResa_itemClicked(QListWidgetItem *item)
 {
-
     Kit * l_kit = SORTIE_get_kitOfResa_selected();
     //if kit not out, then enable "sortir" button
     if (l_kit->getIs_out() == false)
