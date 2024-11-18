@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Installer>
+    <Name>Installeur de Micro Brico</Name>
+    <Version>1.0.0</Version>
+    <Title>Installeur de l'application Micro Brico</Title>
+    <Publisher>Association Micro brico</Publisher>
+    <StartMenuDir>MicroBrico</StartMenuDir>
+    <TargetDir>C:/Program Files/MicroBrico/</TargetDir>
+    <Default>true</Default>
+</Installer>
