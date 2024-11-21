@@ -6,5 +6,4 @@
     <Publisher>Association Micro brico</Publisher>
     <StartMenuDir>MicroBrico</StartMenuDir>
     <TargetDir>C:/Program Files/MicroBrico/</TargetDir>
-    <Default>true</Default>
 </Installer>

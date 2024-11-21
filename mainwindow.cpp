@@ -16,7 +16,7 @@
 
 
 #define DAY_OF_RESA 5
-static QString VERSION = "1.0.0";
+static QString VERSION = "1.0.1";
 
 QPointer<LogBrowser> logBrowser;
 
@@ -34,10 +34,17 @@ MainWindow::MainWindow(QWidget *parent)
 
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL", "dbtest");
 
+#ifdef NDEBUG //Release compilation
+    db.setHostName("192.168.10.120");
+    db.setDatabaseName("db_pret_micro");
+    db.setUserName("admin");
+    db.setPassword("PAPYRUS");
+#else //Debug compilation
     db.setHostName("localhost");
     db.setDatabaseName("db_dev");
     db.setUserName("adrien");
     db.setPassword("adrien");
+#endif
     db.open();
     g_connect_db.set_db();
 
