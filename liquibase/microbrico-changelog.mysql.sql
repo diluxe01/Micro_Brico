@@ -43,7 +43,7 @@ ALTER TABLE kit CHANGE COLUMN `nom` `nom` VARCHAR(150) NULL DEFAULT NULL ;
 ALTER TABLE item CHANGE COLUMN `name` `name` VARCHAR(100) NULL DEFAULT NULL ;
 
 -- changeset adrie:1716202953457-15 comment:create sortie table
-CREATE TABLE `db_dev`.`sortie` (
+CREATE TABLE `sortie` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `start_date` DATE NOT NULL,
   `id_user` INT NULL,
@@ -52,36 +52,36 @@ CREATE TABLE `db_dev`.`sortie` (
   PRIMARY KEY (`id`));
   
 -- changeset adrie:1716202953457-16 comment:create uid_sortie table
-  CREATE TABLE `db_dev`.`uid_sortie` (
+  CREATE TABLE `uid_sortie` (
   `iduid_sortie` INT NOT NULL,
   PRIMARY KEY (`iduid_sortie`),
   UNIQUE INDEX `iduid_sortie_UNIQUE` (`iduid_sortie` ASC) VISIBLE);
 
 
 -- changeset adrie:1716202953457-17 comment:set utinfo in utilisateur table to "unique" attribute
-ALTER TABLE `db_dev`.`utilisateur` 
+ALTER TABLE `utilisateur` 
 ADD UNIQUE INDEX `utinfo_UNIQUE` (`utinfo` ASC) VISIBLE;
 ;
 
 -- changeset adrie:1716202953457-18 comment:set utinfo to char 10
-ALTER TABLE `db_dev`.`utilisateur` 
+ALTER TABLE `utilisateur` 
 CHANGE COLUMN `utinfo` `utinfo` CHAR(10) NOT NULL ;
 
 -- changeset adrie:1716202953457-19 comment:add quantity_init column to item
-ALTER TABLE `db_dev`.`item` 
+ALTER TABLE `item` 
 ADD COLUMN `quantity_init` SMALLINT NOT NULL AFTER `quantity`;
 
 -- changeset adrie:1716202953457-20 comment:add is_active column to resa table
-ALTER TABLE `db_dev`.`resa` 
+ALTER TABLE `resa` 
 ADD COLUMN `is_active` TINYINT NULL DEFAULT 1 AFTER `id_resa`;
 
 -- changeset adrie:1716202953457-21 comment:add is_active column to sortie table
-ALTER TABLE `db_dev`.`sortie` 
+ALTER TABLE `sortie` 
 ADD COLUMN `is_active` TINYINT NULL DEFAULT 1 AFTER `id_sortie`;
 
 
 -- changeset adrie:1716202953457-22 comment:create log tab
-CREATE TABLE `db_dev`.`log` (
+CREATE TABLE `log` (
   `id` INT NOT NULL,
   `date` DATETIME NULL DEFAULT now(),
   `text` VARCHAR(10000) NULL,
@@ -92,21 +92,21 @@ CREATE TABLE `db_dev`.`log` (
   INDEX `id_kit_idx` (`id_kit` ASC) VISIBLE,
   CONSTRAINT `id_kit`
     FOREIGN KEY (`id_kit`)
-    REFERENCES `db_dev`.`kit` (`idkit`)
+    REFERENCES `kit` (`idkit`)
     ON DELETE SET NULL
     ON UPDATE CASCADE,
   CONSTRAINT `id_user`
     FOREIGN KEY (`id_user`)
-    REFERENCES `db_dev`.`utilisateur` (`id`)
+    REFERENCES `utilisateur` (`id`)
     ON DELETE SET NULL
     ON UPDATE CASCADE);
     
 -- changeset adrie:1716202953457-23 comment:create log tab: correct error
-ALTER TABLE `db_dev`.`log` CHANGE COLUMN `id` `id` INT NOT NULL AUTO_INCREMENT ;
+ALTER TABLE `log` CHANGE COLUMN `id` `id` INT NOT NULL AUTO_INCREMENT ;
 
 
 -- changeset adrie:1716202953457-24 comment: log table set index descend ORDER
-ALTER TABLE `db_dev`.`log` 
+ALTER TABLE `log` 
 ADD INDEX `index_date` (`date` DESC) VISIBLE;
 ;
 

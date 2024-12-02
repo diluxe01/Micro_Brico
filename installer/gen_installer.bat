@@ -35,7 +35,10 @@ del %DATA_DIR%\micro_brico_app.exe
 copy  .\..\build\Desktop_Qt_6_7_3_MinGW_64_bit-Release\micro_brico_app.exe %DATA_DIR%\tmp\micro_brico_app.exe
 
 call windeployqt %DATA_DIR%\tmp\micro_brico_app.exe
-copy C:\Qt\6.7.3\mingw_64\bin\libmysql.dll %DATA_DIR%\tmp\libmysql.dll
+copy .\qsqlmysql.dll_Qt_SQL_driver_6.7.3_MinGW_13.1_64-bit\libmysql.dll %DATA_DIR%\tmp\libmysql.dll
+copy .\qsqlmysql.dll_Qt_SQL_driver_6.7.3_MinGW_13.1_64-bit\libssl-3-x64.dll %DATA_DIR%\tmp\libssl-3-x64.dll
+copy .\qsqlmysql.dll_Qt_SQL_driver_6.7.3_MinGW_13.1_64-bit\libcrypto-3-x64.dll %DATA_DIR%\tmp\libcrypto-3-x64.dll
+xcopy /Y /s /F  .\qsqlmysql.dll_Qt_SQL_driver_6.7.3_MinGW_13.1_64-bit\sqldrivers\ %DATA_DIR%\tmp\sqldrivers\
 
 del %DATA_DIR%\microBricoArch.zip
 call archivegen %DATA_DIR%\microBricoArch.zip %DATA_DIR%\tmp\* -f zip

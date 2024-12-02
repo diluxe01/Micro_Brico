@@ -69,11 +69,15 @@ private slots:
     void on_GESKIT_pushButton_duplicate_kit_clicked();
     void on_GESKIT_pushButton_modify_kit_clicked();
     void on_GESKIT_pushButton_getkit_clicked();
+    void on_GESKIT_lineEdit_findkitbyname_returnPressed();
+    void on_GESKIT_lineEdit_findkitbycode_returnPressed();
     void on_GESKIT_pushButton_logkit_clicked();
     void on_GESKIT_tableWidget_kit_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
     void on_GESKIT_tableWidget_kit_cellDoubleClicked(int row, int column);
 
     //-----------Slots RESA-------------------
+    void on_RESA_lineEdit_findkitbyname_returnPressed();
+    void on_RESA_lineEdit_findkitbycode_returnPressed();
     void on_RESA_pushButton_getkit_resa_clicked();
     void on_RESA_listWidget_resa_itemDoubleClicked(QListWidgetItem *item);
     void on_RESA_listWidget_panierResa_itemDoubleClicked(QListWidgetItem *item);
@@ -82,6 +86,7 @@ private slots:
     void on_RESA_listWidget_resa_currentResa_itemClicked(QListWidgetItem *item);
     void on_RESA_pushButton_suppr_resa_clicked();
     void on_RESA_pushButton_reserver_clicked();
+    void on_RESA_lineEdit_resa_utinfo_user_returnPressed();
 
     //-----------Slots SORTIES-------------------
     void on_SORTIE_pushButton_resa_showResa_clicked();
@@ -92,8 +97,14 @@ private slots:
     void on_SORTIE_popupSortirResa_pushAnnuler();
     void on_SORTIE_popupSortirResa_pushRestituer();//Callback called when "Restituer" button is pushed inside popup
     void on_pushButton_restituerKit_clicked();
+    void on_SORTIE_listWidget_kitsOut_itemClicked(QListWidgetItem *item);
+    void on_SORTIE_listWidget_kitsOut_itemDoubleClicked(QListWidgetItem *item);
     void on_SORTIE_pushButton_retirer_kit_from_resa_clicked();
     void on_SORTIE_pushButton_endResa_clicked();
+    void on_SORTIE_lineEdit_utinfo_returnPressed();
+
+
+
 
 
 

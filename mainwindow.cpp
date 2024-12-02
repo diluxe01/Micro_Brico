@@ -697,6 +697,20 @@ void MainWindow::GESKIT_refresh_kit_list_from_server(std::vector<Kit*> *i_list)
     //Get every kits on server
     g_connect_db.select_all_kits(i_list);
 }
+
+
+
+void MainWindow::on_GESKIT_lineEdit_findkitbyname_returnPressed()
+{
+    on_GESKIT_pushButton_getkit_clicked();
+}
+
+
+void MainWindow::on_GESKIT_lineEdit_findkitbycode_returnPressed()
+{
+    on_GESKIT_pushButton_getkit_clicked();
+}
+
 void MainWindow::on_GESKIT_pushButton_getkit_clicked()
 {
     this->kitListGeskit_view.clear();
@@ -1017,6 +1031,7 @@ void MainWindow::update_connection_status(bool is_user_logged)
             this->ui->RESA_pushButton_suppr_resa->setEnabled(false);
             this->ui->RESA_pushButton_reserver->setEnabled(false);
             this->ui->SORTIE_pushButton_sortir->setEnabled(false);
+            this->ui->pushButton_restituerKit->setEnabled(false);
             this->ui->SORTIE_pushButton_retirer_kit_from_resa->setEnabled(false);
 
 
@@ -1258,6 +1273,25 @@ void MainWindow::on_RESA_calendarWidget_clicked(const QDate &date)
         this->ui->RESA_calendarWidget->setSelectedDate(this->RESA_get_next_resa_day(this->ui->RESA_calendarWidget->selectedDate()));
         this->on_RESA_calendarWidget_clicked(this->ui->RESA_calendarWidget->selectedDate());
     }
+}
+
+void MainWindow::on_RESA_lineEdit_resa_utinfo_user_returnPressed()
+{
+    on_RESA_pushButton_resa_showResa_clicked();
+}
+
+
+
+
+void MainWindow::on_RESA_lineEdit_findkitbyname_returnPressed()
+{
+    on_RESA_pushButton_getkit_resa_clicked();
+}
+
+
+void MainWindow::on_RESA_lineEdit_findkitbycode_returnPressed()
+{
+    on_RESA_pushButton_getkit_resa_clicked();
 }
 
 void MainWindow::on_RESA_pushButton_getkit_resa_clicked()
@@ -1639,6 +1673,13 @@ void MainWindow::RESA_deactivate_outdated_resa(void)
 // vvvvvv MAIN WINDOW "Gestion SORTIES" vvvvvv
 
 
+
+void MainWindow::on_SORTIE_lineEdit_utinfo_returnPressed()
+{
+
+    on_SORTIE_pushButton_resa_showResa_clicked();
+}
+
 void MainWindow::on_SORTIE_pushButton_resa_showResa_clicked()
 {
     bool has_errors = false;
@@ -1669,6 +1710,10 @@ void MainWindow::on_SORTIE_pushButton_resa_showResa_clicked()
             // Updates sortie list
             g_connect_db.select_active_sortie_by_user(&this->sortieList_byUser, this->sortie_user.getId());
             SORTIE_refresh_kitsOut_table();
+
+
+            this->ui->SORTIE_pushButton_sortir->setEnabled(false);
+            this->ui->pushButton_restituerKit->setEnabled(false);
         }
     }
 
@@ -1865,6 +1910,7 @@ void MainWindow::on_SORTIE_pushButton_sortir_clicked()
 }
 
 
+
 ///
 /// \brief MainWindow::on_SORTIE_popupSortirResa_pushSortir : Callback called when "Sortir" button is pushed inside popup
 /////
@@ -1923,6 +1969,18 @@ void MainWindow::SORTIE_sortir_kit()
 
 }
 
+
+
+void MainWindow::on_SORTIE_listWidget_kitsOut_itemClicked(QListWidgetItem *item)
+{
+        this->ui->pushButton_restituerKit->setEnabled(true);
+}
+
+void MainWindow::on_SORTIE_listWidget_kitsOut_itemDoubleClicked(QListWidgetItem *item)
+{
+    on_pushButton_restituerKit_clicked();
+}
+
 ///
 /// \brief MainWindow::on_pushButton_restituerKit_clicked: Function called when "Restituer" Button is called inside main window
 ///
@@ -1954,6 +2012,9 @@ void MainWindow::on_SORTIE_popupSortirResa_pushRestituer()
         delete(this->p_popupSortirResa);
 
         this->setEnabled(true);//enable mainWindow
+
+        /* refresh the kit list by cleaning and loading it again */
+        this->GESKIT_refresh_kit_list_from_server(&this->kitList);
 
         // Updates sortie list
         g_utils.clearList(&this->sortieList_byUser);
@@ -2018,6 +2079,12 @@ void MainWindow::on_SORTIE_pushButton_endResa_clicked()
 }
 // ^^^^^^ MAIN WINDOW "Gestion SORTIES" ^^^^^^
 //---------------------------------------------------------
+
+
+
+
+
+
 
 
 
