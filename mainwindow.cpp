@@ -385,8 +385,8 @@ void MainWindow::on_actionSe_connecter_triggered()
     this->p_loginConnect = new (Login_connect);
     this->p_loginConnect->setUser(&this->login_user);
     this->p_loginConnect->show();
-    QObject::connect(this->p_loginConnect->getOkButton(), &QDialogButtonBox::accepted, this, &MainWindow::on_popupLogin_ok);
-    QObject::connect(this->p_loginConnect->getOkButton(), &QDialogButtonBox::rejected, this, &MainWindow::on_popupLogin_destroyed);
+    QObject::connect(this->p_loginConnect->getOkPushButton(), &QPushButton::clicked, this, &MainWindow::on_popupLogin_ok);
+    QObject::connect(this->p_loginConnect->getAnnulPushButton(), &QPushButton::clicked, this, &MainWindow::on_popupLogin_destroyed);
 }
 
 void MainWindow::on_actionSe_d_connecter_triggered()
@@ -1548,9 +1548,15 @@ void MainWindow::on_RESA_pushButton_resa_showResa_clicked()
     has_errors = g_connect_db.get_user_by_utinfo(this->ui->RESA_lineEdit_resa_utinfo_user->text(), &l_user);
     if (has_errors != true)
     {
+        this->statusBar()->showMessage("GESTION RESA: Réservation pour l'utilisateur: "+this->ui->RESA_lineEdit_resa_utinfo_user->text());
+
         g_connect_db.select_active_resa_by_user(&this->resaList, l_user.getId());
         RESA_refresh_current_resa_list_table();
 
+    }
+    else
+    {
+        this->statusBar()->showMessage("GESTION RESA: L'UTINFO fournie est inconnue");
     }
 }
 
@@ -1703,6 +1709,8 @@ void MainWindow::on_SORTIE_pushButton_resa_showResa_clicked()
         has_errors = g_connect_db.get_user_by_utinfo(this->ui->SORTIE_lineEdit_utinfo->text(), &this->sortie_user);
         if (has_errors == false)
         {
+            this->statusBar()->showMessage("GESTION SORTIE: Sortie/Retour pour l'utilisateur: "+this->ui->SORTIE_lineEdit_utinfo->text());
+
             // Updates resa list
             g_connect_db.select_active_resa_by_user(&this->resaListSortie_byUser, this->sortie_user.getId());
             SORTIE_refresh_current_resa_list_table();
@@ -1714,6 +1722,11 @@ void MainWindow::on_SORTIE_pushButton_resa_showResa_clicked()
 
             this->ui->SORTIE_pushButton_sortir->setEnabled(false);
             this->ui->pushButton_restituerKit->setEnabled(false);
+        }
+        else
+        {
+
+            this->statusBar()->showMessage("GESTION SORTIE: L'UTINFO fournie est inconnue");
         }
     }
 

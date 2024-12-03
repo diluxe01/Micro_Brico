@@ -14,9 +14,14 @@ Login_connect::~Login_connect()
     delete ui;
 }
 
-QDialogButtonBox* Login_connect::getOkButton(void)
+QPushButton* Login_connect::getOkPushButton(void)
 {
-    return ui->buttonBox;
+    return ui->pushButton_ok;
+}
+
+QPushButton* Login_connect::getAnnulPushButton(void)
+{
+    return ui->pushButton_Annuler;
 }
 
 void Login_connect::setUser(Utilisateur *p_user)
@@ -24,11 +29,11 @@ void Login_connect::setUser(Utilisateur *p_user)
     this->user = p_user;
 }
 
-void Login_connect::on_buttonBox_clicked(QAbstractButton *button)
+
+
+void Login_connect::on_pushButton_ok_clicked()
 {
     this->user->setUtinfo(ui->lineEdit_utinfo->text());
     this->user->setMdp(ui->lineEdit_mdp->text());
 }
-
-
 

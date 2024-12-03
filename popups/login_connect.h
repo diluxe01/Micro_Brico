@@ -16,12 +16,14 @@ class Login_connect : public QDialog
 public:
     explicit Login_connect(QWidget *parent = nullptr);
     ~Login_connect();
-    QDialogButtonBox* getOkButton(void);
     void setUser(Utilisateur * p_user);
 
-private slots:
-    void on_buttonBox_clicked(QAbstractButton *button);
+    QPushButton *getAnnulPushButton();
+    QPushButton *getOkPushButton();
 
+private slots:
+
+    void on_pushButton_ok_clicked();
 
 private:
     Ui::login_connect *ui;
