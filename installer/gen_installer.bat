@@ -2,7 +2,7 @@ REM @echo off
 REM Espace utilisateur a remplir avant chaque generation d'installeur
 REM ------------------------------------------------------
 set version=1.0.1
-set date=2024-11-22
+set date=2024-12-04
 
 REM ------------------------------------------------------
 
@@ -40,7 +40,7 @@ copy .\qsqlmysql.dll_Qt_SQL_driver_6.7.3_MinGW_13.1_64-bit\libssl-3-x64.dll %DAT
 copy .\qsqlmysql.dll_Qt_SQL_driver_6.7.3_MinGW_13.1_64-bit\libcrypto-3-x64.dll %DATA_DIR%\tmp\libcrypto-3-x64.dll
 xcopy /Y /s /F  .\qsqlmysql.dll_Qt_SQL_driver_6.7.3_MinGW_13.1_64-bit\sqldrivers\ %DATA_DIR%\tmp\sqldrivers\
 
-del %DATA_DIR%\microBricoArch.zip
+REM del %DATA_DIR%\microBricoArch.zipq
 call archivegen %DATA_DIR%\microBricoArch.zip %DATA_DIR%\tmp\* -f zip
 
 rmdir /s /Q %DATA_DIR%\tmp\
