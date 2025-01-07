@@ -16,7 +16,7 @@
 
 
 #define DAY_OF_RESA 5
-static QString VERSION = "1.0.1";
+static QString VERSION = "1.0.2";
 
 QPointer<LogBrowser> logBrowser;
 
@@ -55,6 +55,7 @@ MainWindow::MainWindow(QWidget *parent)
     //Gestion de la bar de status
     this->p_status_bar_label = new QLabel;
     this->statusBar()->addPermanentWidget(this->p_status_bar_label);
+    this->p_status_bar_label->setTextFormat(Qt::MarkdownText);
 
     //Init default buttons status
     this->GESKIT_enable_geskit_buttons(false);
@@ -121,11 +122,14 @@ MainWindow::MainWindow(QWidget *parent)
     this->ui->actionEffacer_les_reservations_pass_es->setEnabled(false);
 
 
-    // A SUPPRIMER Connection automatique avec l'utilisateur "admin" à chaque démarrage
+    #ifndef NDEBUG //DEBUG compilation
+    // Connection automatique avec l'utilisateur "admin" à chaque démarrage
     this->p_loginConnect = new (Login_connect);
     this->login_user.setUtinfo("admin");
     this->login_user.setMdp("admin");
     this-> on_popupLogin_ok();
+    #endif
+
 
 }
 
@@ -979,8 +983,8 @@ void MainWindow::update_connection_status(bool is_user_logged)
         if (is_user_logged == true)
         {
             qInfo() << "Vous êtes maintenant connecté.";
-
-            this->p_status_bar_label->setText("Connecté en tant que: "+ this->login_user.getUtinfo());
+            this->p_status_bar_label->setStyleSheet("QLabel { color : blue; }");
+            this->p_status_bar_label->setText("Connecté en tant que: **"+ this->login_user.getUtinfo()+"**");
 
             //Refresh kit list every time a user logs in
             this->GESKIT_refresh_kit_list_from_server(&this->kitList);
@@ -989,6 +993,7 @@ void MainWindow::update_connection_status(bool is_user_logged)
 
             //Refresh resa RESA_lineEdit_resa_utinfo_user with user name and enable it only if user is admin
             this->ui->RESA_lineEdit_resa_utinfo_user->setText(this->login_user.getUtinfo());
+
             if (this->login_user.getPrivilege() == E_admin)
             {
                 this->ui->RESA_lineEdit_resa_utinfo_user->setEnabled(true);
@@ -1025,7 +1030,9 @@ void MainWindow::update_connection_status(bool is_user_logged)
         else
         {
             qInfo() << "Vous êtes maintenant déconnecté.";
+            this->p_status_bar_label->setStyleSheet("QLabel { color : red; }");
             this->p_status_bar_label->setText("Déconnecté");
+
             //Clear lineEdit_resa_email_use
             this->ui->RESA_lineEdit_resa_utinfo_user->setText("");
             this->ui->RESA_pushButton_suppr_resa->setEnabled(false);
@@ -1397,6 +1404,7 @@ void MainWindow::RESA_refresh_kit_list_table(void)
         }
         else if (kit_elem->getIs_booked())
         {
+            p_item->setText(p_item->text() + " (déjà réservé à cette date)");
             p_item->setBackground(brush_booked);
         }
         else
@@ -1910,6 +1918,7 @@ void MainWindow::on_SORTIE_pushButton_sortir_clicked()
 {
     Kit * l_kit = SORTIE_get_kitOfResa_selected();
     this->p_popupSortirResa = new (PopupSortirResa);
+    this->p_popupSortirResa->setMode(E_MODE_SORTIE);
     this->p_popupSortirResa->setUser(&this->sortie_user);
     this->p_popupSortirResa->setP_kit(l_kit);
     this->p_popupSortirResa->refresh_source_item_list();
@@ -2001,6 +2010,7 @@ void MainWindow::on_pushButton_restituerKit_clicked()
 {
     Kit * l_kit = SORTIE_get_kitOut_selected();
     this->p_popupSortirResa = new (PopupSortirResa);
+    this->p_popupSortirResa->setMode(E_MODE_RESTITUTION);
     this->p_popupSortirResa->setUser(&this->sortie_user);
     this->p_popupSortirResa->setP_kit(l_kit);
     this->p_popupSortirResa->refresh_source_item_list();
@@ -2045,6 +2055,9 @@ void MainWindow::SORTIE_restit_kit()
 
     int sortie_number = g_connect_db.select_sortie_nb_from_kit(p_kit); // get sortie_nb for logs before deactivating sortie
     g_connect_db.insert_log_by_user_and_kit(p_kit,&l_user,"L'utilisateur '"+l_user.getUtinfo()+"' a restitué le kit '"+p_kit->getNom()+"' (code: "+p_kit->getCode()+", n° de sortie: "+QString::number(sortie_number)+")");
+
+    //Calculate remaining item quantity based on quantity returned and save it to db
+    SORTIE_calculate_remaining_quantity(this->p_popupSortirResa->item_list_dest, p_kit->item_list );
     QString log_str = g_connect_db.update_items_quantity_of_kit (p_kit, this->p_popupSortirResa->item_list_dest);
     g_connect_db.insert_log_by_user_and_kit(p_kit,&l_user,log_str);
 
@@ -2053,6 +2066,36 @@ void MainWindow::SORTIE_restit_kit()
     p_kit->setIs_out(false);
     GEN_raise_popup_info("Vous avez restitué le kit : "+ p_kit->getNom());
 
+}
+
+
+///
+/// \brief MainWindow::SORTIE_calculate_remaining_quantity
+/// Calculate the remaining current quantity (param "quantity_current) of every items i_items_returned, based on the quantity of each item returned compared to the quantity of each item taken out.
+/// \param i_items_returned
+/// \param i_items_kit
+///
+void MainWindow::SORTIE_calculate_remaining_quantity(std::vector<Item *> i_items_returned, std::vector<Item *> i_items_kit )
+{
+    uint current_quantity = 0u;
+    uint new_current_quantity = 0u;
+    for(const auto& elem_returned_item : i_items_returned)
+    {
+        for(const auto& elem_kit_item : i_items_kit)
+        {
+            if (elem_returned_item->getId() == elem_kit_item->getId())
+            {
+                current_quantity = elem_kit_item->getQuantity_current();//save current quantity of item
+                if (elem_returned_item->getQuantity_out() < elem_kit_item->getQuantity_out())
+                {
+                    new_current_quantity = current_quantity - (elem_kit_item->getQuantity_out() - elem_returned_item->getQuantity_out() );
+                    elem_returned_item->setQuantity_current(new_current_quantity );
+                }
+                elem_returned_item->setQuantity_out(0u); //since this function is always called when KIT is returned, then no item should be out
+
+            }
+        }
+    }
 }
 
 

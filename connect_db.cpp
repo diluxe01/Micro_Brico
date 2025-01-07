@@ -282,7 +282,7 @@ void Connect_db::update_kit (Kit *i_kit)  {
 
 ///
 /// \brief Connect_db::update_items_quantity_of_kit
-/// Update the quantity of the items of kit pointed by i_kit, with the quantity of matching items in i_new_items list
+/// Update the quantity_out and quantity_current of the items of kit pointed by i_kit, with the quantity of matching items in i_new_items list
 /// \param i_kit: kit where item are to be changed
 /// \param i_new_items: list containing items whith new quantity
 /// \return Returns the string of new quantity by items for logs
@@ -291,19 +291,20 @@ QString Connect_db::update_items_quantity_of_kit(Kit * i_kit, std::vector<Item *
 
     QSqlQuery query  = QSqlQuery(this->db);
     QString exec_string = "";
-    QString log_str = "-----> Nouvelle quantité de chaque items du kit '"+i_kit->getNom()+"'--> ";
+    QString log_str = "-----> Nouvelle quantités de chaque items du kit '"+i_kit->getNom()+"'--> ";
     for(const auto& elem_new_item : i_new_items)
     {
         for(const auto& elem_kit_item : i_kit->item_list)
         {
             if (elem_new_item->getId() == elem_kit_item->getId())
             {
-                log_str = log_str + elem_new_item->getName()+ " ("+QString::number(elem_new_item->getQuantity_current())+"), ";
-                if (elem_new_item->getQuantity_current() != elem_kit_item->getQuantity_current())
-                {
-                    exec_string = "update item set quantity = " +QString::number(elem_new_item->getQuantity_current())+" where id = " + QString::number(elem_new_item->getId()) ;
+                log_str = log_str + elem_new_item->getName()+ " (qté sortie : "+QString::number(elem_new_item->getQuantity_out())+", qté totale "+QString::number(elem_new_item->getQuantity_current())+",qté init "+QString::number(elem_new_item->getQuantity_init())+") | ";
+                // if ((elem_new_item->getQuantity_current() != elem_kit_item->getQuantity_current())
+                //     || (elem_new_item->getQuantity_out() != elem_kit_item->getQuantity_out()))
+                // {
+                    exec_string = "update item set quantity_out = " +QString::number(elem_new_item->getQuantity_out())+", quantity = " +QString::number(elem_new_item->getQuantity_current())+" where id = " + QString::number(elem_new_item->getId()) ;
                     runQuery(query, exec_string);
-                }
+                // }
             }
         }
     }
@@ -559,7 +560,7 @@ void  Connect_db::select_all_users (std::vector<Utilisateur*> *list)
 void  Connect_db::select_items_by_kit (Kit * kit)
 {
     QSqlQuery query(this->db);
-    runQuery(query,"SELECT id, name, quantity, quantity_init from item where forkey ='"+QString::number(kit->getIdKit())+"'");
+    runQuery(query,"SELECT id, name, quantity, quantity_init, quantity_out from item where forkey ='"+QString::number(kit->getIdKit())+"'");
     g_utils.clearList(&kit->item_list);
     populate_item_list_from_query(kit, std::move(query));
 }
@@ -572,12 +573,14 @@ void Connect_db::populate_item_list_from_query(Kit * kit, QSqlQuery query)
         QString name = query.value("name").toString();
         int quantity = query.value("quantity").toInt();
         int quantity_init = query.value("quantity_init").toInt();
+        int quantity_out = query.value("quantity_out").toInt();
 
         Item * i = new Item();
         i->setid((uint)id);
         i->setName(name);
         i->setQuantity_current(quantity);
         i->setQuantity_init(quantity_init);
+        i->setQuantity_out(quantity_out);
 
         kit->item_list.push_back(i);
     }
