@@ -44,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
     db.setDatabaseName("db_dev");
     db.setUserName("adrien");
     db.setPassword("adrien");
+    VERSION += "_DEBUG";
 #endif
     db.open();
     g_connect_db.set_db();
