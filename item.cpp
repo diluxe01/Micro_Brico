@@ -51,6 +51,16 @@ void Item::setQuantity_current(uint newQuantity_current)
     quantity_current = newQuantity_current;
 }
 
+uint Item::getQuantity_out() const
+{
+    return quantity_out;
+}
+
+void Item::setQuantity_out(uint newQuantity_out)
+{
+    quantity_out = newQuantity_out;
+}
+
 Item::Item(QObject *parent)
     : QObject{parent}
 {
@@ -68,11 +78,12 @@ uint Item::getForkey() const
 }
 
 
-Item::Item(uint id, const QString &name, uint forkey, uint quantity_init, uint quantity_current) : id(std::move(id)),
+Item::Item(uint id, const QString &name, uint forkey, uint quantity_init, uint quantity_current, uint quantity_out) : id(std::move(id)),
     name(name),
     forkey(std::move(forkey)),
     quantity_init(std::move(quantity_init)),
-    quantity_current(std::move(quantity_current))
+    quantity_current(std::move(quantity_current)),
+    quantity_out(std::move(quantity_out))
 {
     is_verified = false;
 }

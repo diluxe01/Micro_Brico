@@ -20,12 +20,13 @@ private:
     uint forkey;
     uint quantity_init;
     uint quantity_current;
+    uint quantity_out;
 
     bool is_verified;
 public:
     explicit Item(QObject *parent = nullptr);
     Item(uint id, const QString &name, uint forkey);
-    Item(uint id, const QString &name, uint forkey, uint quantity_init, uint quantity_current);
+    Item(uint id, const QString &name, uint forkey, uint quantity_init, uint quantity_current, uint quantity_out);
 
     QString getName() const;
     uint getForkey() const;
@@ -47,6 +48,9 @@ public:
 
     uint getQuantity_current() const;
     void setQuantity_current(uint newQuantity_current);
+
+    uint getQuantity_out() const;
+    void setQuantity_out(uint newQuantity_out);
 
 signals:
 };

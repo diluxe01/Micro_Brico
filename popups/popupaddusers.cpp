@@ -77,9 +77,10 @@ Utilisateur* popupAddUsers::get_user_from_form(void)
         ok_to_create_user = false;
     }
 
-    if (ui->lineEdit_utinfo->text().size() != 8 &&  ui->lineEdit_utinfo->text().size() != 10)
+    qsizetype utinfo_char_size = ui->lineEdit_utinfo->text().size();
+    if (utinfo_char_size != 8 && utinfo_char_size != 8 &&  utinfo_char_size != 10)
     {
-        error_string_list.append("Votre Utinfo ne fait pas la bonne taille. Il devrait contenir 8 ou 10 lettres.");
+        error_string_list.append("Votre Utinfo ne fait pas la bonne taille. Il devrait contenir 7, 8 ou 10 lettres.");
         ok_to_create_user = false;
     }
 

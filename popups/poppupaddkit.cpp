@@ -63,7 +63,7 @@ void PoppupAddKit::on_pushButton_addobject_clicked()
     if (item_text!= "")
     {
         //Push_back new item into private item list
-        Item* p_item = new Item(0, item_text, 0, item_qty_init, item_qty_current);
+        Item* p_item = new Item(0, item_text, 0, item_qty_init, item_qty_current, 0);
         this->kit->item_list.push_back(p_item);
 
         //Push_back new item into display tab
@@ -213,7 +213,7 @@ void PoppupAddKit::set_form_from_kit(Kit * p_kit)
     for(const auto& item_elem : p_kit->item_list)
     {
         //Push_back new item into private item list
-        Item* p_item = new Item(item_elem->getId(), item_elem->getName(), 0,item_elem->getQuantity_init(), item_elem->getQuantity_current());
+        Item* p_item = new Item(item_elem->getId(), item_elem->getName(), 0,item_elem->getQuantity_init(), item_elem->getQuantity_current(), item_elem->getQuantity_out());
         this->kit->item_list.push_back(p_item);
         push_back_new_item_on_tabWidget(item_elem);
     }

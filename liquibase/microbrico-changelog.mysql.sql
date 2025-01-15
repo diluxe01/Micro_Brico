@@ -110,3 +110,12 @@ ALTER TABLE `log`
 ADD INDEX `index_date` (`date` DESC) VISIBLE;
 ;
 
+-- changeset adrie:1716202953457-25 comment: Add quantity_out column in item tab
+ALTER TABLE `item` 
+ADD COLUMN `quantity_out` SMALLINT UNSIGNED NULL AFTER `quantity_init`,
+CHANGE COLUMN `quantity` `quantity` SMALLINT UNSIGNED NULL ,
+CHANGE COLUMN `quantity_init` `quantity_init` SMALLINT UNSIGNED NULL ;
+
+-- changeset adrie:1716202953457-26 comment: quantity_out is now zero filled
+ALTER TABLE `item` 
+CHANGE COLUMN `quantity_out` `quantity_out` SMALLINT UNSIGNED ZEROFILL NULL DEFAULT NULL ;

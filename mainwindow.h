@@ -202,5 +202,7 @@ private:
     void SORTIE_refresh_kits_of_resa_table(int i_resa_nb);
     void SORTIE_refresh_kitsOut_table();
     void SORTIE_restit_kit();
+    void SORTIE_calculate_remaining_quantity(std::vector<Item *> i_items_returned, std::vector<Item *> i_items_kit );
+
 };
 #endif // MAINWINDOW_H
