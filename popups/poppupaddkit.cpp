@@ -62,12 +62,16 @@ void PoppupAddKit::on_pushButton_addobject_clicked()
     // If user entered text
     if (item_text!= "")
     {
-        //Push_back new item into private item list
+        //Push_back new item into private item list, before deleted items, to keep order with
         Item* p_item = new Item(0, item_text, 0, item_qty_init, item_qty_current, 0);
-        this->kit->item_list.push_back(p_item);
+
+        int list_size = this->ui->listWidget_itemBasket->count(); //Get the number of item in listWidget_itemBasket
+        this->kit->item_list.insert(this->kit->item_list.begin() + list_size,p_item);//insert the new item in item list of kit, before deleted items
 
         //Push_back new item into display tab
         push_back_new_item_on_tabWidget(p_item);
+
+        p_item->setState(E_STATE_ADDED);
 
     }
 
@@ -75,8 +79,23 @@ void PoppupAddKit::on_pushButton_addobject_clicked()
 
 void PoppupAddKit::push_back_new_item_on_tabWidget(Item* p_item)
 {
+    new QListWidgetItem(p_item->getName()+ " (Qté init: "+ QString::number(p_item->getQuantity_init())+")"+ " (Qté restante: "+ QString::number(p_item->getQuantity_current())+")", this->ui->listWidget_itemBasket);
+}
 
-    new QListWidgetItem(p_item->getName()+ " (Qté init: "+ QString::number(p_item->getQuantity_init())+")"+ " (Qté courante: "+ QString::number(p_item->getQuantity_current())+")", this->ui->listWidget_itemBasket);
+Item* PoppupAddKit::get_item_selected()
+{
+    Item * p_item = NULL;
+    if (this->kit->item_list.empty() == false)
+    {
+        //Get current row
+        int currentRow = ui->listWidget_itemBasket->currentRow();
+
+
+        //get item on list corresponding to item selected on listWidget
+        p_item = this->kit->item_list.at(currentRow);
+    }
+    return p_item;
+
 }
 
 void PoppupAddKit::on_pushButton_deleteitemfromlist_clicked()
@@ -89,8 +108,22 @@ void PoppupAddKit::on_pushButton_deleteitemfromlist_clicked()
         //Delete element on tab widget
         ui->listWidget_itemBasket->takeItem(currentRow);
 
-        //Delete element on the list at given index
-        this->kit->item_list.erase(this->kit->item_list.begin()+currentRow);
+        //Change item state to deleted
+        Item * l_item = this->kit->item_list.at(currentRow);
+
+        if (l_item->getState() == E_STATE_ADDED)
+        {
+            //Item can be completely erased from list only if it has been added
+            this->kit->item_list.erase(this->kit->item_list.begin()+currentRow);
+        }
+        else
+        {
+            //Item must not be erased from list in any other state
+            // It state must change to "DELETED" and it must be pushed at the end of the list
+            l_item->setState(E_STATE_DELETED);
+            this->kit->item_list.erase(this->kit->item_list.begin()+currentRow);
+            this->kit->item_list.push_back(l_item);
+        }
     }
 
 }
@@ -219,8 +252,6 @@ void PoppupAddKit::set_form_from_kit(Kit * p_kit)
     }
 }
 
-
-
 void PoppupAddKit::on_spinBox_item_quantity_init_valueChanged(int arg1)
 {
     // automatically set value of current qty spinbox to init_value
@@ -228,3 +259,65 @@ void PoppupAddKit::on_spinBox_item_quantity_init_valueChanged(int arg1)
     this->ui->spinBox_item_quantity_current->setValue(arg1);
 }
 
+///
+/// \brief PoppupAddKit::on_listWidget_itemBasket_itemDoubleClicked
+/// Function called when user wants to modify item quantities
+/// \param item
+///
+void PoppupAddKit::on_listWidget_itemBasket_itemDoubleClicked(QListWidgetItem *item)
+{
+    //First get item selected by user
+    Item* p_item = get_item_selected();
+    if (p_item !=nullptr)
+    {
+        //Open popup pre filled with selected item informations
+        this->popupChangeQty = new (PopuppChangeItemQuantities);
+        this->popupChangeQty->set_form_from_item(p_item);
+        this->popupChangeQty->setWindowTitle("Modification des quantités de l'item : "+ p_item->getName());
+        this->popupChangeQty->show();
+        this->setEnabled(false);//disable current window
+        QObject::connect(this->popupChangeQty->getOkButton(), &QPushButton::clicked, this, &PoppupAddKit::on_popupchangeQty_ok);
+        QObject::connect(this->popupChangeQty->getCancelButton(), &QPushButton::clicked, this, &PoppupAddKit::on_popupchangeQty_destroyed);
+        QObject::connect(this->popupChangeQty, &PopuppChangeItemQuantities::delete_popup, this, &PoppupAddKit::on_popupchangeQty_destroyed);
+    }
+}
+
+void PoppupAddKit::refresh_item_basket(void)
+{
+    this->ui->listWidget_itemBasket->clear();
+    // Add items of kit
+    for(const auto& item_elem : this->kit->item_list)
+    {
+        if (item_elem->getState() != E_STATE_DELETED )
+        {
+            push_back_new_item_on_tabWidget(item_elem);
+        }
+    }
+}
+
+
+void PoppupAddKit::on_popupchangeQty_ok()
+{
+    Item* p_item = get_item_selected();
+    this->popupChangeQty->get_form_data(p_item);
+    refresh_item_basket();
+
+    //if current item state is added or deleted, it must remain in the same state
+    if ((p_item->getState() == E_STATE_ADDED) || (p_item->getState() == E_STATE_DELETED ))
+    {
+    }
+    else
+    {
+        // Otherwise it must be marked as edited
+        p_item->setState(E_STATE_EDITED);
+    }
+
+    delete (this->popupChangeQty);
+    this->setEnabled(true);//enable mainWindow
+}
+
+void PoppupAddKit::on_popupchangeQty_destroyed()
+{
+    delete (this->popupChangeQty);
+    this->setEnabled(true);//enable mainWindow
+}

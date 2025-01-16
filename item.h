@@ -2,6 +2,7 @@
 #define ITEM_H
 
 #include <QObject>
+#include "types.h"
 
 // enum T_etat_item
 // {
@@ -23,6 +24,7 @@ private:
     uint quantity_out;
 
     bool is_verified;
+    T_ITEM_STATE state;
 public:
     explicit Item(QObject *parent = nullptr);
     Item(uint id, const QString &name, uint forkey);
@@ -51,6 +53,9 @@ public:
 
     uint getQuantity_out() const;
     void setQuantity_out(uint newQuantity_out);
+
+    T_ITEM_STATE getState() const;
+    void setState(T_ITEM_STATE newState);
 
 signals:
 };

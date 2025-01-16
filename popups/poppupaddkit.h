@@ -5,6 +5,8 @@
 #include <QPushButton>
 #include "../item.h"
 #include "../kit.h"
+#include "PopuppChangeItemQuantities.h"
+#include <QListWidgetItem>
 #include <list>
 
 namespace Ui {
@@ -30,12 +32,19 @@ private slots:
     void on_pushButton_addobject_clicked();
     void on_pushButton_deleteitemfromlist_clicked();
     void on_spinBox_item_quantity_init_valueChanged(int arg1);
+    void on_listWidget_itemBasket_itemDoubleClicked(QListWidgetItem *item);
+    void on_popupchangeQty_ok();
+    void on_popupchangeQty_destroyed();
 
 private:
     Ui::PoppupAddKit *ui;
     Kit * kit;
+    PopuppChangeItemQuantities * popupChangeQty;
+
     void push_back_new_item_on_tabWidget(Item *item);
     void GEN_raise_popup_warning(QString msg);
+    Item *get_item_selected();
+    void refresh_item_basket();
 signals:
     void delete_popup(void);
 };

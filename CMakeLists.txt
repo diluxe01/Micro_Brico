@@ -52,6 +52,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         log.h log.cpp
         logger/log_user_kit_appli.h logger/log_user_kit_appli.cpp logger/log_user_kit_appli.ui
         types.h
+        popups/popuppchangeitemquantities.h popups/popuppchangeitemquantities.cpp popups/popuppchangeitemquantities.ui
 
 
 
