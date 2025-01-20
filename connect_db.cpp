@@ -175,36 +175,43 @@ bool Connect_db::update_user (Utilisateur *i_user)  {
 /// \param p_item: pointer to item to add to db
 /// \param i_idkit: idkit (foreign key of item) associated to added item
 ///
-void Connect_db::add_item (Item *p_item, QString i_idkit)  {
+void Connect_db::add_item (Item *p_item, Kit *p_kit)  {
 
     QSqlQuery query  = QSqlQuery(this->db);
-    QString exec_string = "insert into item (name, forkey, quantity, quantity_init) values('"+p_item->getName()+"', '"+i_idkit+"', '"+QString::number(p_item->getQuantity_current())+"', '"+QString::number(p_item->getQuantity_init())+"')";
-
+    QString exec_string = "insert into item (name, forkey, quantity, quantity_init, quantity_out) values('"+p_item->getName()+"', '"+QString::number( p_kit->getIdKit())+"', '"+QString::number(p_item->getQuantity_current())+"', '"+QString::number(p_item->getQuantity_init())+"', '"+QString::number(p_item->getQuantity_out())+"')";
+    QString log_string = "name = %1, forkey = %2, quantity = %3, quantity_init = %4, quantity_out = %5";
+    log_string = log_string .arg(p_item->getName())
+                            .arg(QString::number( p_kit->getIdKit()))
+                            .arg(QString::number(p_item->getQuantity_current()))
+                            .arg(QString::number(p_item->getQuantity_init()))
+                            .arg(QString::number(p_item->getQuantity_out()));
+    insert_log_by_user_and_kit(p_kit, active_user, "=====> l'item ID '"+ QString::number(p_item->getId())+"' a été ajouté. Valeurs: " + exec_string);
     runQuery(query, exec_string);
 }
 
-void Connect_db::add_kit (Kit *kit)  {
+void Connect_db::add_kit (Kit *p_kit)  {
     vector<Item*>::iterator it;
-    QString idkit;
+    int idkit;
     QSqlQuery query  = QSqlQuery(this->db);
     //add a kit in DB
     QString exec_string = "insert into kit "
                           "( nom, description, date_achat, prix_achat, texte_libre, en_panne, code_kit, caution) "
-                          "values(\""+kit->getNom()+"\",\""+kit->getDescription()+"\",'"+kit->getDate_achat().toString(Qt::ISODateWithMs)+"','"+kit->getPrix_achat().getStringValue()+"',\""+kit->getTexte_libre()+"\",'0','"+kit->getCode()+"','"+kit->getCaution().getStringValue()+"')";
+                          "values(\""+p_kit->getNom()+"\",\""+p_kit->getDescription()+"\",'"+p_kit->getDate_achat().toString(Qt::ISODateWithMs)+"','"+p_kit->getPrix_achat().getStringValue()+"',\""+p_kit->getTexte_libre()+"\",'0','"+p_kit->getCode()+"','"+p_kit->getCaution().getStringValue()+"')";
 
     runQuery(query, exec_string);
     //Add associated items to DB if no errors
     if (!get_querry_errors(query))
     {
-        exec_string = "select idkit from kit where code_kit='"+kit->getCode()+"'";
+        exec_string = "select idkit from kit where code_kit='"+p_kit->getCode()+"'";
         query.exec(exec_string);
         if (!get_querry_errors(query))
         {
             query.first();
-            idkit = query.value("idkit").toString();
-            for (it = kit->item_list.begin(); it != kit->item_list.end(); it++)
+            idkit = query.value("idkit").toInt();
+            p_kit->setIdkit(idkit);
+            for (it = p_kit->item_list.begin(); it != p_kit->item_list.end(); it++)
             {
-                add_item(*it, idkit);
+                add_item(*it, p_kit);
             }
         }
     }
@@ -233,48 +240,48 @@ void Connect_db::update_kit (Kit *i_kit)  {
     //Add associated items to DB if no errors
     if (!get_querry_errors(query))
     {
-        //Get every items of kit in DB
-        l_db_kit.setIdkit(i_kit->getIdKit());
-        this->select_items_by_kit(&l_db_kit);
+        QString log_string = " nom = '%1' |  description = '%2'|  date_achat = '%3'|   prix_achat = '%4'|  texte_libre = '%5'| en_panne = '%6'|  code_kit = '%7'|  caution = '%8'";
+        log_string = log_string.arg(i_kit->getNom())
+                        .arg(i_kit->getDescription())
+                        .arg(i_kit->getDate_achat().toString(Qt::ISODateWithMs))
+                        .arg(i_kit->getPrix_achat().getStringValue())
+                        .arg(i_kit->getTexte_libre())
+                        .arg("0")
+                        .arg(i_kit->getCode())
+                        .arg(i_kit->getCaution().getStringValue());
+        insert_log_by_user_and_kit(i_kit, active_user, "L'utilisateur "+active_user->getUtinfo()+" a mis à jout le Kit '"+i_kit->getNom()+"' avec les données suivantes : "+log_string);
 
-        // Iterate through items of db, and compare to new items to find those: deleted or edited
-        for(const auto& elem_item_db : l_db_kit.item_list)
-        {
-            item_matching = false;
-            for(const auto& elem_item_new : i_kit->item_list)
-            {
-                // 1) There is a matching edited item => do nothing
-                if (elem_item_db->getId() == elem_item_new->getId())
-                {
-                    item_matching = true;
-                    // exec_string = "update item set name = \""+elem_item_new->getName()+"\" where id =  "+ QString::number(elem_item_new->getId());
-                    // runQuery(query, exec_string);
-                    break;
-                }
-            }
-            // 2) There is no matching edited item => delete item
-            if (item_matching == false)
-            {
-                exec_string = "delete from item where id =  "+ QString::number(elem_item_db->getId());
-                runQuery(query, exec_string);
-            }
-        }
-
-        // Iterate through new items, and compare to items on db to find those : added
+        // Iterate through i_kit item list and update, create or delete items on dB depending on items state
         for(const auto& elem_item_new : i_kit->item_list)
         {
-            item_matching = false;
-            for(const auto& elem_item_db : l_db_kit.item_list)
+            switch (elem_item_new->getState())
             {
-                if (elem_item_db->getId() == elem_item_new->getId())
-                {
-                    item_matching = true;
-                }
-            }
-            // 3) if no item is matching then it is a new item => add item
-            if (item_matching == false)
-            {
-                add_item(elem_item_new, QString::number(i_kit->getIdKit()));
+            case E_STATE_EDITED:
+                exec_string = "update item set name = \""+elem_item_new->getName()+"\",  quantity = "+QString::number(elem_item_new->getQuantity_current())+", "
+                                                                                        "quantity_init = "+QString::number(elem_item_new->getQuantity_init())+", "
+                                                                                        "quantity_out = "+QString::number(elem_item_new->getQuantity_out())+"  "
+                                                                                        "where id =  "+ QString::number(elem_item_new->getId());
+                runQuery(query, exec_string);
+                log_string.clear();
+                log_string = " name = %1 ,  quantity =  %2 , quantity_init = %3 , quantity_out = %4";
+                log_string = log_string.arg(elem_item_new->getName())
+                                 .arg(QString::number(elem_item_new->getQuantity_current()))
+                                 .arg(QString::number(elem_item_new->getQuantity_init()))
+                                 .arg(QString::number(elem_item_new->getQuantity_out()));
+                insert_log_by_user_and_kit(i_kit, active_user, "=====> l'item ID '"+ QString::number(elem_item_new->getId())+"' a été modifié: " + log_string);
+                break;
+            case E_STATE_ADDED:
+                add_item(elem_item_new, i_kit);
+                break;
+            case E_STATE_DELETED:
+                exec_string = "delete from item where id =  "+ QString::number(elem_item_new->getId());
+                runQuery(query, exec_string);
+
+                insert_log_by_user_and_kit(i_kit, active_user, "=====> l'item ID '"+ QString::number(elem_item_new->getId())+"' ("+elem_item_new->getName()+") a été Supprimé.");
+                break;
+            case E_STATE_UNCHANGED:
+            default:
+                break;
             }
         }
     }

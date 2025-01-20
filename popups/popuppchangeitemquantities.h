@@ -23,10 +23,11 @@ public:
     void set_form_from_item(Item *p_item);
     QPushButton *getOkButton();
     QPushButton *getCancelButton();
-    void get_form_data(Item *o_item);
+    bool get_form_data(Item *o_item);
 private:
     Ui::PopuppChangeItemQuantities *ui;
 
+    void GEN_raise_popup_warning(QString msg);
 signals:
     void delete_popup(void);
 };

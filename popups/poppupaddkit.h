@@ -33,8 +33,8 @@ private slots:
     void on_pushButton_deleteitemfromlist_clicked();
     void on_spinBox_item_quantity_init_valueChanged(int arg1);
     void on_listWidget_itemBasket_itemDoubleClicked(QListWidgetItem *item);
-    void on_popupchangeQty_ok();
-    void on_popupchangeQty_destroyed();
+    void on_popupchangeQtyok();
+    void on_popupchangeQtyDestroyed();
 
 private:
     Ui::PoppupAddKit *ui;

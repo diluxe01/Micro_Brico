@@ -139,7 +139,7 @@ MainWindow::~MainWindow()
     delete ui;
     logBrowser->close();
     delete logBrowser;
-}
+ }
 
 void MainWindow::closeEvent (QCloseEvent *event)
 {
@@ -1927,17 +1927,17 @@ void MainWindow::on_SORTIE_pushButton_sortir_clicked()
     this->p_popupSortirResa->setButtonText("Sortir");
     this->p_popupSortirResa->show();
     this->setEnabled(false);//disable mainWindow
-    QObject::connect(this->p_popupSortirResa->getSortirButton(), &QPushButton::clicked, this, &MainWindow::on_SORTIE_popupSortirResa_pushSortir);
-    QObject::connect(this->p_popupSortirResa->getAnnulerButton(), &QPushButton::clicked, this, &MainWindow::on_SORTIE_popupSortirResa_pushAnnuler);
-    QObject::connect(this->p_popupSortirResa, &PopupSortirResa::delete_popup, this, &MainWindow::on_SORTIE_popupSortirResa_pushAnnuler);
+    QObject::connect(this->p_popupSortirResa->getSortirButton(), &QPushButton::clicked, this, &MainWindow::on_SORTIE_popupSortirResaPushSortir);
+    QObject::connect(this->p_popupSortirResa->getAnnulerButton(), &QPushButton::clicked, this, &MainWindow::on_SORTIE_popupSortirResaPushAnnuler);
+    QObject::connect(this->p_popupSortirResa, &PopupSortirResa::delete_popup, this, &MainWindow::on_SORTIE_popupSortirResaPushAnnuler);
 }
 
 
 
 ///
-/// \brief MainWindow::on_SORTIE_popupSortirResa_pushSortir : Callback called when "Sortir" button is pushed inside popup
+/// \brief MainWindow::on_SORTIE_popupSortirResaPushSortir : Callback called when "Sortir" button is pushed inside popup
 /////
-void MainWindow::on_SORTIE_popupSortirResa_pushSortir()
+void MainWindow::on_SORTIE_popupSortirResaPushSortir()
 {
 
     if (this->p_popupSortirResa->checkIfOk() == true)
@@ -2019,15 +2019,15 @@ void MainWindow::on_pushButton_restituerKit_clicked()
     this->p_popupSortirResa->setButtonText("Restituer");
     this->p_popupSortirResa->show();
     this->setEnabled(false);//disable mainWindow
-    QObject::connect(this->p_popupSortirResa->getSortirButton(), &QPushButton::clicked, this, &MainWindow::on_SORTIE_popupSortirResa_pushRestituer);
-    QObject::connect(this->p_popupSortirResa->getAnnulerButton(), &QPushButton::clicked, this, &MainWindow::on_SORTIE_popupSortirResa_pushAnnuler);
-    QObject::connect(this->p_popupSortirResa, &PopupSortirResa::delete_popup, this, &MainWindow::on_SORTIE_popupSortirResa_pushAnnuler);
+    QObject::connect(this->p_popupSortirResa->getSortirButton(), &QPushButton::clicked, this, &MainWindow::on_SORTIE_popupSortirResaPushRestituer);
+    QObject::connect(this->p_popupSortirResa->getAnnulerButton(), &QPushButton::clicked, this, &MainWindow::on_SORTIE_popupSortirResaPushAnnuler);
+    QObject::connect(this->p_popupSortirResa, &PopupSortirResa::delete_popup, this, &MainWindow::on_SORTIE_popupSortirResaPushAnnuler);
 }
 
 ///
-/// \brief MainWindow::on_SORTIE_popupSortirResa_pushRestituer : Callback called when "Restituer" button is pushed inside popup
+/// \brief MainWindow::on_SORTIE_popupSortirResaPushRestituer : Callback called when "Restituer" button is pushed inside popup
 /////
-void MainWindow::on_SORTIE_popupSortirResa_pushRestituer()
+void MainWindow::on_SORTIE_popupSortirResaPushRestituer()
 {
 
     if (this->p_popupSortirResa->checkIfOk() == true)
@@ -2101,9 +2101,9 @@ void MainWindow::SORTIE_calculate_remaining_quantity(std::vector<Item *> i_items
 
 
 ///
-/// \brief MainWindow::on_SORTIE_popupSortirResa_pushAnnuler: : Callback called when "Annuler" button is pushed inside popup
+/// \brief MainWindow::on_SORTIE_popupSortirResaPushAnnuler: : Callback called when "Annuler" button is pushed inside popup
 ///
-void MainWindow::on_SORTIE_popupSortirResa_pushAnnuler()
+void MainWindow::on_SORTIE_popupSortirResaPushAnnuler()
 {
     delete this->p_popupSortirResa;
     this->setEnabled(true);//enable mainWindow

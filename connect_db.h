@@ -64,7 +64,7 @@ public:
     void add_kit (Kit *);
     void update_kit (Kit *);
     QString update_items_quantity_of_kit (Kit *, std::vector<Item*> i_new_items);
-    void add_item(Item *p_item, QString i_idkit);
+    void add_item(Item *p_item, Kit *p_kit);
     void select_all_kits(std::vector<Kit*> *kits);
     void select_items_by_kit (Kit * );
     void populate_item_list_from_query(Kit * kit, QSqlQuery query);

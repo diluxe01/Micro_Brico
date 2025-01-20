@@ -276,9 +276,9 @@ void PoppupAddKit::on_listWidget_itemBasket_itemDoubleClicked(QListWidgetItem *i
         this->popupChangeQty->setWindowTitle("Modification des quantités de l'item : "+ p_item->getName());
         this->popupChangeQty->show();
         this->setEnabled(false);//disable current window
-        QObject::connect(this->popupChangeQty->getOkButton(), &QPushButton::clicked, this, &PoppupAddKit::on_popupchangeQty_ok);
-        QObject::connect(this->popupChangeQty->getCancelButton(), &QPushButton::clicked, this, &PoppupAddKit::on_popupchangeQty_destroyed);
-        QObject::connect(this->popupChangeQty, &PopuppChangeItemQuantities::delete_popup, this, &PoppupAddKit::on_popupchangeQty_destroyed);
+        QObject::connect(this->popupChangeQty->getOkButton(), &QPushButton::clicked, this, &PoppupAddKit::on_popupchangeQtyok);
+        QObject::connect(this->popupChangeQty->getCancelButton(), &QPushButton::clicked, this, &PoppupAddKit::on_popupchangeQtyDestroyed);
+        QObject::connect(this->popupChangeQty, &PopuppChangeItemQuantities::delete_popup, this, &PoppupAddKit::on_popupchangeQtyDestroyed);
     }
 }
 
@@ -296,27 +296,29 @@ void PoppupAddKit::refresh_item_basket(void)
 }
 
 
-void PoppupAddKit::on_popupchangeQty_ok()
+void PoppupAddKit::on_popupchangeQtyok()
 {
     Item* p_item = get_item_selected();
-    this->popupChangeQty->get_form_data(p_item);
-    refresh_item_basket();
-
-    //if current item state is added or deleted, it must remain in the same state
-    if ((p_item->getState() == E_STATE_ADDED) || (p_item->getState() == E_STATE_DELETED ))
+    if (this->popupChangeQty->get_form_data(p_item) == true) // If the form was correctly filled
     {
-    }
-    else
-    {
-        // Otherwise it must be marked as edited
-        p_item->setState(E_STATE_EDITED);
-    }
+        refresh_item_basket();
 
-    delete (this->popupChangeQty);
-    this->setEnabled(true);//enable mainWindow
+        //if current item state is added or deleted, it must remain in the same state
+        if ((p_item->getState() == E_STATE_ADDED) || (p_item->getState() == E_STATE_DELETED ))
+        {
+        }
+        else
+        {
+            // Otherwise it must be marked as edited
+            p_item->setState(E_STATE_EDITED);
+        }
+
+        delete (this->popupChangeQty);
+        this->setEnabled(true);//enable mainWindow
+    }
 }
 
-void PoppupAddKit::on_popupchangeQty_destroyed()
+void PoppupAddKit::on_popupchangeQtyDestroyed()
 {
     delete (this->popupChangeQty);
     this->setEnabled(true);//enable mainWindow

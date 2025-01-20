@@ -93,9 +93,9 @@ private slots:
     void on_SORTIE_listWidget_resa_currentResa_itemClicked(QListWidgetItem *item);
     void on_SORTIE_pushButton_sortir_clicked(); // Function called when "Sortir" Button is called inside main window
     void on_SORTIE_listWidget_resa_kitsOfResa_itemClicked(QListWidgetItem *item);
-    void on_SORTIE_popupSortirResa_pushSortir();//Callback called when "Sortir" button is pushed inside popup
-    void on_SORTIE_popupSortirResa_pushAnnuler();
-    void on_SORTIE_popupSortirResa_pushRestituer();//Callback called when "Restituer" button is pushed inside popup
+    void on_SORTIE_popupSortirResaPushSortir();//Callback called when "Sortir" button is pushed inside popup
+    void on_SORTIE_popupSortirResaPushAnnuler();
+    void on_SORTIE_popupSortirResaPushRestituer();//Callback called when "Restituer" button is pushed inside popup
     void on_pushButton_restituerKit_clicked();
     void on_SORTIE_listWidget_kitsOut_itemClicked(QListWidgetItem *item);
     void on_SORTIE_listWidget_kitsOut_itemDoubleClicked(QListWidgetItem *item);
