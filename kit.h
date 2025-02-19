@@ -69,7 +69,7 @@ public:
 
     bool getIs_out() const;
     void setIs_out(bool newIs_out);
-
+    QString getIs_out_str() const;
     bool getIs_in_basket() const;
     void setIs_in_basket(bool newIs_in_basket);
 

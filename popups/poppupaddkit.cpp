@@ -209,7 +209,7 @@ Kit * PoppupAddKit::get_kit_from_form()
         this->kit->setDate_achat(date_formatted);
         this->kit->setPrix_achat(prix_formatted);
         this->kit->setTexte_libre(texte_libre);
-        this->kit->setEn_panne(false);
+        this->kit->setEn_panne(this->ui->checkBox->isChecked());
         this->kit->setCode(code);
         this->kit->setCaution( caution_formatted);
         return this->kit;
@@ -235,6 +235,7 @@ void PoppupAddKit::set_form_from_kit(Kit * p_kit)
     this->ui->lineEdit_kit_name->setText(p_kit->getNom());
     this->ui->textEdit_kit_description->setText(p_kit->getDescription());
     this->ui->textEdit_kit_texte_libre->setText(p_kit->getTexte_libre());
+    this->ui->checkBox->setChecked(p_kit->getEn_panne());
 
     // copies "to_duplicate" to know if it is a kit to duplicate or to modify
     this->kit->setTo_duplicate(p_kit->getTo_duplicate());

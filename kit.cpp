@@ -150,6 +150,18 @@ void Kit::setIs_out(bool newIs_out)
     is_out = newIs_out;
 }
 
+QString Kit::getIs_out_str() const
+{
+    if (is_out == true)
+    {
+        return "Oui";
+    }
+    else
+    {
+        return "Non";
+    }
+}
+
 bool Kit::getIs_in_basket() const
 {
     return is_in_basket;

@@ -63,6 +63,20 @@ void Connect_db::select_logs_by_user(std::vector<Log *> *o_log, Utilisateur *i_u
 
 }
 
+bool Connect_db::get_user_who_has_kit_out(Kit * i_kit, Utilisateur * o_user)
+{
+    QSqlQuery query  = QSqlQuery(this->db);
+    QString exec_string = "select id_user from sortie where id_kit = "+ QString::number(i_kit->getIdKit()) ;
+    bool retVal = false;
+    retVal = runQuery(query, exec_string);
+    while (query.next())
+    {
+        o_user->setId(query.value("id_user").toInt());
+        get_user_by_id(o_user->getId(), o_user);
+    }
+    return retVal;
+}
+
 void Connect_db::insert_log_by_user_and_kit(Kit *i_kit, Utilisateur *i_user, QString i_text)
 {
     QDateTime date = QDateTime::currentDateTime();
@@ -196,7 +210,7 @@ void Connect_db::add_kit (Kit *p_kit)  {
     //add a kit in DB
     QString exec_string = "insert into kit "
                           "( nom, description, date_achat, prix_achat, texte_libre, en_panne, code_kit, caution) "
-                          "values(\""+p_kit->getNom()+"\",\""+p_kit->getDescription()+"\",'"+p_kit->getDate_achat().toString(Qt::ISODateWithMs)+"','"+p_kit->getPrix_achat().getStringValue()+"',\""+p_kit->getTexte_libre()+"\",'0','"+p_kit->getCode()+"','"+p_kit->getCaution().getStringValue()+"')";
+                          "values(\""+p_kit->getNom()+"\",\""+p_kit->getDescription()+"\",'"+p_kit->getDate_achat().toString(Qt::ISODateWithMs)+"','"+p_kit->getPrix_achat().getStringValue()+"',\""+p_kit->getTexte_libre()+"\",'"+QString::number(p_kit->getEn_panne())+"','"+p_kit->getCode()+"','"+p_kit->getCaution().getStringValue()+"')";
 
     runQuery(query, exec_string);
     //Add associated items to DB if no errors
@@ -231,7 +245,7 @@ void Connect_db::update_kit (Kit *i_kit)  {
                               .arg(i_kit->getDate_achat().toString(Qt::ISODateWithMs))
                               .arg(i_kit->getPrix_achat().getStringValue())
                               .arg(i_kit->getTexte_libre())
-                              .arg("0")
+                              .arg(i_kit->getEn_panne())
                               .arg(i_kit->getCode())
                               .arg(i_kit->getCaution().getStringValue())
                               .arg(QString::number(i_kit->getIdKit()));
@@ -246,7 +260,7 @@ void Connect_db::update_kit (Kit *i_kit)  {
                         .arg(i_kit->getDate_achat().toString(Qt::ISODateWithMs))
                         .arg(i_kit->getPrix_achat().getStringValue())
                         .arg(i_kit->getTexte_libre())
-                        .arg("0")
+                        .arg(i_kit->getEn_panne())
                         .arg(i_kit->getCode())
                         .arg(i_kit->getCaution().getStringValue());
         insert_log_by_user_and_kit(i_kit, active_user, "L'utilisateur "+active_user->getUtinfo()+" a mis à jout le Kit '"+i_kit->getNom()+"' avec les données suivantes : "+log_string);

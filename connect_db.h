@@ -58,6 +58,8 @@ public:
     bool get_user_by_utinfo(QString i_utinfo, Utilisateur *o_user);
     bool get_user_by_id(int id, Utilisateur *o_user);
     void select_logs_by_user(std::vector<Log *> *o_log, Utilisateur *i_user, int i_max_lines);
+    bool get_user_who_has_kit_out(Kit * i_kit, Utilisateur * o_user);
+
     //-----------Kit-------------------
     void select_kits_by_code(std::vector<Kit *> *kits, QString code);
     void select_kits_by_name(std::vector<Kit *> *kits, QString code);
@@ -70,6 +72,7 @@ public:
     void populate_item_list_from_query(Kit * kit, QSqlQuery query);
     void set_kit_booked_status(std::vector<Kit*> *i_kits, QDate i_date);
     void select_logs_by_kit(std::vector<Log *> * o_log, Kit * i_kit, int i_max_lines);
+
     //-----------Resa-------------------
     void select_all_active_resa(std::vector<Resa *> *i_resa);
     void select_active_resa_by_user(std::vector<Resa *> *o_resa, uint user_id);

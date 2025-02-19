@@ -88,13 +88,14 @@ MainWindow::MainWindow(QWidget *parent)
     // Init of Kit display table
     header_list.clear();
     ui->GESKIT_tableWidget_kit->setRowCount(0);
-    ui->GESKIT_tableWidget_kit->setColumnCount(6);
+    ui->GESKIT_tableWidget_kit->setColumnCount(7);
     header_list.append("Code");
     header_list.append("Nom");
     header_list.append("Caution");
     header_list.append("Date achat");
     header_list.append("Prix d'achat");
     header_list.append("En Panne?");
+    header_list.append("Sorti?");
     ui->GESKIT_tableWidget_kit->setHorizontalHeaderLabels(header_list);
     ui->GESKIT_tableWidget_kit->setColumnWidth(1, 250);
 
@@ -506,6 +507,10 @@ void MainWindow::activateWidgets(void)
     else
     {
         do_enable = true;
+
+        //Automatically populates geskit and gesuser table if admin connects
+        on_GESKIT_pushButton_getkit_clicked();
+        on_GESUSER_pushButton_getuser_clicked();
     }
     this->ui->TAB_ges_user->setEnabled(do_enable);
     this->ui->TAB_ges_kits->setEnabled(do_enable);
@@ -689,6 +694,7 @@ void MainWindow::GESKIT_enable_geskit_buttons(bool i_enable)
 
 void MainWindow::GESKIT_refresh_kit_list_from_server(std::vector<Kit*> *i_list)
 {
+    std::vector<Sortie *> l_sortie;
     /* clean the kit list and delete objects pointed by element of this list */
     g_utils.clearList(i_list);
     // clear every depending lists
@@ -699,8 +705,22 @@ void MainWindow::GESKIT_refresh_kit_list_from_server(std::vector<Kit*> *i_list)
     this->ui->RESA_listWidget_panierResa->clear();
     this->ui->RESA_listWidget_resa->clear();
     GESKIT_clear_display();
-    //Get every kits on server
+    //Get every kits on server and find if kit is out
     g_connect_db.select_all_kits(i_list);
+    g_connect_db.select_all_active_sortie(&l_sortie);
+
+    for(const auto& sortie_elem : l_sortie)
+    {
+        for(const auto& kit_elem : *i_list)
+        {
+            if (kit_elem->getIdKit() == sortie_elem->getId_kit())
+            {
+                kit_elem->setIs_out(true);
+                break;
+            }
+        }
+    }
+
 }
 
 
@@ -768,36 +788,72 @@ void MainWindow::GESKIT_push_back_new_kit_on_table(Kit* kit, int row)
     QTableWidgetItem* p_widget_item_date;
     QTableWidgetItem* p_widget_item_prix;
     QTableWidgetItem* p_widget_item_etat;
+    QTableWidgetItem* p_widget_isOut;
+    Utilisateur l_user;
+    QBrush brush_out = Qt::red;
+    QBrush brush;
+    // Change line color depending on kit status
+    if (kit->getIs_out() == true)
+    {
+        brush = Qt::gray;
+        //Get user having the kit out informations
+        g_connect_db.get_user_who_has_kit_out(kit, &l_user);
+    }
+    else if (kit->getEn_panne() == true)
+    {
+        brush = Qt::red;
+    }
+    else
+    {
+        brush = Qt::black;
+    }
 
     // Set second item of last row (code)
     p_widget_item_code= new QTableWidgetItem(kit->getCode());
+    p_widget_item_code->setForeground(brush);
     ui->GESKIT_tableWidget_kit->setItem(row-1, column_index, p_widget_item_code);
     column_index ++;
 
     // Set first item of last row (name)
     p_widget_item_nom= new QTableWidgetItem(kit->getNom());
+    p_widget_item_nom->setForeground(brush);
     ui->GESKIT_tableWidget_kit->setItem(row-1, column_index, p_widget_item_nom);
     column_index ++;
 
     // Set third item of last row (caution)
     p_widget_item_caution= new QTableWidgetItem(kit->getCaution().getStringValue());
+    p_widget_item_caution->setForeground(brush);
     ui->GESKIT_tableWidget_kit->setItem(row-1, column_index, p_widget_item_caution);
     column_index ++;
 
     // Set fourth item of last row (date)
     QString date = kit->getDate_achat().toString("dd.MM.yyyy");
     p_widget_item_date= new QTableWidgetItem(date);
+    p_widget_item_date->setForeground(brush);
     ui->GESKIT_tableWidget_kit->setItem(row-1, column_index, p_widget_item_date);
     column_index ++;
 
     // Set fifth item of last row (prix)
     p_widget_item_prix= new QTableWidgetItem(kit->getPrix_achat().getStringValue());
+    p_widget_item_prix->setForeground(brush);
     ui->GESKIT_tableWidget_kit->setItem(row-1, column_index, p_widget_item_prix);
     column_index ++;
 
     // Set sixth item of last row (etat)
     p_widget_item_etat= new QTableWidgetItem(kit->getEn_panne_str());
+    p_widget_item_etat->setForeground(brush);
     ui->GESKIT_tableWidget_kit->setItem(row-1, column_index, p_widget_item_etat);
+    column_index ++;
+
+    // Set seventh item of last row (Is out?)
+    QString str = kit->getIs_out_str();
+    if (kit->getIs_out())
+    {
+        str = str + " ("+l_user.getUtinfo()+")"; //only set utinfo if the kit is out
+    }
+    p_widget_isOut= new QTableWidgetItem( str );
+    p_widget_isOut->setForeground(brush);
+    ui->GESKIT_tableWidget_kit->setItem(row-1, column_index, p_widget_isOut);
     column_index ++;
 }
 
