@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>565</width>
-    <height>418</height>
+    <width>592</width>
+    <height>428</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -147,9 +147,9 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
-         <widget class="QLabel" name="label">
+         <widget class="QLabel" name="label_mdp">
           <property name="text">
-           <string>Mot de passe utilisateur</string>
+           <string>Mot de passe </string>
           </property>
          </widget>
         </item>
@@ -170,6 +170,13 @@
          </widget>
         </item>
        </layout>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox_mdpadmin">
+        <property name="text">
+         <string>Cocher pour forcer la sortie (mdp admin)</string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QFrame" name="frame_2">

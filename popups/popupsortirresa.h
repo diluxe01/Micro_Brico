@@ -24,7 +24,6 @@ public:
 
     QPushButton * getSortirButton();
     QPushButton * getAnnulerButton();
-    void setUser (Utilisateur *newUser);
     bool checkIfOk (void);
     Kit *getP_kit() const;
     void setP_kit(Kit *newP_kit);
@@ -37,15 +36,26 @@ public:
     T_SORTIE_RESTIT getMode() const;
     void setMode(T_SORTIE_RESTIT newMode);
 
+    void setUser (Utilisateur *newUser); // set active user in popup
+
+    Utilisateur *getUser_basic() const;
+    void setUser_basic(Utilisateur *newUser_basic);
+
+    Utilisateur *getUser_admin() const;
+    void setUser_admin(Utilisateur *newUser_admin);
+
 private slots:
     void on_listWidget_popupSortie_ItemSource_itemDoubleClicked(QListWidgetItem *item);
     void on_listWidget_popupSortie_ItemDest_itemDoubleClicked(QListWidgetItem *item);
     void on_listWidget_popupSortie_ItemSource_itemClicked(QListWidgetItem *item);
     void on_pushButton_popupSortie_pushDest_clicked();
+    void on_checkBox_mdpadmin_clicked(bool checked);
 
 private:
     Ui::PopupSortirResa *ui;
-    Utilisateur *user;
+    Utilisateur *user; // Active user in popup
+    Utilisateur *user_basic; // save basic user
+    Utilisateur *user_admin; // save admin user
     QString buttonText;
     Kit *p_kit;
     T_SORTIE_RESTIT mode;

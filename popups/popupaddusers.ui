@@ -31,7 +31,7 @@
        </font>
       </property>
       <property name="text">
-       <string>Ajouter un Nouvel Utilisateur</string>
+       <string>Veuillez renseigner les champs:</string>
       </property>
      </widget>
     </item>

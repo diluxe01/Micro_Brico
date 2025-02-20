@@ -55,7 +55,6 @@ private slots:
     void on_actionAjouter_utilisateur_triggered();
     void on_actionModifier_l_utilisateur_triggered();
 
-
     //-----------Slots GESUSER-------------------
     void on_GESUSER_pushButton_getuser_clicked();
     void on_GESUSER_pushButton_add_user_clicked();
@@ -102,11 +101,6 @@ private slots:
     void on_SORTIE_pushButton_retirer_kit_from_resa_clicked();
     void on_SORTIE_pushButton_endResa_clicked();
     void on_SORTIE_lineEdit_utinfo_returnPressed();
-
-
-
-
-
 
 private:
     Ui::MainWindow *ui;

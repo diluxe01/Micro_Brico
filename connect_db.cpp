@@ -263,7 +263,7 @@ void Connect_db::update_kit (Kit *i_kit)  {
                         .arg(i_kit->getEn_panne())
                         .arg(i_kit->getCode())
                         .arg(i_kit->getCaution().getStringValue());
-        insert_log_by_user_and_kit(i_kit, active_user, "L'utilisateur "+active_user->getUtinfo()+" a mis à jout le Kit '"+i_kit->getNom()+"' avec les données suivantes : "+log_string);
+        insert_log_by_user_and_kit(i_kit, active_user, "L'utilisateur "+active_user->getUtinfo()+" a mis à jour le Kit '"+i_kit->getNom()+"' avec les données suivantes : "+log_string);
 
         // Iterate through i_kit item list and update, create or delete items on dB depending on items state
         for(const auto& elem_item_new : i_kit->item_list)
@@ -503,6 +503,7 @@ bool Connect_db::connect_user(void)
     mdp_db = query.value("mdp").toString();
     //Convert user mdp to sha1
     mdp_user_sha1 = get_sha1_from_Qstring(this->active_user->getMdp());
+    this->active_user->setMdp(mdp_user_sha1);
 
     if (mdp_db == mdp_user_sha1)
     {

@@ -1976,7 +1976,9 @@ void MainWindow::on_SORTIE_pushButton_sortir_clicked()
     Kit * l_kit = SORTIE_get_kitOfResa_selected();
     this->p_popupSortirResa = new (PopupSortirResa);
     this->p_popupSortirResa->setMode(E_MODE_SORTIE);
-    this->p_popupSortirResa->setUser(&this->sortie_user);
+    this->p_popupSortirResa->setUser_basic(&this->sortie_user);
+    this->p_popupSortirResa->setUser_admin(&this->login_user);
+    this->p_popupSortirResa->setUser(&this->sortie_user); //set active user to "sortie_user" by default.
     this->p_popupSortirResa->setP_kit(l_kit);
     this->p_popupSortirResa->refresh_source_item_list();
     this->p_popupSortirResa->setWindowTitle(l_kit->getNom());
@@ -2068,6 +2070,8 @@ void MainWindow::on_pushButton_restituerKit_clicked()
     Kit * l_kit = SORTIE_get_kitOut_selected();
     this->p_popupSortirResa = new (PopupSortirResa);
     this->p_popupSortirResa->setMode(E_MODE_RESTITUTION);
+    this->p_popupSortirResa->setUser_basic(&this->sortie_user);
+    this->p_popupSortirResa->setUser_admin(&this->login_user);
     this->p_popupSortirResa->setUser(&this->sortie_user);
     this->p_popupSortirResa->setP_kit(l_kit);
     this->p_popupSortirResa->refresh_source_item_list();

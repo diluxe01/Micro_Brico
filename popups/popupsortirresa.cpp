@@ -9,6 +9,7 @@ PopupSortirResa::PopupSortirResa(QWidget *parent)
     , ui(new Ui::PopupSortirResa)
 {
     ui->setupUi(this);
+    ui->label_mdp->setText("Mot de passe utilisateur");
 }
 
 PopupSortirResa::~PopupSortirResa()
@@ -45,6 +46,7 @@ QPushButton * PopupSortirResa::getAnnulerButton(void)
 {
     return ui->pushButton_annuler;
 }
+
 void PopupSortirResa::setUser(Utilisateur *newUser)
 {
     user = newUser;
@@ -334,5 +336,41 @@ void PopupSortirResa::setButtonText(const QString &newButtonText)
 {
     buttonText = newButtonText;
     this->ui->pushButton_sortir->setText(buttonText);
+}
+
+
+void PopupSortirResa::on_checkBox_mdpadmin_clicked(bool checked)
+{
+    if (checked)
+    {
+        ui->label_mdp->setText("Mot de passe admin:");
+        this->setUser(this->user_admin);
+    }
+    else
+    {
+
+        ui->label_mdp->setText("Mot de passe utilisateur:");
+        this->setUser(this->user_basic);
+    }
+}
+
+Utilisateur *PopupSortirResa::getUser_admin() const
+{
+    return user_admin;
+}
+
+void PopupSortirResa::setUser_admin(Utilisateur *newUser_admin)
+{
+    user_admin = newUser_admin;
+}
+
+Utilisateur *PopupSortirResa::getUser_basic() const
+{
+    return user_basic;
+}
+
+void PopupSortirResa::setUser_basic(Utilisateur *newUser_basic)
+{
+    user_basic = newUser_basic;
 }
 
