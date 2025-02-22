@@ -1442,27 +1442,37 @@ void MainWindow::RESA_refresh_kit_list_table(void)
     QBrush brush_booked;
     QBrush brush_free;
     QBrush brush_basket;
+    QBrush brush_enpanne;
     // Define brush to display kit free in kit reservation list
     brush_free.setColor(Qt::GlobalColor::blue);
     brush_free.setStyle(Qt::SolidPattern);
     // Define brush to display kit booked in kit reservation list
-    brush_booked.setColor(Qt::GlobalColor::gray);
+    brush_booked.setColor(Qt::GlobalColor::red);
     brush_booked.setStyle(Qt::SolidPattern);
     // Define brush to display kit in basket
     brush_basket.setColor(Qt::GlobalColor::yellow);
     brush_basket.setStyle(Qt::SolidPattern);
+    // Define brush to display kit in basket
+    brush_enpanne.setColor(Qt::GlobalColor::gray);
+    brush_enpanne.setStyle(Qt::SolidPattern);
     this->ui->RESA_listWidget_resa->clear();
     for(const auto& kit_elem : this->kitListResa_view)
     {
         QListWidgetItem* p_item = new QListWidgetItem(kit_elem->toString(), this->ui->RESA_listWidget_resa);
         if(kit_elem->getIs_in_basket())
         {
+            p_item->setText(p_item->text() + " (déjà dans le panier)");
             p_item->setBackground(brush_basket);
         }
         else if (kit_elem->getIs_booked())
         {
             p_item->setText(p_item->text() + " (déjà réservé à cette date)");
             p_item->setBackground(brush_booked);
+        }
+        else if (kit_elem->getEn_panne())
+        {
+            p_item->setText(p_item->text() + " (En panne)");
+            p_item->setBackground(brush_enpanne);
         }
         else
         {
@@ -1476,7 +1486,7 @@ void MainWindow::on_RESA_listWidget_resa_itemDoubleClicked(QListWidgetItem *item
     int row = this->ui->RESA_listWidget_resa->row(item);
     Kit* p_kit = this->kitListResa_view.at(row);
 
-    if (p_kit->getIs_in_basket())
+    if (p_kit->getIs_in_basket() || p_kit->getEn_panne()) // Do not allow to book a kit if Out of order , or already in basket
     {
         //do nothing
     }
@@ -1501,7 +1511,7 @@ void MainWindow::RESA_refresh_basket_kit_list_table(void)
     this->isBasketReadyToBook = true;
 
     // Define brush to display kit booked in kit reservation list
-    brush_booked.setColor(Qt::GlobalColor::gray);
+    brush_booked.setColor(Qt::GlobalColor::red);
     brush_booked.setStyle(Qt::SolidPattern);
     // Define brush to display kit free in kit reservation list
     brush_free.setColor(Qt::GlobalColor::blue);
@@ -1997,8 +2007,9 @@ void MainWindow::on_SORTIE_pushButton_sortir_clicked()
 /////
 void MainWindow::on_SORTIE_popupSortirResaPushSortir()
 {
-
-    if (this->p_popupSortirResa->checkIfOk() == true)
+    bool forced_by_admin;
+    QString optional_text = "None";
+    if (this->p_popupSortirResa->checkIfOk(&forced_by_admin, &optional_text) == true)
     {
         SORTIE_sortir_kit();
         delete(this->p_popupSortirResa);
@@ -2089,10 +2100,11 @@ void MainWindow::on_pushButton_restituerKit_clicked()
 /////
 void MainWindow::on_SORTIE_popupSortirResaPushRestituer()
 {
-
-    if (this->p_popupSortirResa->checkIfOk() == true)
+    bool forced_by_admin;
+    QString optional_text = "None";
+    if (this->p_popupSortirResa->checkIfOk(&forced_by_admin, &optional_text) == true)
     {
-        SORTIE_restit_kit();
+        SORTIE_restit_kit(&forced_by_admin, &optional_text);
         delete(this->p_popupSortirResa);
 
         this->setEnabled(true);//enable mainWindow
@@ -2108,15 +2120,23 @@ void MainWindow::on_SORTIE_popupSortirResaPushRestituer()
 }
 
 
-void MainWindow::SORTIE_restit_kit()
+void MainWindow::SORTIE_restit_kit(bool * i_forced_by_admin, QString *i_optional_text)
 {
     Kit * p_kit = this->p_popupSortirResa->getP_kit();
     Utilisateur l_user;
+    QString None = "None";
     g_connect_db.get_user_by_utinfo(this->ui->SORTIE_lineEdit_utinfo->text(), &l_user);
 
     int sortie_number = g_connect_db.select_sortie_nb_from_kit(p_kit); // get sortie_nb for logs before deactivating sortie
     g_connect_db.insert_log_by_user_and_kit(p_kit,&l_user,"L'utilisateur '"+l_user.getUtinfo()+"' a restitué le kit '"+p_kit->getNom()+"' (code: "+p_kit->getCode()+", n° de sortie: "+QString::number(sortie_number)+")");
-
+    if (*i_forced_by_admin)
+    {
+        g_connect_db.insert_log_by_user_and_kit(p_kit,&l_user,"-----> La restitution du kit a été signée par l'administrateur '"+this->login_user.getUtinfo()+"' (en l'absence de "+l_user.getUtinfo()+").");
+    }
+    if (QString::compare(*i_optional_text, None , Qt::CaseSensitive) != 0) // if an optionnal string has been set by user
+    {
+        g_connect_db.insert_log_by_user_and_kit(p_kit,&l_user,"-----> Message optionnel lié à la restitution: " + *i_optional_text);
+    }
     //Calculate remaining item quantity based on quantity returned and save it to db
     SORTIE_calculate_remaining_quantity(this->p_popupSortirResa->item_list_dest, p_kit->item_list );
     QString log_str = g_connect_db.update_items_quantity_of_kit (p_kit, this->p_popupSortirResa->item_list_dest);

@@ -195,7 +195,7 @@ private:
     void SORTIE_refresh_current_resa_list_table();
     void SORTIE_refresh_kits_of_resa_table(int i_resa_nb);
     void SORTIE_refresh_kitsOut_table();
-    void SORTIE_restit_kit();
+    void SORTIE_restit_kit(bool * i_forced_by_admin, QString *i_optional_text);
     void SORTIE_calculate_remaining_quantity(std::vector<Item *> i_items_returned, std::vector<Item *> i_items_kit );
 
 };

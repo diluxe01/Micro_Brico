@@ -24,7 +24,7 @@ public:
 
     QPushButton * getSortirButton();
     QPushButton * getAnnulerButton();
-    bool checkIfOk (void);
+    bool checkIfOk (bool *o_forced_by_admin, QString *o_optional_text);
     Kit *getP_kit() const;
     void setP_kit(Kit *newP_kit);
     void refresh_source_item_list();

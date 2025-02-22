@@ -54,7 +54,7 @@ void PopupSortirResa::setUser(Utilisateur *newUser)
     this->ui->label_set_user_name->setText(this->user->getEmail());
 }
 
-bool PopupSortirResa::checkIfOk()
+bool PopupSortirResa::checkIfOk(bool * o_forced_by_admin, QString *o_optional_text)
 {
     bool returnValue = true;
 
@@ -71,6 +71,12 @@ bool PopupSortirResa::checkIfOk()
         GEN_raise_popup_warning("Attention, vous n'avez pas vérifié tous les objets du kit.");
         returnValue = false;
     }
+
+    //Get forced by admin checkbox value
+    *o_forced_by_admin = this->ui->checkBox_mdpadmin->isChecked();
+
+    //Get optionnal text
+    *o_optional_text = this->ui->lineEdit_optionnal_text->text();
 
     if (mode == E_MODE_SORTIE)
     {
