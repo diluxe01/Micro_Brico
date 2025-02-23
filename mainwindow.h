@@ -191,7 +191,7 @@ private:
     //-----------Sorties-------------------
     Kit *SORTIE_get_kitOfResa_selected();
     Kit *SORTIE_get_kitOut_selected();
-    void SORTIE_sortir_kit();
+    void SORTIE_sortir_kit(bool * i_forced_by_admin, QString *i_optional_text);
     void SORTIE_refresh_current_resa_list_table();
     void SORTIE_refresh_kits_of_resa_table(int i_resa_nb);
     void SORTIE_refresh_kitsOut_table();

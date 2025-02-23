@@ -2008,10 +2008,10 @@ void MainWindow::on_SORTIE_pushButton_sortir_clicked()
 void MainWindow::on_SORTIE_popupSortirResaPushSortir()
 {
     bool forced_by_admin;
-    QString optional_text = "None";
+    QString optional_text = "";
     if (this->p_popupSortirResa->checkIfOk(&forced_by_admin, &optional_text) == true)
     {
-        SORTIE_sortir_kit();
+        SORTIE_sortir_kit(&forced_by_admin, &optional_text);
         delete(this->p_popupSortirResa);
 
         this->setEnabled(true);//enable mainWindow
@@ -2031,7 +2031,7 @@ void MainWindow::on_SORTIE_popupSortirResaPushSortir()
     }
 }
 
-void MainWindow::SORTIE_sortir_kit()
+void MainWindow::SORTIE_sortir_kit(bool * i_forced_by_admin, QString *i_optional_text)
 {
     int sortie_nb = 0;
     Utilisateur l_user;
@@ -2050,6 +2050,14 @@ void MainWindow::SORTIE_sortir_kit()
         sortie_nb = g_connect_db.guess_next_sortie_nb();
         g_connect_db.add_sortie_from_kit(p_kit, l_user.getId(), start_date, sortie_nb);
         g_connect_db.insert_log_by_user_and_kit(p_kit,&l_user,"L'utilisateur '"+l_user.getUtinfo()+"' a sorti le kit '"+p_kit->getNom()+"' (code: "+p_kit->getCode()+", n° de sortie: "+QString::number(sortie_nb)+")");
+        if (*i_forced_by_admin)
+        {
+            g_connect_db.insert_log_by_user_and_kit(p_kit,&l_user,"-----> La sortie du kit a été signée par l'administrateur '"+this->login_user.getUtinfo()+"' (en l'absence de "+l_user.getUtinfo()+").");
+        }
+        if (i_optional_text->isEmpty() !=  false) // if an optionnal string has been set by user
+        {
+            g_connect_db.insert_log_by_user_and_kit(p_kit,&l_user,"-----> Message optionnel lié à la sortie: " + *i_optional_text);
+        }
         g_connect_db.insert_log_by_user_and_kit(p_kit,&l_user,log_str);
         // End of LOCK
         g_connect_db.end_sortie();
@@ -2101,7 +2109,7 @@ void MainWindow::on_pushButton_restituerKit_clicked()
 void MainWindow::on_SORTIE_popupSortirResaPushRestituer()
 {
     bool forced_by_admin;
-    QString optional_text = "None";
+    QString optional_text = "";
     if (this->p_popupSortirResa->checkIfOk(&forced_by_admin, &optional_text) == true)
     {
         SORTIE_restit_kit(&forced_by_admin, &optional_text);
@@ -2124,7 +2132,6 @@ void MainWindow::SORTIE_restit_kit(bool * i_forced_by_admin, QString *i_optional
 {
     Kit * p_kit = this->p_popupSortirResa->getP_kit();
     Utilisateur l_user;
-    QString None = "None";
     g_connect_db.get_user_by_utinfo(this->ui->SORTIE_lineEdit_utinfo->text(), &l_user);
 
     int sortie_number = g_connect_db.select_sortie_nb_from_kit(p_kit); // get sortie_nb for logs before deactivating sortie
@@ -2133,7 +2140,7 @@ void MainWindow::SORTIE_restit_kit(bool * i_forced_by_admin, QString *i_optional
     {
         g_connect_db.insert_log_by_user_and_kit(p_kit,&l_user,"-----> La restitution du kit a été signée par l'administrateur '"+this->login_user.getUtinfo()+"' (en l'absence de "+l_user.getUtinfo()+").");
     }
-    if (QString::compare(*i_optional_text, None , Qt::CaseSensitive) != 0) // if an optionnal string has been set by user
+    if (i_optional_text->isEmpty() !=  true)
     {
         g_connect_db.insert_log_by_user_and_kit(p_kit,&l_user,"-----> Message optionnel lié à la restitution: " + *i_optional_text);
     }
