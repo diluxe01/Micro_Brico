@@ -119,3 +119,10 @@ CHANGE COLUMN `quantity_init` `quantity_init` SMALLINT UNSIGNED NULL ;
 -- changeset adrie:1716202953457-26 comment: quantity_out is now zero filled
 ALTER TABLE `item` 
 CHANGE COLUMN `quantity_out` `quantity_out` SMALLINT UNSIGNED ZEROFILL NULL DEFAULT NULL ;
+
+-- changeset adrie:1716202953457-27 comment: add new data for users (phone nb, caution, adhesion, date caution)
+ALTER TABLE `utilisateur` 
+ADD COLUMN `telephone` VARCHAR(45) NOT NULL AFTER `privilege`,
+ADD COLUMN `caution` DECIMAL(9,2) NULL AFTER `telephone`,
+ADD COLUMN `adhesion_payed` TINYINT NULL DEFAULT '0' AFTER `caution`,
+ADD COLUMN `date_caution` DATE NULL AFTER `adhesion_payed`;

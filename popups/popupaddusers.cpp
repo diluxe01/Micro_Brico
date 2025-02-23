@@ -6,6 +6,7 @@
 #include <QRegularExpressionMatch>
 #include <QListWidgetItem>
 #include <QMessageBox>
+#include <QDate>
 
 popupAddUsers::popupAddUsers(QWidget *parent)
     : QDialog(parent)
@@ -15,6 +16,7 @@ popupAddUsers::popupAddUsers(QWidget *parent)
     ui->lineEdit_utinfo->setFocus();
     user = new Utilisateur;
     user->setCreate_type(E_new);// By default a user is created
+    ui->dateEdit_dateEdit->setDate(QDate::currentDate());
 }
 
 void popupAddUsers::closeEvent( QCloseEvent* event )
@@ -49,6 +51,7 @@ void popupAddUsers::GEN_raise_popup_warning(QString msg)
 Utilisateur* popupAddUsers::get_user_from_form(void)
 {
     T_user_privilege privilege = E_basic;
+    QString phone_nb = "";
 
     QStringList error_string_list;
     bool ok_to_create_user = true;
@@ -96,6 +99,31 @@ Utilisateur* popupAddUsers::get_user_from_form(void)
         ok_to_create_user = false;
     }
 
+    //-----------Verifie la caution -----------
+    if (caution_formatted.setValue(ui->lineEdit_montant_cheque_caution->text()) == false)
+    {
+        error_string_list.append("Erreur dans le format de la caution: Doit avoir le format: xxxx,yy");
+        ok_to_create_user = false;
+    }
+
+    //-----------Verifie le numero mobile  -----------
+    QRegularExpression re("^(?:(?:\\+33|0)[1-9])(?:[ \\-]?\\d{2}){4}$");
+    QString toto = ui->lineEdit_tel_mobile->text();
+    QRegularExpressionMatch match = re.match(toto);
+    if (match.hasMatch()) {
+        phone_nb = match.captured(0);
+        phone_nb.replace(" ", "");
+        phone_nb.replace(".", "");
+        phone_nb.replace("-", "");
+    }
+    else
+    {
+        ok_to_create_user = false;
+        error_string_list.append("Erreur dans le format du numéro de tel : Doit avoir le format: 06 12 34 45 78");
+    }
+
+
+
     // If in edit mode, do not change password, unless the linedit has been changed
     if (this->user->getCreate_type() == E_modify)
     {
@@ -115,7 +143,11 @@ Utilisateur* popupAddUsers::get_user_from_form(void)
                                 ui->lineEdit_Prenom->text(),
                                 ui->lineEditMail->text(),
                                 ui->lineEdit_utinfo->text(),
-                                privilege
+                                privilege,
+                                phone_nb,
+                                ui->dateEdit_dateEdit->date(),
+                                ui->checkBox_adhesion->isChecked(),
+                                caution_formatted
                                 );
 
         return this->user;
@@ -148,6 +180,11 @@ void popupAddUsers::set_form_from_user(Utilisateur * p_user)
     {
         this->ui->comboBox_privilege->setCurrentIndex(0);
     }
+    this->ui->lineEdit_tel_mobile->setText(p_user->getTelephone());
+    this->ui->lineEdit_montant_cheque_caution->setText(p_user->getCaution().getStringValue());
+    this->ui->checkBox_adhesion->setChecked(p_user->getAdhesion_payed());
+    this->ui->dateEdit_dateEdit->setDate(p_user->getDate_caution());
+
     this->user->setId(p_user->getId());
     this->user->setCreate_type(p_user->getCreate_type());
     this->user->setMdp(p_user->getMdp());

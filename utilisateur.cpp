@@ -12,7 +12,8 @@ Utilisateur::Utilisateur(void ) {
     this->is_logged_on = false;
     this->create_type = E_new;
 }
-Utilisateur::Utilisateur( QString nom, QString mdp, QString prenom, QString email, QString utinfo)
+
+Utilisateur::Utilisateur(QString nom, QString mdp, QString prenom, QString email, QString utinfo, QString telephone, QDate date_caution, bool adhesion_payed, Money caution)
 {
     this->nom = nom;
     this->mdp = mdp;
@@ -21,16 +22,28 @@ Utilisateur::Utilisateur( QString nom, QString mdp, QString prenom, QString emai
     this->utinfo = utinfo;
     this->is_logged_on = false;
     this->create_type = E_new;
+    this->telephone = telephone;
+    this->date_caution = date_caution;
+    this->adhesion_payed = adhesion_payed;
+    this->caution = caution;
+
 }
 
-void Utilisateur::setUserData( QString nom,  QString prenom, QString email, QString utinfo, T_user_privilege newPrivilege)
+
+void Utilisateur::setUserData(QString nom, QString prenom, QString email, QString utinfo, T_user_privilege newPrivilege, QString telephone, QDate date_caution, bool adhesion_payed, Money caution)
 {
     this->nom = nom;
     this->prenom = prenom;
     this->email = email;
     this->utinfo = utinfo;
     this->privilege = newPrivilege;
+    this->telephone = telephone;
+    this->date_caution = date_caution;
+    this->adhesion_payed = adhesion_payed;
+    this->caution = caution;
+
 }
+
 
 QString Utilisateur::getNom(void)
 {
@@ -132,6 +145,46 @@ void Utilisateur::setCreate_type(T_modify_or_new newCreate_type)
     create_type = newCreate_type;
 }
 
+QString Utilisateur::getTelephone() const
+{
+    return telephone;
+}
+
+void Utilisateur::setTelephone(const QString &newTelephone)
+{
+    telephone = newTelephone;
+}
+
+QDate Utilisateur::getDate_caution() const
+{
+    return date_caution;
+}
+
+void Utilisateur::setDate_caution(const QDate &newDate_caution)
+{
+    date_caution = newDate_caution;
+}
+
+bool Utilisateur::getAdhesion_payed() const
+{
+    return adhesion_payed;
+}
+
+void Utilisateur::setAdhesion_payed(bool newAdhesion_payed)
+{
+    adhesion_payed = newAdhesion_payed;
+}
+
+Money Utilisateur::getCaution() const
+{
+    return caution;
+}
+
+void Utilisateur::setCaution(const Money &newCaution)
+{
+    caution = newCaution;
+}
+
 
 QString Utilisateur::ToString() {
 
@@ -145,3 +198,4 @@ QString Utilisateur::ToString() {
                     ;
     return ret;
 }
+

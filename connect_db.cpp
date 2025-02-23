@@ -150,8 +150,8 @@ bool Connect_db::add_user (Utilisateur *user)  {
     }
 
     return runQuery(query, "insert into utilisateur "
-               "( nom, mdp, prenom, email, token, utinfo, privilege)"
-               " values('"+user->getNom()+"','"+user->getMdp()+"','"+user->getPrenom()+"','"+user->getEmail()+"','"+user->getToken()+"','"+user->getUtinfo()+"','"+l_privilege+"')");
+               "( nom, mdp, prenom, email, token, utinfo, privilege,  telephone, caution, adhesion_payed, date_caution)"
+               " values('"+user->getNom()+"','"+user->getMdp()+"','"+user->getPrenom()+"','"+user->getEmail()+"','"+user->getToken()+"','"+user->getUtinfo()+"','"+l_privilege+"','"+user->getTelephone()+"','"+user->getCaution().getStringValue()+"','"+QString::number(user->getAdhesion_payed())+"','"+user->getDate_caution().toString(Qt::ISODateWithMs)+"')");
 }
 ///
 /// \brief Connect_db::update_user
@@ -171,7 +171,7 @@ bool Connect_db::update_user (Utilisateur *i_user)  {
     }
 
 
-    QString exec_string = "update utilisateur set  nom = \"%1\" ,  mdp = \"%2\", prenom = \"%3\",  email = \"%4\", utinfo = \"%5\",privilege = \"%6\" where id = %7";
+    QString exec_string = "update utilisateur set  nom = \"%1\" ,  mdp = \"%2\", prenom = \"%3\",  email = \"%4\", utinfo = \"%5\",privilege = \"%6\", telephone = \"%7\", caution = \"%8\", adhesion_payed = \"%9\", date_caution = \"%10\" where id = %11";
 
     exec_string = exec_string .arg(i_user->getNom())
                               .arg(i_user->getMdp())
@@ -179,6 +179,10 @@ bool Connect_db::update_user (Utilisateur *i_user)  {
                               .arg(i_user->getEmail())
                               .arg(i_user->getUtinfo())
                               .arg(l_privilege)
+                              .arg(i_user->getTelephone())
+                              .arg(i_user->getCaution().getStringValue())
+                              .arg(i_user->getAdhesion_payed())
+                              .arg(i_user->getDate_caution().toString(Qt::ISODateWithMs))
                               .arg(i_user->getId());
 
     return runQuery(query, exec_string);
@@ -548,7 +552,7 @@ void Connect_db::update_user_infos_from_db(Utilisateur *login_user)
 void  Connect_db::select_all_users (std::vector<Utilisateur*> *list)
 {
     QSqlQuery query2 = QSqlQuery(this->db);
-    runQuery(query2, "SELECT id, nom, mdp, prenom, email, utinfo, token, privilege from utilisateur");
+    runQuery(query2, "SELECT id, nom, mdp, prenom, email, utinfo, token, telephone,  privilege, date_caution, adhesion_payed, caution from utilisateur");
     while (query2.next())
     {
         QString nom = query2.value("nom").toString();
@@ -558,11 +562,15 @@ void  Connect_db::select_all_users (std::vector<Utilisateur*> *list)
         QString utinfo = query2.value("utinfo").toString();
         QString token = query2.value("token").toString();
         QString privilege_str = query2.value("privilege").toString();
+        QString telephone = query2.value("telephone").toString();
+        QDate date_caution = query2.value("date_caution").toDate();
+        bool adhesion_payed = query2.value("adhesion_payed").toBool();
+        QString caution = query2.value("caution").toString();
 
 
         int id = query2.value("id").toInt();
 
-        Utilisateur * u = new Utilisateur(nom, mdp,prenom, email, utinfo );
+        Utilisateur * u = new Utilisateur(nom, mdp, prenom, email, utinfo, telephone, date_caution, adhesion_payed, caution );//QString telephone, QDate date_caution, bool adhesion_payed, Money caution
         u->setId(id);
         u->setToken(token);
         if (privilege_str == "admin")

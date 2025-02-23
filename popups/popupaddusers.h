@@ -5,6 +5,7 @@
 #include <qabstractbutton.h>
 #include <QDialogButtonBox>
 #include "../utilisateur.h"
+#include "../money.h"
 
 namespace Ui {
 class popupAddUsers;
@@ -31,6 +32,7 @@ private:
     Ui::popupAddUsers *ui;
     Utilisateur *user;
     T_user_privilege caller_privilege;
+    Money caution_formatted;
     void GEN_raise_popup_warning(QString msg);
 signals:
     void delete_popup(void);
