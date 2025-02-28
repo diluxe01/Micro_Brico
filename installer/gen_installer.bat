@@ -1,8 +1,8 @@
 REM @echo off
 REM Espace utilisateur a remplir avant chaque generation d'installeur
 REM ------------------------------------------------------
-set version=1.0.1
-set date=2024-12-04
+set version=1.0.3
+set date=2025-02-28
 
 REM ------------------------------------------------------
 
