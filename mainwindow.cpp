@@ -16,7 +16,7 @@
 
 
 #define DAY_OF_RESA 5
-static QString VERSION = "1.0.2";
+static QString VERSION = "1.0.3";
 
 QPointer<LogBrowser> logBrowser;
 
@@ -123,10 +123,9 @@ MainWindow::MainWindow(QWidget *parent)
     // Disable menu items that should not be activable if no user is connected
     this->ui->actionEffacer_les_reservations_pass_es->setEnabled(false);
 
-
+    this->p_loginConnect = new (Login_connect);
     #ifndef NDEBUG //DEBUG compilation
     // Connection automatique avec l'utilisateur "admin" à chaque démarrage
-    this->p_loginConnect = new (Login_connect);
     this->login_user.setUtinfo("admin");
     this->login_user.setMdp("admin");
     this-> on_popupLogin_ok();
