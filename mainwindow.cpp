@@ -500,12 +500,26 @@ void MainWindow::activateWidgets(void)
     bool do_enable = false;
     if (login_user.getPrivilege() == E_basic)
     {
-        do_enable = false;
         this->ui->tabwidget->setCurrentIndex(2);//By default, when user connects, open on the reservation page
+
+        //Do not let user book items if adhesion was not payed
+        if (login_user.getAdhesion_payed() == false)
+        {
+            this->ui->TAB_RESA->setEnabled(false);
+
+            GEN_raise_popup_info("Attention, vous n'avez pas réglé votre adhésion cette année, vous ne pouvez donc pas réserver de matériel. Veuillez demander à un bénévol la marche à suivre.");
+        }
+        else
+        {
+            this->ui->TAB_RESA->setEnabled(true);
+        }
+
+        do_enable = false;
     }
     else
     {
         do_enable = true;
+        this->ui->TAB_RESA->setEnabled(true);// always enable reservation tab when admin is connected
 
         //Automatically populates geskit and gesuser table if admin connects
         on_GESKIT_pushButton_getkit_clicked();

@@ -533,7 +533,7 @@ bool Connect_db::connect_user(void)
 void Connect_db::update_user_infos_from_db(Utilisateur *login_user)
 {
     QSqlQuery query  = QSqlQuery(this->db);
-    runQuery(query, "SELECT id, nom, prenom, email, privilege from utilisateur where utinfo = '"+login_user->getUtinfo()+"'");
+    runQuery(query, "SELECT id, nom, mdp, prenom, email, utinfo, token, telephone,  privilege, date_caution, adhesion_payed, caution from utilisateur where utinfo = '"+login_user->getUtinfo()+"'");
     query.first();
     login_user->setNom(query.value("nom").toString());
     login_user->setPrenom(query.value("prenom").toString());
@@ -547,6 +547,13 @@ void Connect_db::update_user_infos_from_db(Utilisateur *login_user)
     {
         login_user->setPrivilege(E_basic);
     }
+
+    login_user->setUtinfo(query.value("utinfo").toString());
+    login_user->setToken(query.value("token").toString());
+    login_user->setTelephone(query.value("telephone").toString());
+    login_user->setDate_caution(query.value("date_caution").toDate());
+    login_user->setAdhesion_payed(query.value("adhesion_payed").toBool());
+    login_user->setCaution(query.value("caution").toString());
 }
 
 void  Connect_db::select_all_users (std::vector<Utilisateur*> *list)

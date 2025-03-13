@@ -422,6 +422,13 @@
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_17">
              <item>
+              <widget class="QLabel" name="label_5">
+               <property name="text">
+                <string>Qui réserve? (Utinfo)</string>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QLineEdit" name="RESA_lineEdit_resa_utinfo_user">
                <property name="text">
                 <string/>
