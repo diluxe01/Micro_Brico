@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>login_connect</class>
  <widget class="QDialog" name="login_connect">
+  <property name="windowModality">
+   <enum>Qt::WindowModality::ApplicationModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>

@@ -579,12 +579,20 @@
             </widget>
            </item>
            <item>
-            <widget class="QCalendarWidget" name="RESA_calendarWidget"/>
+            <widget class="QCalendarWidget" name="RESA_calendarWidget">
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>300</height>
+              </size>
+             </property>
+            </widget>
            </item>
            <item>
             <widget class="QPushButton" name="RESA_pushButton_reserver">
              <property name="font">
               <font>
+               <family>Segoe UI</family>
                <bold>true</bold>
                <underline>true</underline>
               </font>
