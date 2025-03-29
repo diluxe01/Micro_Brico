@@ -721,7 +721,7 @@ void  Connect_db::set_kit_booked_status (std::vector<Kit*> *i_kits, QDate i_date
 void  Connect_db::select_all_active_resa (std::vector<Resa *> *i_resa)
 {
     QSqlQuery query(this->db);
-    runQuery(query, "SELECT * from resa where is_active = 1");
+    runQuery(query, "SELECT * from resa where is_active = 1 order by start_date DESC ");
 
     populate_resa_list_from_query(i_resa, std::move(query));
 }
@@ -736,7 +736,7 @@ void Connect_db::select_active_resa_by_user(std::vector<Resa *> *o_resa, uint us
 {
 
     QSqlQuery query(this->db);
-    runQuery(query, "SELECT * from resa WHERE id_user="+QString::number(user_id) + " AND is_active = 1");
+    runQuery(query, "SELECT * from resa WHERE id_user="+QString::number(user_id) + " AND is_active = 1 order by start_date DESC ");
 
     populate_resa_list_from_query(o_resa, std::move(query));
 }

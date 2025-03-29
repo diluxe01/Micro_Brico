@@ -1827,9 +1827,17 @@ void MainWindow::on_SORTIE_pushButton_resa_showResa_clicked()
         }
         else
         {
-
             this->statusBar()->showMessage("GESTION SORTIE: L'UTINFO fournie est inconnue");
         }
+    }
+    else
+    {
+        // Updates resa list
+        g_connect_db.select_all_active_resa(&this->resaListSortie_byUser);
+        SORTIE_refresh_current_resa_list_table();
+        g_connect_db.select_all_active_sortie(&this->sortieList_byUser);
+        SORTIE_refresh_kitsOut_table();
+        this->statusBar()->showMessage("GESTION SORTIE: Sortie/Retour pour tous les utilisateurs");
     }
 
 }
